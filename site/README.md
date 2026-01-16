@@ -1,0 +1,41 @@
+# Products Catalog - React Frontend
+
+A React web application for browsing and filtering products from the products API.
+
+## Features
+
+- Select multiple categories to filter products
+- View all product details including:
+  - Name, description, and price
+  - Barcode number and type (GTIN/PLU)
+  - Primary, secondary, and tertiary categories
+  - Ingredients list
+  - Product images
+
+## Setup
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Make sure the Flask backend server is running on `http://localhost:6000`
+
+3. Start the development server:
+```bash
+npm run dev
+```
+
+The React app will start on `http://localhost:3000`
+
+## Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+
+## Tech Stack
+
+- React 18
+- Vite (build tool)
+- CSS for styling
