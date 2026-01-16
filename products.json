@@ -8,7 +8,7 @@
     "price": 4.99,
     "image_url": "https://example.com/images/milk.jpg",
     "primary_category": "Dairy",
-    "secondary_category": "Beverages",
+    "secondary_category": "Milk",
     "tertiary_category": null
   },
   {
@@ -19,9 +19,9 @@
     "ingredients": ["Organic bananas"],
     "price": 2.49,
     "image_url": "https://example.com/images/bananas.jpg",
-    "primary_category": "Fruits",
-    "secondary_category": "Organic",
-    "tertiary_category": "Tropical"
+    "primary_category": "Produce",
+    "secondary_category": "Fresh Fruit",
+    "tertiary_category": "Bananas"
   },
   {
     "barcode": "0123456789013",
@@ -31,7 +31,7 @@
     "ingredients": ["Whole wheat flour", "Water", "Yeast", "Salt", "Honey"],
     "price": 3.99,
     "image_url": "https://example.com/images/bread.jpg",
-    "primary_category": "Bakery",
+    "primary_category": "Dry Goods",
     "secondary_category": "Bread",
     "tertiary_category": "Whole Grain"
   },
@@ -55,9 +55,9 @@
     "ingredients": ["Organic apples"],
     "price": 3.99,
     "image_url": "https://example.com/images/apples.jpg",
-    "primary_category": "Fruits",
-    "secondary_category": "Organic",
-    "tertiary_category": null
+    "primary_category": "Produce",
+    "secondary_category": "Fresh Fruit",
+    "tertiary_category": "Apples"
   },
   {
     "barcode": "0123456789015",
@@ -69,7 +69,7 @@
     "image_url": "https://example.com/images/chicken.jpg",
     "primary_category": "Meat",
     "secondary_category": "Poultry",
-    "tertiary_category": null
+    "tertiary_category": "Chicken"
   },
   {
     "barcode": "0123456789016",
@@ -81,7 +81,7 @@
     "image_url": "https://example.com/images/salmon.jpg",
     "primary_category": "Seafood",
     "secondary_category": "Fish",
-    "tertiary_category": null
+    "tertiary_category": "Salmon"
   },
   {
     "barcode": "4225",
@@ -91,9 +91,9 @@
     "ingredients": ["Organic carrots"],
     "price": 2.99,
     "image_url": "https://example.com/images/carrots.jpg",
-    "primary_category": "Vegetables",
-    "secondary_category": "Organic",
-    "tertiary_category": "Root Vegetables"
+    "primary_category": "Produce",
+    "secondary_category": "Fresh Vegetables",
+    "tertiary_category": "Carrots"
   },
   {
     "barcode": "0123456789017",
@@ -115,9 +115,9 @@
     "ingredients": ["Organic spinach"],
     "price": 3.49,
     "image_url": "https://example.com/images/spinach.jpg",
-    "primary_category": "Vegetables",
-    "secondary_category": "Organic",
-    "tertiary_category": "Leafy Greens"
+    "primary_category": "Produce",
+    "secondary_category": "Fresh Vegetables",
+    "tertiary_category": "Spinach"
   },
   {
     "barcode": "0123456789019",
@@ -151,9 +151,9 @@
     "ingredients": ["Tomatoes"],
     "price": 3.29,
     "image_url": "https://example.com/images/tomatoes.jpg",
-    "primary_category": "Vegetables",
-    "secondary_category": "Fresh",
-    "tertiary_category": null
+    "primary_category": "Produce",
+    "secondary_category": "Fresh Vegetables",
+    "tertiary_category": "Tomatoes"
   },
   {
     "barcode": "0123456789022",
@@ -175,8 +175,8 @@
     "ingredients": ["Durum wheat semolina", "Water"],
     "price": 2.99,
     "image_url": "https://example.com/images/pasta.jpg",
-    "primary_category": "Pantry",
-    "secondary_category": "Grains",
+    "primary_category": "Dry Goods",
+    "secondary_category": "Pasta",
     "tertiary_category": null
   },
   {
@@ -187,7 +187,7 @@
     "ingredients": ["Olive oil"],
     "price": 9.99,
     "image_url": "https://example.com/images/olive-oil.jpg",
-    "primary_category": "Pantry",
+    "primary_category": "Dry Goods",
     "secondary_category": "Oils",
     "tertiary_category": null
   },
@@ -199,9 +199,9 @@
     "ingredients": ["Organic strawberries"],
     "price": 5.99,
     "image_url": "https://example.com/images/strawberries.jpg",
-    "primary_category": "Fruits",
-    "secondary_category": "Organic",
-    "tertiary_category": "Berries"
+    "primary_category": "Produce",
+    "secondary_category": "Fresh Fruit",
+    "tertiary_category": "Strawberries"
   },
   {
     "barcode": "0123456789026",
@@ -211,9 +211,9 @@
     "ingredients": ["Organic broccoli"],
     "price": 3.79,
     "image_url": "https://example.com/images/broccoli.jpg",
-    "primary_category": "Vegetables",
-    "secondary_category": "Organic",
-    "tertiary_category": "Cruciferous"
+    "primary_category": "Produce",
+    "secondary_category": "Fresh Vegetables",
+    "tertiary_category": "Broccoli"
   },
   {
     "barcode": "0123456789027",
@@ -223,8 +223,8 @@
     "ingredients": ["White rice"],
     "price": 3.49,
     "image_url": "https://example.com/images/rice.jpg",
-    "primary_category": "Pantry",
-    "secondary_category": "Grains",
+    "primary_category": "Dry Goods",
+    "secondary_category": "Cereal",
     "tertiary_category": null
   },
   {
@@ -247,8 +247,8 @@
     "ingredients": ["Onions"],
     "price": 2.99,
     "image_url": "https://example.com/images/onions.jpg",
-    "primary_category": "Vegetables",
-    "secondary_category": "Fresh",
-    "tertiary_category": "Alliums"
+    "primary_category": "Produce",
+    "secondary_category": "Fresh Vegetables",
+    "tertiary_category": "Onions"
   }
 ]

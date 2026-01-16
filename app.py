@@ -23,26 +23,29 @@ def load_products():
 def get_products():
     """
     GET endpoint to retrieve products.
-    Supports optional 'category' query parameter for filtering.
+    Supports optional 'category' query parameters for filtering (can specify multiple).
     
     Query parameters:
-        category (optional): Filter products by primary, secondary, or tertiary category
+        category (optional, can be multiple): Filter products by primary, secondary, or tertiary category.
+                                            Products matching any of the specified categories will be returned.
+                                            Example: ?category=dairy&category=beverages
     
     Returns:
         JSON response with list of products
     """
     products = load_products()
     
-    # Get category filter from query parameters
-    category = request.args.get('category')
+    # Get all category filters from query parameters (supports multiple)
+    categories = request.args.getlist('category')
     
-    if category:
-        # Filter products by category (check primary, secondary, and tertiary)
+    if categories:
+        # Filter products by categories (check primary, secondary, and tertiary)
+        # A product matches if any of its categories match any of the requested categories
         filtered_products = [
             product for product in products
-            if (product.get('primary_category') == category or
-                product.get('secondary_category') == category or
-                product.get('tertiary_category') == category)
+            if (product.get('primary_category') in categories or
+                product.get('secondary_category') in categories or
+                product.get('tertiary_category') in categories)
         ]
         return jsonify(filtered_products)
     

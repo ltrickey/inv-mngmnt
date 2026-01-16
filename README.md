@@ -25,7 +25,7 @@ The server will start on `http://localhost:5000`
 Returns a list of products. Supports optional category filtering.
 
 **Query Parameters:**
-- `category` (optional): Filter products by category. Matches primary, secondary, or tertiary category.
+- `category` (optional, can specify multiple): Filter products by category. Matches primary, secondary, or tertiary category. Products matching any of the specified categories will be returned.
 
 **Examples:**
 
@@ -34,11 +34,17 @@ Get all products:
 curl http://localhost:5000/products
 ```
 
-Get products by category:
+Get products by single category:
 ```bash
 curl http://localhost:5000/products?category=Dairy
 curl http://localhost:5000/products?category=Fruits
 curl http://localhost:5000/products?category=Organic
+```
+
+Get products by multiple categories:
+```bash
+curl http://localhost:5000/products?category=dairy&category=beverages
+curl http://localhost:5000/products?category=Fruits&category=Vegetables
 ```
 
 **Response Format:**
