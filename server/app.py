@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 import json
 import os
@@ -6,15 +6,69 @@ import os
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
+# Serve static images from infrastructure/images directory for local development
+@app.route('/images/<path:filename>')
+def serve_image(filename):
+    """Serve images from infrastructure/images directory for local testing."""
+    return send_from_directory(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'infrastructure', 'images'), filename)
+
 # Path to the products JSON file
 PRODUCTS_FILE = 'products.json'
 
+# S3 configuration (optional - if not set, uses local images)
+S3_BUCKET_URL = os.environ.get('S3_BUCKET_URL', None)
+
+
+def get_image_url(image_path):
+    """
+    Get the full image URL based on environment configuration.
+    
+    If S3_BUCKET_URL is set, prepends it to the image path for S3 storage.
+    Otherwise, returns a Flask-served URL for local testing.
+    
+    Args:
+        image_path: Relative path to the image (e.g., 'infrastructure/images/product.jpg')
+    
+    Returns:
+        Full URL string for the image
+    """
+    if S3_BUCKET_URL:
+        # Production: Use S3 bucket URL
+        # Remove 'infrastructure/' prefix if present, S3 should have direct paths
+        s3_path = image_path.replace('infrastructure/', '') if image_path.startswith('infrastructure/') else image_path
+        return f"{S3_BUCKET_URL.rstrip('/')}/{s3_path}"
+    else:
+        # Local development: Use Flask static file serving
+        # Convert 'infrastructure/images/...' to '/images/...'
+        if image_path.startswith('infrastructure/images/'):
+            return image_path.replace('infrastructure/images/', '/images/')
+        elif image_path.startswith('infrastructure/'):
+            return image_path.replace('infrastructure/', '/')
+        else:
+            # If it's already a full URL (http/https), return as-is
+            if image_path.startswith(('http://', 'https://')):
+                return image_path
+            # Otherwise, assume it's a local path and prepend /images/
+            return f"/images/{image_path}"
+
 
 def load_products():
-    """Load products from the JSON file."""
+    """
+    Load products from the JSON file and resolve image URLs.
+    Image URLs are resolved based on S3_BUCKET_URL environment variable.
+    If S3_BUCKET_URL is set, images are fetched from S3.
+    Otherwise, images are served from local infrastructure/images directory.
+    """
     try:
         with open(PRODUCTS_FILE, 'r') as f:
-            return json.load(f)
+            products = json.load(f)
+        
+        # Transform image URLs based on environment (S3 or local)
+        for product in products:
+            if 'image_url' in product:
+                product['image_url'] = get_image_url(product['image_url'])
+        
+        return products
     except FileNotFoundError:
         return []
     except json.JSONDecodeError:

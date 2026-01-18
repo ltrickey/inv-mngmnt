@@ -6,7 +6,7 @@
     "description": "Fresh, organic whole milk from grass-fed cows",
     "ingredients": ["Organic whole milk"],
     "price": 4.99,
-    "image_url": "https://example.com/images/milk.jpg",
+    "image_url": "infrastructure/images/0123456789012-organic-whole-milk.jpg",
     "primary_category": "Dairy",
     "secondary_category": "Milk",
     "tertiary_category": null
@@ -18,7 +18,7 @@
     "description": "Fresh organic bananas, perfect for snacking",
     "ingredients": ["Organic bananas"],
     "price": 2.49,
-    "image_url": "https://example.com/images/bananas.jpg",
+    "image_url": "infrastructure/images/4011-organic-bananas.jpg",
     "primary_category": "Produce",
     "secondary_category": "Fresh Fruit",
     "tertiary_category": "Bananas"
@@ -30,7 +30,7 @@
     "description": "Fresh baked whole wheat bread with no preservatives",
     "ingredients": ["Whole wheat flour", "Water", "Yeast", "Salt", "Honey"],
     "price": 3.99,
-    "image_url": "https://example.com/images/bread.jpg",
+    "image_url": "infrastructure/images/0123456789013-whole-wheat-bread.jpg",
     "primary_category": "Dry Goods",
     "secondary_category": "Bread",
     "tertiary_category": "Whole Grain"
@@ -42,7 +42,7 @@
     "description": "Creamy Greek yogurt with live cultures",
     "ingredients": ["Pasteurized milk", "Live active cultures"],
     "price": 5.49,
-    "image_url": "https://example.com/images/yogurt.jpg",
+    "image_url": "infrastructure/images/0123456789014-greek-yogurt.jpg",
     "primary_category": "Dairy",
     "secondary_category": "Yogurt",
     "tertiary_category": null
@@ -54,7 +54,7 @@
     "description": "Crisp organic apples, perfect for eating fresh",
     "ingredients": ["Organic apples"],
     "price": 3.99,
-    "image_url": "https://example.com/images/apples.jpg",
+    "image_url": "infrastructure/images/4080-organic-apples.jpg",
     "primary_category": "Produce",
     "secondary_category": "Fresh Fruit",
     "tertiary_category": "Apples"
@@ -66,7 +66,7 @@
     "description": "Fresh, boneless, skinless chicken breast",
     "ingredients": ["Chicken breast"],
     "price": 8.99,
-    "image_url": "https://example.com/images/chicken.jpg",
+    "image_url": "infrastructure/images/0123456789015-chicken-breast.jpg",
     "primary_category": "Meat",
     "secondary_category": "Poultry",
     "tertiary_category": "Chicken"
@@ -78,7 +78,7 @@
     "description": "Fresh Atlantic salmon fillet, wild-caught",
     "ingredients": ["Salmon"],
     "price": 12.99,
-    "image_url": "https://example.com/images/salmon.jpg",
+    "image_url": "infrastructure/images/0123456789016-salmon-fillet.jpg",
     "primary_category": "Seafood",
     "secondary_category": "Fish",
     "tertiary_category": "Salmon"
@@ -90,7 +90,7 @@
     "description": "Fresh organic carrots, great for cooking or snacking",
     "ingredients": ["Organic carrots"],
     "price": 2.99,
-    "image_url": "https://example.com/images/carrots.jpg",
+    "image_url": "infrastructure/images/4225-organic-carrots.jpg",
     "primary_category": "Produce",
     "secondary_category": "Fresh Vegetables",
     "tertiary_category": "Carrots"
@@ -102,7 +102,7 @@
     "description": "Sharp cheddar cheese, aged 12 months",
     "ingredients": ["Pasteurized milk", "Cheese cultures", "Salt", "Enzymes"],
     "price": 6.99,
-    "image_url": "https://example.com/images/cheese.jpg",
+    "image_url": "infrastructure/images/0123456789017-cheddar-cheese.jpg",
     "primary_category": "Dairy",
     "secondary_category": "Cheese",
     "tertiary_category": null
@@ -114,7 +114,7 @@
     "description": "Fresh organic baby spinach leaves",
     "ingredients": ["Organic spinach"],
     "price": 3.49,
-    "image_url": "https://example.com/images/spinach.jpg",
+    "image_url": "infrastructure/images/0123456789018-organic-spinach.jpg",
     "primary_category": "Produce",
     "secondary_category": "Fresh Vegetables",
     "tertiary_category": "Spinach"
@@ -126,7 +126,7 @@
     "description": "Fresh squeezed orange juice, no added sugar",
     "ingredients": ["Orange juice"],
     "price": 4.49,
-    "image_url": "https://example.com/images/orange-juice.jpg",
+    "image_url": "infrastructure/images/0123456789019-orange-juice.jpg",
     "primary_category": "Beverages",
     "secondary_category": "Juice",
     "tertiary_category": null
@@ -138,7 +138,7 @@
     "description": "Fresh ground beef, 80/20 lean",
     "ingredients": ["Ground beef"],
     "price": 7.99,
-    "image_url": "https://example.com/images/ground-beef.jpg",
+    "image_url": "infrastructure/images/0123456789020-ground-beef.jpg",
     "primary_category": "Meat",
     "secondary_category": "Beef",
     "tertiary_category": null
@@ -150,7 +150,7 @@
     "description": "Fresh vine-ripened tomatoes",
     "ingredients": ["Tomatoes"],
     "price": 3.29,
-    "image_url": "https://example.com/images/tomatoes.jpg",
+    "image_url": "infrastructure/images/0123456789021-tomatoes.jpg",
     "primary_category": "Produce",
     "secondary_category": "Fresh Vegetables",
     "tertiary_category": "Tomatoes"
@@ -162,7 +162,7 @@
     "description": "Large free-range eggs, 12 count",
     "ingredients": ["Eggs"],
     "price": 4.99,
-    "image_url": "https://example.com/images/eggs.jpg",
+    "image_url": "infrastructure/images/0123456789022-eggs.jpg",
     "primary_category": "Dairy",
     "secondary_category": "Eggs",
     "tertiary_category": null
@@ -174,7 +174,7 @@
     "description": "Italian pasta, durum wheat semolina",
     "ingredients": ["Durum wheat semolina", "Water"],
     "price": 2.99,
-    "image_url": "https://example.com/images/pasta.jpg",
+    "image_url": "infrastructure/images/0123456789023-pasta.jpg",
     "primary_category": "Dry Goods",
     "secondary_category": "Pasta",
     "tertiary_category": null
@@ -186,7 +186,7 @@
     "description": "Extra virgin olive oil, cold-pressed",
     "ingredients": ["Olive oil"],
     "price": 9.99,
-    "image_url": "https://example.com/images/olive-oil.jpg",
+    "image_url": "infrastructure/images/0123456789024-olive-oil.jpg",
     "primary_category": "Dry Goods",
     "secondary_category": "Oils",
     "tertiary_category": null
@@ -198,7 +198,7 @@
     "description": "Fresh organic strawberries",
     "ingredients": ["Organic strawberries"],
     "price": 5.99,
-    "image_url": "https://example.com/images/strawberries.jpg",
+    "image_url": "infrastructure/images/0123456789025-strawberries.jpg",
     "primary_category": "Produce",
     "secondary_category": "Fresh Fruit",
     "tertiary_category": "Strawberries"
@@ -210,7 +210,7 @@
     "description": "Fresh organic broccoli florets",
     "ingredients": ["Organic broccoli"],
     "price": 3.79,
-    "image_url": "https://example.com/images/broccoli.jpg",
+    "image_url": "infrastructure/images/0123456789026-broccoli.jpg",
     "primary_category": "Produce",
     "secondary_category": "Fresh Vegetables",
     "tertiary_category": "Broccoli"
@@ -222,7 +222,7 @@
     "description": "Long grain white rice, 2 lb bag",
     "ingredients": ["White rice"],
     "price": 3.49,
-    "image_url": "https://example.com/images/rice.jpg",
+    "image_url": "infrastructure/images/0123456789027-rice.jpg",
     "primary_category": "Dry Goods",
     "secondary_category": "Cereal",
     "tertiary_category": null
@@ -234,7 +234,7 @@
     "description": "Unsalted butter, made from cream",
     "ingredients": ["Cream", "Salt"],
     "price": 4.49,
-    "image_url": "https://example.com/images/butter.jpg",
+    "image_url": "infrastructure/images/0123456789028-butter.jpg",
     "primary_category": "Dairy",
     "secondary_category": "Butter",
     "tertiary_category": null
@@ -246,7 +246,7 @@
     "description": "Yellow onions, 3 lb bag",
     "ingredients": ["Onions"],
     "price": 2.99,
-    "image_url": "https://example.com/images/onions.jpg",
+    "image_url": "infrastructure/images/0123456789029-onions.jpg",
     "primary_category": "Produce",
     "secondary_category": "Fresh Vegetables",
     "tertiary_category": "Onions"

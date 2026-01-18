@@ -13,6 +13,10 @@ export default defineConfig({
       '/categories': {
         target: 'http://localhost:8000',
         changeOrigin: true,
+      },
+      '/images': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
       }
     }
   }

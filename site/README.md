@@ -19,7 +19,7 @@ A React web application for browsing and filtering products from the products AP
 npm install
 ```
 
-2. Make sure the Flask backend server is running on `http://localhost:6000`
+2. Make sure the Flask backend server is running on `http://localhost:8000`
 
 3. Start the development server:
 ```bash
