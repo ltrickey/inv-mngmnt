@@ -1,4 +1,3 @@
-/*
 data "aws_vpc" "default" {
   default = true
 }
@@ -16,15 +15,23 @@ data "aws_subnet" "default" {
 
 #TODO: Lynn not sure about this took this from Tim's example
 #https://github.com/tim-spinney/cloud_project_manager/blob/52525410ee89a8cbf1c50eeb639dc6a198354c5b/infrastructure/variables.tf
- resource "aws_security_group" "product_catalogue" {
+resource "aws_security_group" "product_catalogue" {
   name        = "${local.name_prefix}-product-catalogue-sg"
-  description = "Security group for customer website EC2 instance"
+  description = "Security group for product catalogue customer website EC2 instance"
   vpc_id      = data.aws_vpc.default.id
 
+  # Ensure EC2 instance is destroyed before security group
+  # This prevents deletion timeout issues
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  # Flask serves both React app (static files) and API endpoints
+  # React app is built and served as static files by Flask
   ingress {
-    description = "HTTP"
-    from_port   = 3000
-    to_port     = 3000
+    description = "Flask App (React + API)"
+    from_port   = 8000
+    to_port     = 8000
     protocol    = "tcp"
     cidr_blocks = var.allowed_cidr_blocks
   }
@@ -46,7 +53,6 @@ data "aws_subnet" "default" {
   }
 
   tags = merge(local.common_tags, {
-    Name = "${local.name_prefix}-produxt-catalogue-sg"
+    Name = "${local.name_prefix}-product-catalogue-sg"
   })
 }
-*/

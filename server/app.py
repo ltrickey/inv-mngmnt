@@ -3,14 +3,26 @@ from flask_cors import CORS
 import json
 import os
 
-app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
+# Determine if we're in production (serving React static files)
+# In production, React build is in ../site-dist relative to server directory
+REACT_BUILD_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'site-dist')
+IS_PRODUCTION = os.path.exists(REACT_BUILD_DIR) and os.path.isdir(REACT_BUILD_DIR)
 
-# Serve static images from infrastructure/images directory for local development
+if IS_PRODUCTION:
+    # Production: Serve React static files
+    app = Flask(__name__, static_folder=REACT_BUILD_DIR, static_url_path='')
+    CORS(app)  # Enable CORS for all routes
+else:
+    # Development: Don't serve static files (Vite dev server handles it)
+    app = Flask(__name__)
+    CORS(app)  # Enable CORS for all routes
+
+# Serve static images from infrastructure/images directory
 @app.route('/images/<path:filename>')
 def serve_image(filename):
-    """Serve images from infrastructure/images directory for local testing."""
-    return send_from_directory(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'infrastructure', 'images'), filename)
+    """Serve images from infrastructure/images directory."""
+    images_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'infrastructure', 'images')
+    return send_from_directory(images_dir, filename)
 
 # Path to the products JSON file
 PRODUCTS_FILE = 'products.json'
@@ -154,6 +166,18 @@ def get_products():
     
     # Return all products if no filter is specified
     return jsonify(products)
+
+
+# In production, serve React app for all non-API routes
+# This must be defined AFTER all API routes to avoid intercepting them
+if IS_PRODUCTION:
+    @app.route('/', defaults={'path': ''})
+    @app.route('/<path:path>')
+    def serve_react_app(path):
+        """Serve React app for all non-API routes."""
+        # API routes are already handled above, so this only catches non-API routes
+        # Serve index.html for all routes (React Router handles client-side routing)
+        return send_from_directory(REACT_BUILD_DIR, 'index.html')
 
 
 if __name__ == '__main__':

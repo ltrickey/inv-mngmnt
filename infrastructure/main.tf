@@ -1,8 +1,15 @@
 # Configure the AWS Provider
-# set env vars for:
-# % export AWS_ACCESS_KEY_ID=""
-# % export AWS_SECRET_ACCESS_KEY=""
-
+# Credentials can be set via:
+# 1. Environment variables:
+#    export AWS_ACCESS_KEY_ID=""
+#    export AWS_SECRET_ACCESS_KEY=""
+#    export AWS_SESSION_TOKEN=""  # Required for temporary credentials
+# 2. AWS credentials file (~/.aws/credentials):
+#    [default]
+#    aws_access_key_id = YOUR_ACCESS_KEY
+#    aws_secret_access_key = YOUR_SECRET_KEY
+#    aws_session_token = YOUR_SESSION_TOKEN  # Required for temporary credentials
+# 3. AWS CLI: aws configure
 
 provider "aws" {
     region = var.aws_region
@@ -16,4 +23,13 @@ data "aws_ami" "amazon_linux" {
         name   = "image-id"
         values = ["ami-059afa9e3a9c7af0c"]
     }
+}
+
+locals {
+  name_prefix = "${var.project_name}-${var.environment}"
+  common_tags = {
+    Project     = var.project_name
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
 }
