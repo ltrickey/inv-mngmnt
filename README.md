@@ -1,6 +1,7 @@
 # Customer Website
 Homework series for CPSC 5910 Cloud Computing Seattle University
 
+Written by Lynn Trickey with assistance from Cursor AI agent
 
 ## AWS Credentials Setup
 
@@ -84,7 +85,16 @@ To deploy to EC2 instances, you need an SSH key pair. The Terraform configuratio
 
 ## Deployment Process
 
-The deployment is fully automated through Terraform. When you run `terraform apply`, everything is built and deployed automatically.
+Before running deployment, you must have the correct aws credentials and ssh key set as described above.  From the Learner's Lab, once I've launched my Learner's instance I click on "AWS Details." 
+This should display: 
+AWS CLI:   
+   Copy and paste the following into ~/.aws/credentials
+
+I do that directly.  Then I download the SSH key by clicking 'Download PEM" or show SSH KEY and copy that information into `~/.ssh/vockey.pem` 
+
+
+
+The deployment is fully automated through Terraform. To verify terraform is set up correctly run 'terraform init.'  Then when you run `terraform apply`, everything is built and deployed automatically.
 
 ### What Happens When You Run `terraform apply`
 
