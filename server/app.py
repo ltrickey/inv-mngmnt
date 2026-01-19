@@ -157,4 +157,9 @@ def get_products():
 
 
 if __name__ == '__main__':
+    # Development server only - NOT for production
+    # For production, use a WSGI server like Gunicorn:
+    #   gunicorn -w 4 -b 0.0.0.0:8000 app:app
+    # host='0.0.0.0' makes the server accessible from other machines on the network
+    # This is useful for testing from other devices during development
     app.run(debug=True, host='0.0.0.0', port=8000)
