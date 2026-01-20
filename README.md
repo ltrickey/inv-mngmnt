@@ -85,16 +85,9 @@ To deploy to EC2 instances, you need an SSH key pair. The Terraform configuratio
 
 ## Deployment Process
 
-Before running deployment, you must have the correct aws credentials and ssh key set as described above.  From the Learner's Lab, once I've launched my Learner's instance I click on "AWS Details." 
-This should display: 
-AWS CLI:   
-   Copy and paste the following into ~/.aws/credentials
+Before running deployment, you must have the correct aws credentials and ssh key set as described above.  Otherwise the deployment will fail.
 
-I do that directly.  Then I download the SSH key by clicking 'Download PEM" or show SSH KEY and copy that information into `~/.ssh/vockey.pem` 
-
-
-
-The deployment is fully automated through Terraform. To verify terraform is set up correctly run 'terraform init.'  Then when you run `terraform apply`, everything is built and deployed automatically.
+The deployment is fully automated through Terraform. To verify terraform is set up correctly run `terraform init`.  Then run `terraform apply.`
 
 ### What Happens When You Run `terraform apply`
 
@@ -104,7 +97,8 @@ The deployment is fully automated through Terraform. To verify terraform is set 
    - Configures networking
 
 2. **Automatic Build and Deployment:**
-   After the EC2 instance is created, Terraform automatically triggers the deployment process:
+
+   After the EC2 instance is created, Terraform automatically triggers the deployment process.  
 
    **Step 1: Build React Application**
    - Runs `npm install` (if `node_modules` doesn't exist)
@@ -137,11 +131,46 @@ terraform apply
 **Manual deployment (if needed):**
 ```bash
 # Build and package locally
-./scripts/package.sh --skip-deploy
+./scripts/package.sh
 
 # Deploy to EC2
 ./scripts/deploy_remote.sh
 ```
+
+### Deployment Scripts Overview
+
+The deployment process uses three scripts, each with a specific role:
+
+**1. `package.sh` (Local only - no EC2 interaction)**
+- **Purpose:** Builds and packages the application locally
+- **Responsibilities:**
+  - Builds React application (`npm install`, `npm run build`)
+  - Packages Flask server files
+  - Packages React production build
+  - Packages product images
+  - Creates ZIP archive (`deploy/product_catalogue.zip`)
+- **Output:** Creates `deploy/product_catalogue.zip` ready for deployment
+
+**2. `deploy_remote.sh` (Handles all EC2 interaction)**
+- **Purpose:** Orchestrates deployment to EC2 instance
+- **Responsibilities:**
+  - Gets EC2 instance details from Terraform outputs
+  - Finds SSH key for EC2 access
+  - Copies package to EC2 via SCP (`/tmp/product_catalogue.zip`)
+  - Waits for SSH availability
+  - Connects to EC2 and extracts package
+  - Runs `deploy.sh` on EC2 instance
+
+**3. `deploy.sh` (Runs on EC2 instance)**
+- **Purpose:** Sets up the application on the EC2 instance
+- **Responsibilities:**
+  - Extracts package to `/opt/product_catalogue/`
+  - Creates Python virtual environment
+  - Installs Python dependencies
+  - Creates systemd service file
+  - Starts and enables Flask service
+- **Runs on:** EC2 instance (executed via SSH from `deploy_remote.sh`)
+
 
 ### What Gets Built
 

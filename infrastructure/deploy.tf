@@ -1,13 +1,13 @@
 # Automatically deploy application after EC2 instance is created
 # This uses local-exec to run the deployment scripts from your local machine
-resource "null_resource" "deploy_app" {
+# terraform_data is the recommended built-in resource (replaces null_resource in Terraform v1.14+)
+resource "terraform_data" "deploy_app" {
   depends_on = [aws_instance.product_catalogue]
 
-  triggers = {
-    instance_id = aws_instance.product_catalogue.id
-    # Re-deploy if instance changes
-    instance_public_ip = aws_instance.product_catalogue.public_ip
-  }
+  triggers_replace = [
+    aws_instance.product_catalogue.id,
+    aws_instance.product_catalogue.public_ip
+  ]
 
   provisioner "local-exec" {
     command = <<-EOT
@@ -18,7 +18,7 @@ resource "null_resource" "deploy_app" {
       echo "Making scripts executable..."
       chmod +x scripts/package.sh scripts/deploy_remote.sh scripts/deploy.sh
       echo "Building and packaging application..."
-      ./scripts/package.sh --skip-deploy
+      ./scripts/package.sh
       echo ""
       echo "Deploying to EC2 instance..."
       ./scripts/deploy_remote.sh

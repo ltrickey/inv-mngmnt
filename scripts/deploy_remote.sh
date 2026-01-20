@@ -1,18 +1,30 @@
 #!/bin/bash
-# Remote deployment script - runs deployment on EC2 instance via SSH
-# This script is called after package.sh copies the archive to EC2
+# Remote deployment script - handles all EC2 interaction
+# This script copies the package to EC2 and runs deployment
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 INFRASTRUCTURE_DIR="$PROJECT_ROOT/infrastructure"
+OUTPUT_DIR="$PROJECT_ROOT/deploy"
 PACKAGE_NAME="product_catalogue.zip"
 EC2_USER="ec2-user"
 
 echo "=========================================="
 echo "REMOTE DEPLOYMENT TO EC2"
 echo "=========================================="
+
+# Check if package exists
+PACKAGE_PATH="$OUTPUT_DIR/$PACKAGE_NAME"
+if [ ! -f "$PACKAGE_PATH" ]; then
+    echo "Error: Package not found at $PACKAGE_PATH"
+    echo "Please run ./scripts/package.sh first to build and package the application"
+    exit 1
+fi
+
+echo "Package found: $PACKAGE_PATH"
+echo ""
 
 # Get EC2 instance details from Terraform output
 cd "$INFRASTRUCTURE_DIR"
@@ -47,7 +59,38 @@ fi
 echo "Using SSH key: $SSH_KEY"
 echo ""
 
-# Wait for SSH to be available
+# ============================================
+# STEP 1: COPY PACKAGE TO EC2 VIA SCP
+# ============================================
+echo "=========================================="
+echo "COPYING PACKAGE TO EC2 INSTANCE"
+echo "=========================================="
+echo "EC2 Instance: $EC2_HOST"
+echo "EC2 User: $EC2_USER"
+echo "Package: $PACKAGE_PATH"
+echo ""
+echo "COPY DESTINATION ON EC2:"
+echo "  Temporary location: /tmp/$PACKAGE_NAME"
+echo "  (Will be extracted to: /opt/product_catalogue/)"
+echo ""
+
+echo "Copying package to EC2 instance..."
+scp -i "$SSH_KEY" \
+    -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null \
+    "$PACKAGE_PATH" \
+    "$EC2_USER@$EC2_HOST:/tmp/"
+
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "✗ Failed to copy package to EC2 instance"
+    exit 1
+fi
+
+echo "✓ Package successfully copied to EC2 instance!"
+echo ""
+
+# Wait for SSH to be available (in case instance just started)
 echo "Waiting for SSH to be available..."
 for i in {1..30}; do
     if ssh -i "$SSH_KEY" \
@@ -65,8 +108,13 @@ for i in {1..30}; do
     sleep 2
 done
 
+# ============================================
+# STEP 2: DEPLOY ON EC2 INSTANCE VIA SSH
+# ============================================
 echo ""
-echo "Deploying to EC2 instance..."
+echo "=========================================="
+echo "DEPLOYING ON EC2 INSTANCE"
+echo "=========================================="
 echo ""
 
 # Run deployment commands remotely via SSH
