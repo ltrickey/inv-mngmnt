@@ -77,6 +77,12 @@ cp "$SCRIPT_DIR/deploy.sh" "$OUTPUT_DIR/deploy.sh"
 chmod +x "$OUTPUT_DIR/deploy.sh"
 echo "  → Deployment script packaged (will be at /opt/product_catalogue/deploy.sh on EC2)"
 
+# Copy runtime setup files (systemd service, etc.)
+echo "Packaging runtime setup files..."
+mkdir -p "$OUTPUT_DIR/runtime_setup"
+cp -r "$SCRIPT_DIR/runtime_setup"/* "$OUTPUT_DIR/runtime_setup/" 2>/dev/null || echo "  → Note: Runtime setup directory not found or empty"
+echo "  → Runtime setup files packaged (will be at /opt/product_catalogue/runtime_setup/ on EC2)"
+
 # ============================================
 # STEP 3: CREATE DEPLOYMENT ARCHIVE
 # ============================================

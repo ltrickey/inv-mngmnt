@@ -64,45 +64,16 @@ if [ -d "../site-dist" ]; then
     echo "✓ React build found at $DEPLOY_DIR/site-dist"
 fi
 
-# Create systemd service for Flask
+# Set up systemd service for Flask
 echo ""
 echo "Setting up Flask service..."
-cat > /tmp/product_catalogue_flask.service << EOF
-[Unit]
-Description=Product Catalogue Flask API
-After=network.target
-Wants=network-online.target
+SERVICE_FILE="$DEPLOY_DIR/runtime_setup/product_catalogue_flask.service"
+if [ ! -f "$SERVICE_FILE" ]; then
+    echo "Error: Service file not found at $SERVICE_FILE"
+    exit 1
+fi
 
-[Service]
-Type=simple
-User=$SERVICE_USER
-Group=$SERVICE_USER
-WorkingDirectory=$DEPLOY_DIR/server
-Environment="PATH=$DEPLOY_DIR/server/.venv/bin"
-ExecStart=$DEPLOY_DIR/server/.venv/bin/gunicorn -w 4 -b 0.0.0.0:8000 app:app
-Restart=always
-RestartSec=10
-StartLimitInterval=300
-StartLimitBurst=5
-
-# Security hardening
-NoNewPrivileges=true
-PrivateTmp=true
-
-# Resource limits
-LimitNOFILE=65536
-MemoryLimit=512M
-
-# Logging
-StandardOutput=journal
-StandardError=journal
-SyslogIdentifier=product_catalogue_flask
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-sudo mv /tmp/product_catalogue_flask.service /etc/systemd/system/
+sudo cp "$SERVICE_FILE" /etc/systemd/system/product_catalogue_flask.service
 sudo systemctl daemon-reload
 sudo systemctl enable product_catalogue_flask
 sudo systemctl restart product_catalogue_flask

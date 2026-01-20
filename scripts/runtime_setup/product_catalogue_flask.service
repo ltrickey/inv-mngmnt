@@ -1,0 +1,32 @@
+[Unit]
+Description=Product Catalogue Flask API
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ec2-user
+Group=ec2-user
+WorkingDirectory=/opt/product_catalogue/server
+Environment="PATH=/opt/product_catalogue/server/.venv/bin"
+ExecStart=/opt/product_catalogue/server/.venv/bin/gunicorn -w 4 -b 0.0.0.0:8000 app:app
+Restart=always
+RestartSec=10
+StartLimitInterval=300
+StartLimitBurst=5
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+
+# Resource limits
+LimitNOFILE=65536
+MemoryLimit=512M
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=product_catalogue_flask
+
+[Install]
+WantedBy=multi-user.target
