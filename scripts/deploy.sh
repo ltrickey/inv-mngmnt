@@ -1,5 +1,6 @@
 #!/bin/bash
 # Deployment script to run on EC2 instance
+# Can be run manually but is automatically run by Terraform when the infrastructure is deployed
 # This script extracts the package and sets up the application
 
 set -e
@@ -76,7 +77,19 @@ fi
 sudo cp "$SERVICE_FILE" /etc/systemd/system/product_catalogue_flask.service
 sudo systemctl daemon-reload
 sudo systemctl enable product_catalogue_flask
-sudo systemctl restart product_catalogue_flask
+
+# Terminate the previously running instance of the web server
+echo "Stopping existing web server instance..."
+if sudo systemctl is-active --quiet product_catalogue_flask; then
+    sudo systemctl stop product_catalogue_flask
+    echo "✓ Previous web server instance stopped"
+else
+    echo "  → No running instance found (this is normal for first deployment)"
+fi
+
+# Start a new instance using the newly deployed code
+echo "Starting web server with newly deployed code..."
+sudo systemctl start product_catalogue_flask
 
 # Check service status
 sleep 2
@@ -97,11 +110,5 @@ else
 fi
 
 echo ""
-echo "=========================================="
-echo "DEPLOYMENT COMPLETE"
-echo "=========================================="
-echo "Application: http://$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4):8000"
-echo "Flask API: http://localhost:8000/products"
-echo "Service status: sudo systemctl status product_catalogue_flask"
-echo "Service logs: sudo journalctl -u product_catalogue_flask -f"
+echo "✓ Deployment script completed successfully"
 echo ""

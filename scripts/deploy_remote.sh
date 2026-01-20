@@ -34,12 +34,31 @@ if [ ! -d "$INFRASTRUCTURE_DIR" ]; then
     exit 1
 fi
 
-EC2_PUBLIC_IP=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw ec2_instance_public_ip 2>/dev/null || echo "")
-EC2_PUBLIC_DNS=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw ec2_instance_public_dns 2>/dev/null || echo "")
-KEY_PAIR=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw ec2_key_pair 2>/dev/null || echo "vockey")
+# Retry mechanism: Wait for Terraform outputs to become available
+# This is needed because terraform_data runs immediately after EC2 creation, and outputs may not be ready yet
+echo "Retrieving EC2 instance details from Terraform output..."
+EC2_PUBLIC_IP=""
+EC2_PUBLIC_DNS=""
+KEY_PAIR=""
+
+for i in {1..30}; do
+    EC2_PUBLIC_IP=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw ec2_instance_public_ip 2>/dev/null || echo "")
+    EC2_PUBLIC_DNS=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw ec2_instance_public_dns 2>/dev/null || echo "")
+    KEY_PAIR=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw ec2_key_pair 2>/dev/null || echo "vockey")
+    
+    if [ -n "$EC2_PUBLIC_IP" ] || [ -n "$EC2_PUBLIC_DNS" ]; then
+        echo "✓ EC2 instance details retrieved"
+        break
+    fi
+    
+    if [ $i -lt 30 ]; then
+        echo "  Waiting for Terraform outputs to become available... (attempt $i/30)"
+        sleep 1
+    fi
+done
 
 if [ -z "$EC2_PUBLIC_IP" ] && [ -z "$EC2_PUBLIC_DNS" ]; then
-    echo "Error: Could not retrieve EC2 instance details from Terraform output."
+    echo "Error: Could not retrieve EC2 instance details from Terraform output after 30 attempts."
     echo "Current directory: $(pwd)"
     echo "Infrastructure directory: $INFRASTRUCTURE_DIR"
     echo "Terraform state file exists: $([ -f "$INFRASTRUCTURE_DIR/terraform.tfstate" ] && echo 'yes' || echo 'no')"
@@ -167,20 +186,15 @@ ssh -i "$SSH_KEY" \
     # Run deployment script
     cd "$DEPLOY_DIR"
     sudo ./deploy.sh
-    
-    echo ""
-    echo "=========================================="
-    echo "DEPLOYMENT COMPLETE"
-    echo "=========================================="
 REMOTE_DEPLOY
 
 if [ $? -eq 0 ]; then
     echo ""
-    echo "✓ Remote deployment completed successfully!"
+    echo "=========================================="
+    echo "DEPLOYMENT COMPLETE"
+    echo "=========================================="
+    echo "Service URL: http://$EC2_HOST:8000"
     echo ""
-    echo "Application should be running at:"
-    echo "  Flask API: http://$EC2_HOST:8000"
-    echo "  React App: http://$EC2_HOST:3000"
 else
     echo ""
     echo "✗ Remote deployment failed"

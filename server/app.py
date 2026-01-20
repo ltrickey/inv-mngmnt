@@ -45,7 +45,7 @@ def get_image_url(image_path):
         Full URL string for the image
     """
     if S3_BUCKET_URL:
-        # Production: Use S3 bucket URL
+        # TODO: IMPLEMENT PUlling images from S3Production: Use S3 bucket URL
         # Remove 'infrastructure/' prefix if present, S3 should have direct paths
         s3_path = image_path.replace('infrastructure/', '') if image_path.startswith('infrastructure/') else image_path
         return f"{S3_BUCKET_URL.rstrip('/')}/{s3_path}"
