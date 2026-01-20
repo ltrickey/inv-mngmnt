@@ -87,7 +87,15 @@ To deploy to EC2 instances, you need an SSH key pair. The Terraform configuratio
 
 Before running deployment, you must have the correct aws credentials and ssh key set as described above.  Otherwise the deployment will fail.
 
-The deployment is fully automated through Terraform. To verify terraform is set up correctly run `terraform init`.  Then run `terraform apply.`
+The deployment is fully automated through Terraform. To deploy:
+
+```bash
+cd /infrastructure
+terraform init
+terraform apply
+```
+
+You will need to input `yes` to allow `terraform apply` to make the required changes.
 
 ### What Happens When You Run `terraform apply`
 

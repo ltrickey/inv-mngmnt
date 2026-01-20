@@ -11,7 +11,9 @@ resource "terraform_data" "deploy_app" {
 
   provisioner "local-exec" {
     command = <<-EOT
-      cd ${path.module}/..
+      PROJECT_ROOT="${abspath("${path.module}/..")}"
+      INFRA_DIR="${abspath(path.module)}"
+      cd "$PROJECT_ROOT"
       echo "=========================================="
       echo "TERRAFORM TRIGGERED DEPLOYMENT"
       echo "=========================================="
@@ -21,7 +23,7 @@ resource "terraform_data" "deploy_app" {
       ./scripts/package.sh
       echo ""
       echo "Deploying to EC2 instance..."
-      ./scripts/deploy_remote.sh
+      INFRASTRUCTURE_DIR="$INFRA_DIR" ./scripts/deploy_remote.sh
     EOT
   }
 }

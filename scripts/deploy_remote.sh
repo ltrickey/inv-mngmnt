@@ -6,7 +6,8 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-INFRASTRUCTURE_DIR="$PROJECT_ROOT/infrastructure"
+# Allow INFRASTRUCTURE_DIR to be overridden by environment variable (useful when called from Terraform)
+INFRASTRUCTURE_DIR="${INFRASTRUCTURE_DIR:-$PROJECT_ROOT/infrastructure}"
 OUTPUT_DIR="$PROJECT_ROOT/deploy"
 PACKAGE_NAME="product_catalogue.zip"
 EC2_USER="ec2-user"
@@ -27,13 +28,25 @@ echo "Package found: $PACKAGE_PATH"
 echo ""
 
 # Get EC2 instance details from Terraform output
-cd "$INFRASTRUCTURE_DIR"
-EC2_PUBLIC_IP=$(terraform output -raw ec2_instance_public_ip 2>/dev/null || echo "")
-EC2_PUBLIC_DNS=$(terraform output -raw ec2_instance_public_dns 2>/dev/null || echo "")
-KEY_PAIR=$(terraform output -raw ec2_key_pair 2>/dev/null || echo "vockey")
+# Use -chdir to run terraform commands from the infrastructure directory where terraform.tfstate is located
+if [ ! -d "$INFRASTRUCTURE_DIR" ]; then
+    echo "Error: Infrastructure directory not found: $INFRASTRUCTURE_DIR"
+    exit 1
+fi
+
+EC2_PUBLIC_IP=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw ec2_instance_public_ip 2>/dev/null || echo "")
+EC2_PUBLIC_DNS=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw ec2_instance_public_dns 2>/dev/null || echo "")
+KEY_PAIR=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw ec2_key_pair 2>/dev/null || echo "vockey")
 
 if [ -z "$EC2_PUBLIC_IP" ] && [ -z "$EC2_PUBLIC_DNS" ]; then
     echo "Error: Could not retrieve EC2 instance details from Terraform output."
+    echo "Current directory: $(pwd)"
+    echo "Infrastructure directory: $INFRASTRUCTURE_DIR"
+    echo "Terraform state file exists: $([ -f "$INFRASTRUCTURE_DIR/terraform.tfstate" ] && echo 'yes' || echo 'no')"
+    echo ""
+    echo "Trying to get outputs from infrastructure directory..."
+    terraform -chdir="$INFRASTRUCTURE_DIR" output 2>&1 || true
+    echo ""
     echo "Make sure Terraform has been applied and the infrastructure directory is accessible."
     exit 1
 fi
