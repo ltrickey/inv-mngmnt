@@ -80,6 +80,44 @@ curl http://localhost:8000/products?category=Fruits&category=Vegetables
 ]
 ```
 
+## Testing
+
+The project includes unit tests using pytest. To run the tests:
+
+1. **Install test dependencies** (if not already installed):
+```bash
+pip install -r requirements.txt
+```
+
+2. **Run all tests**:
+```bash
+pytest test_app.py -v
+```
+
+3. **Run tests with coverage report**:
+```bash
+pytest test_app.py --cov=app --cov-report=term-missing
+```
+
+4. **Run a specific test class**:
+```bash
+pytest test_app.py::TestProductsEndpoint -v
+```
+
+5. **Run a specific test**:
+```bash
+pytest test_app.py::TestProductsEndpoint::test_get_all_products -v
+```
+
+### Test Coverage
+
+The test suite covers:
+- **Products endpoint** (`/products`): All products, single category filter, multiple category filters, edge cases
+- **Categories endpoint** (`/categories`): Category retrieval, sorting, level hierarchy
+- **Image URL resolution**: Local development 
+- **Error handling**: Missing files, invalid JSON, empty responses
+- **CORS headers**: Cross-origin request support
+
 ## Product Data
 
 Products are stored in `products.json`. Each product includes:

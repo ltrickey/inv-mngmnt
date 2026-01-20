@@ -107,6 +107,7 @@ def get_categories():
             tertiary_categories.add(product.get('tertiary_category'))
     
     # Build categories list with levels
+    # TODO: Update this logic as we use data stores.
     # If a category appears at multiple levels, use the highest level (primary > secondary > tertiary)
     categories_dict = {}
     
