@@ -19,6 +19,7 @@ def client():
 class TestProductsEndpoint:
     """Tests for the /products endpoint."""
     
+    #TODO: Add better verification than length of data. 
     def test_get_all_products(self, client):
         """Test retrieving all products without filters."""
         response = client.get('/products')

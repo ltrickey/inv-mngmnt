@@ -1,0 +1,27 @@
+[
+  {
+    "store_id": "1234567890",
+    "store_name": "Store 1",
+    "store_address": "123 Main St, Anytown, USA"
+  },
+  {
+    "store_id": "1234567891",
+    "store_name": "Downtown Market",
+    "store_address": "456 Oak Ave, Seattle, WA 98101"
+  },
+  {
+    "store_id": "1234567892",
+    "store_name": "Westside Grocers",
+    "store_address": "789 Pine Blvd, Portland, OR 97201"
+  },
+  {
+    "store_id": "1234567893",
+    "store_name": "Capitol Hill Fresh",
+    "store_address": "321 Broadway E, Seattle, WA 98102"
+  },
+  {
+    "store_id": "1234567894",
+    "store_name": "Ballard Corner Store",
+    "store_address": "555 NW Market St, Seattle, WA 98107"
+  }
+]

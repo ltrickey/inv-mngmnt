@@ -1,0 +1,82 @@
+@startuml
+package "Client Browser" as client {
+}
+cloud {
+  folder "React UI" as react {
+    
+'     • package
+' • node
+' • folder
+' • frame
+' • cloud
+' • database
+    frame ProductsPage {
+      usecase "Get all products" as UC1
+      usecase "Get all Stores" as UCStores
+      usecase "Get Store Info" as UC2
+      usecase "Get Products for a store" as UC3
+      usecase "Get Sales for a store" as UC4
+
+    }
+  }
+  frame "Flask API" {
+    frame "get /PRODUCTS" as productDetails {
+   
+    } 
+    frame "get /STORE/<STORE_ID>" as storeDetails {
+    }
+    frame "get /STOCK/<STORE_ID>" as stockDetails {
+    }
+    frame "get /SALES/<STORE_ID>" as salesDetails {
+    }
+    
+  }
+  
+  database "DynamoDB" {
+    frame "Products" {
+      map productTable {
+        hash_key => barcode
+        secondary_indecies => categories
+      }
+    }
+    frame "Stores" {
+      map storeTable {
+        hash_key => store_id
+      }
+    }
+    frame "Stock" {
+      map stockTable {
+        hash_key => barcode
+        range_key => store_id
+      }
+    }
+    frame "Sales" {
+      map salesTable {
+        hash_key => barcode
+        range_key => store_id
+      }
+    }
+  }
+}
+
+[client] --> [react] 
+[UC1] --> [productDetails]
+[UC1] <-- [productDetails]
+[UC2] --> [storeDetails]
+[UC2] <-- [storeDetails]
+[UC3] --> [stockDetails]
+[UC3] <-- [stockDetails]
+[UC4] --> [salesDetails]
+[UC4] <-- [salesDetails]
+
+[storeDetails] --> [storeTable]
+[storeDetails] <-- [storeTable]
+[productDetails] --> [productTable]
+[productDetails] <-- [productTable]
+
+[stockDetails] --> [stockTable]
+[stockDetails] <-- [stockTable]
+[salesDetails] --> [salesTable]
+[salesDetails] <-- [salesTable]
+
+@enduml

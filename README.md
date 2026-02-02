@@ -108,19 +108,19 @@ You will need to input `yes` to allow `terraform apply` to make the required cha
 
    After the EC2 instance is created, Terraform automatically triggers the deployment process.  
 
-   **Step 1: Build React Application**
+   **Step 1: Builds React Application**
    - Runs `npm install` (if `node_modules` doesn't exist)
    - Runs `npm run build` to create production build in `site/dist/`
    - Build happens on your **local machine** (where Terraform runs)
    - Requires Node.js installed locally
 
-   **Step 2: Package Everything**
+   **Step 2: Packages Everything**
    - Packages Flask server files (`server/`)
    - Packages React production build (`site/dist/`)
    - Packages product images (`infrastructure/images/`)
    - Creates deployment archive (`product_catalogue.zip`)
 
-   **Step 3: Deploy to EC2**
+   **Step 3: Deploys to EC2**
    - Copies package to EC2 instance via SCP
    - Extracts files to `/opt/product_catalogue/`
    - Sets up Python virtual environment

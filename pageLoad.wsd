@@ -1,0 +1,36 @@
+@startuml "Page Load"
+actor User
+participant ReactApp #LightBlue
+participant FlaskAPI #LightGreen
+database DynamoDB #DarkSalmon
+
+
+' CLI -> CLI : Verify photo format & dimensions
+' alt error bad image 
+'   CLI -> User : "Show error, Try again"
+' else image satisfies requirements
+'   CLI -> User : "Enter list of transformations"
+'   User -> CLI : Types in or selects list
+'   CLI -> CLI : Verify valid commands
+'   alt error bad arguments
+'     CLI -> User : "Bad args, please choose valid commands"
+'   else valid transformation list
+'     CLI -> IPS : Calls transform(image, "action1, action2")
+'     activate IPS #DarkSalmon
+'   end
+' end
+
+' Loop Apply Transformations (in order)
+' IPS -> IPS
+' end
+
+' alt Transformation Failure
+'   IPS -> CLI : Error
+'   CLI -> User : Display helpful error message
+' else Transformation Successful
+'   IPS -> CLI : Return Transformed Image + opt Thumbnail
+'   deactivate IPS
+'   CLI -> User : New Image Destination (url or filepath)
+' deactivate CLI
+' end
+@enduml
