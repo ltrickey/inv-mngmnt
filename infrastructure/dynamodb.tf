@@ -1,18 +1,10 @@
 # DynamoDB Tables
-
-# Stores Table
-# Store Name
-# Store ID
-# Store Address
-
-# Stock Table
-# hash_key: productID
-# range_key: storeID
-
-# OR storeID + productID ==  main key
-# storeId = secondary keyto allow for scan on secondary 
-# index by store ID to get the initial call for ALL Products.  
-# BUT THEN can also do CRUD On one product in one store.
+#
+# Data model aligns with server/seed_data:
+#   products.json -> products (barcode PK; GSIs by category)
+#   stores.json   -> stores   (store_id PK)
+#   stock.json    -> stock   (barcode PK, store_id SK)
+#   sales.json    -> sales   (store_id PK, barcode SK)
 
 ## Products table which includes Product details
 resource "aws_dynamodb_table" "products" {
@@ -27,10 +19,6 @@ resource "aws_dynamodb_table" "products" {
     name = "barcode"
     type = "S"
   }
-
-
-
-
 
   #TODO: change this to nested? 
   attribute {
@@ -79,25 +67,18 @@ resource "aws_dynamodb_table" "products" {
   }
 }
 
-# Stores Table - Store name & addresses
+# Stores table - one item per store (store_id, store_name, store_address)
 resource "aws_dynamodb_table" "stores" {
   name           = "${local.name_prefix}-stores"
   billing_mode   = "PROVISIONED"
   read_capacity  = 2
   write_capacity = 2
   hash_key       = "store_id"
-  range_key      = "store_name"
 
   attribute {
     name = "store_id"
     type = "S"
   }
-
-  attribute {
-    name = "store_name"
-    type = "S"
-  }
-  
 }
 
 # Stock Table - TODO: May need to up capacity here.
@@ -120,37 +101,41 @@ resource "aws_dynamodb_table" "stock" {
   }
   
 
-  # TODO: ?? global_secondary_index Query stock across all stores?
+  # GSI: list stock by store (e.g. "all inventory at store X")
+  global_secondary_index {
+    name            = "ByStore"
+    hash_key        = "store_id"
+    range_key       = "barcode"
+    read_capacity   = 2
+    write_capacity  = 2
+    projection_type = "ALL"
+  }
 }
 
-# Comments Table
-resource "aws_dynamodb_table" "comments" {
-  name           = "${local.name_prefix}-comments"
+# Sales table - per-store discounts (store_id, barcode, percent_off)
+resource "aws_dynamodb_table" "sales" {
+  name           = "${local.name_prefix}-sales"
   billing_mode   = "PROVISIONED"
   read_capacity  = 2
   write_capacity = 2
-  hash_key       = "id"
+  hash_key       = "store_id"
+  range_key      = "barcode"
 
   attribute {
-    name = "id"
+    name = "store_id"
     type = "S"
   }
 
   attribute {
-    name = "taskId"
+    name = "barcode"
     type = "S"
   }
 
-  attribute {
-    name = "createdAt"
-    type = "S"
-  }
-
-  # GSI1: TaskCommentsIndex - Query comments by task, sorted by creation time
+  # GSI: list sales by product (e.g. "which stores have this on sale")
   global_secondary_index {
-    name            = "TaskCommentsIndex"
-    hash_key        = "taskId"
-    range_key       = "createdAt"
+    name            = "ByProduct"
+    hash_key        = "barcode"
+    range_key       = "store_id"
     read_capacity   = 2
     write_capacity  = 2
     projection_type = "ALL"

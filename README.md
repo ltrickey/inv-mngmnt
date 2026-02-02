@@ -218,3 +218,15 @@ View logs:
 ```bash
 ssh -i ~/.ssh/vockey.pem ec2-user@<EC2_HOST> "sudo journalctl -u product_catalogue_flask -f"
 ```
+
+### Seeding DynamoDB
+
+DynamoDB tables are seeded from `server/seed_data` **as part of the Terraform deployment workflow**. When you run `terraform apply`, the provisioner runs `scripts/seed_dynamodb.sh` before packaging and deploying to EC2. The script loads `products.json`, `stores.json`, `stock.json`, and `sales.json` into the tables named by Terraform (`name_prefix-products`, `-stores`, `-stock`, `-sales`).
+
+**Requirements:** `jq` and AWS CLI installed and configured (same credentials as Terraform).
+
+**To seed manually** (e.g. after changing seed data without re-deploying):
+```bash
+./scripts/seed_dynamodb.sh
+```
+Optional env vars: `INFRASTRUCTURE_DIR`, `SEED_DATA_DIR`, `AWS_REGION`.

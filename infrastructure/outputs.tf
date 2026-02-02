@@ -33,3 +33,8 @@ output "ec2_key_pair" {
   description = "EC2 key pair name for SSH access"
   value       = var.ec2_key_pair
 }
+
+output "name_prefix" {
+  description = "Prefix used for resource names (e.g. DynamoDB tables: name_prefix-products)"
+  value       = local.name_prefix
+}

@@ -11,6 +11,7 @@ resource "terraform_data" "deploy_app" {
 
   provisioner "local-exec" {
     command = <<-EOT
+      set -e
       PROJECT_ROOT="${abspath("${path.module}/..")}"
       INFRA_DIR="${abspath(path.module)}"
       cd "$PROJECT_ROOT"
@@ -18,7 +19,10 @@ resource "terraform_data" "deploy_app" {
       echo "TERRAFORM TRIGGERED DEPLOYMENT"
       echo "=========================================="
       echo "Making scripts executable..."
-      chmod +x scripts/package.sh scripts/deploy_remote.sh scripts/deploy.sh
+      chmod +x scripts/package.sh scripts/deploy_remote.sh scripts/deploy.sh scripts/seed_dynamodb.sh
+      echo "Seeding DynamoDB from server/seed_data..."
+      INFRASTRUCTURE_DIR="$INFRA_DIR" ./scripts/seed_dynamodb.sh || { echo "DynamoDB seed failed; stopping deployment."; exit 1; }
+      echo ""
       echo "Building and packaging application..."
       ./scripts/package.sh
       echo ""
