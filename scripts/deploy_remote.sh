@@ -140,6 +140,12 @@ for i in {1..30}; do
     sleep 2
 done
 
+# Get DynamoDB table name and region for Flask (so EC2 uses DynamoDB for products)
+NAME_PREFIX=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw name_prefix 2>/dev/null || echo "")
+AWS_REGION=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw aws_region 2>/dev/null || echo "us-east-1")
+DYNAMODB_PRODUCTS_TABLE=""
+[ -n "$NAME_PREFIX" ] && DYNAMODB_PRODUCTS_TABLE="${NAME_PREFIX}-products"
+
 # ============================================
 # STEP 2: DEPLOY ON EC2 INSTANCE VIA SSH
 # ============================================
@@ -149,43 +155,45 @@ echo "DEPLOYING ON EC2 INSTANCE"
 echo "=========================================="
 echo ""
 
-# Run deployment commands remotely via SSH
+# Run deployment commands remotely via SSH (pass DynamoDB table so Flask uses it on EC2)
 ssh -i "$SSH_KEY" \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null \
-    "$EC2_USER@$EC2_HOST" << 'REMOTE_DEPLOY'
+    "$EC2_USER@$EC2_HOST" << REMOTE_DEPLOY
     set -e
-    
+    export DYNAMODB_PRODUCTS_TABLE="$DYNAMODB_PRODUCTS_TABLE"
+    export AWS_REGION="$AWS_REGION"
+
     PACKAGE_NAME="product_catalogue.zip"
     DEPLOY_DIR="/opt/product_catalogue"
-    
+
     echo "=========================================="
     echo "EXTRACTING PACKAGE ON EC2"
     echo "=========================================="
-    
+
     # Create deployment directory
-    sudo mkdir -p "$DEPLOY_DIR"
-    sudo chown ec2-user:ec2-user "$DEPLOY_DIR"
-    
+    sudo mkdir -p "\$DEPLOY_DIR"
+    sudo chown ec2-user:ec2-user "\$DEPLOY_DIR"
+
     # Extract package
     cd /tmp
-    if [ ! -f "$PACKAGE_NAME" ]; then
-        echo "Error: Package not found at /tmp/$PACKAGE_NAME"
+    if [ ! -f "\$PACKAGE_NAME" ]; then
+        echo "Error: Package not found at /tmp/\$PACKAGE_NAME"
         exit 1
     fi
-    
-    echo "Extracting package to $DEPLOY_DIR..."
-    sudo unzip -o "$PACKAGE_NAME" -d "$DEPLOY_DIR"
+
+    echo "Extracting package to \$DEPLOY_DIR..."
+    sudo unzip -o "\$PACKAGE_NAME" -d "\$DEPLOY_DIR"
     echo "✓ Package extracted"
-    
+
     echo ""
     echo "=========================================="
     echo "RUNNING DEPLOYMENT SCRIPT"
     echo "=========================================="
-    
-    # Run deployment script
-    cd "$DEPLOY_DIR"
-    sudo ./deploy.sh
+
+    # Run deployment script (with DynamoDB env vars so it writes Flask env file)
+    cd "\$DEPLOY_DIR"
+    sudo -E ./deploy.sh
 REMOTE_DEPLOY
 
 if [ $? -eq 0 ]; then

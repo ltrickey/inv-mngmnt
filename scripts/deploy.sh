@@ -65,6 +65,20 @@ if [ -d "../site-dist" ]; then
     echo "✓ React build found at $DEPLOY_DIR/site-dist"
 fi
 
+# Create env file for Flask (DynamoDB table name and region when deploying from Terraform)
+FLASK_ENV_FILE="/etc/product_catalogue_flask.env"
+if [ -n "$DYNAMODB_PRODUCTS_TABLE" ]; then
+  echo "Configuring Flask to use DynamoDB (table: $DYNAMODB_PRODUCTS_TABLE)"
+  {
+    echo "USE_DYNAMODB=1"
+    echo "DYNAMODB_PRODUCTS_TABLE=$DYNAMODB_PRODUCTS_TABLE"
+    [ -n "$AWS_REGION" ] && echo "AWS_REGION=$AWS_REGION"
+  } | sudo tee "$FLASK_ENV_FILE" > /dev/null
+else
+  echo "USE_DYNAMODB=0" | sudo tee "$FLASK_ENV_FILE" > /dev/null
+fi
+echo "✓ Flask env file created at $FLASK_ENV_FILE"
+
 # Set up systemd service for Flask
 echo ""
 echo "Setting up Flask service..."

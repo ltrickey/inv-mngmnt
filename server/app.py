@@ -1,7 +1,15 @@
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 import json
+import logging
 import os
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Use DynamoDB for products when on EC2 (USE_DYNAMODB=1 and DYNAMODB_PRODUCTS_TABLE set); otherwise JSON files
+USE_DYNAMODB = os.environ.get('USE_DYNAMODB', '').lower() in ('1', 'true', 'yes')
+DYNAMODB_PRODUCTS_TABLE = os.environ.get('DYNAMODB_PRODUCTS_TABLE', '').strip()
 
 # Determine if we're in production (serving React static files)
 # In production, React build is in ../site-dist relative to server directory
@@ -24,8 +32,8 @@ def serve_image(filename):
     images_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'infrastructure', 'images')
     return send_from_directory(images_dir, filename)
 
-# Path to the products JSON file
-PRODUCTS_FILE = 'products.json'
+# Path to the products JSON file (used when running locally, not using DynamoDB)
+PRODUCTS_FILE = os.path.join(os.path.dirname(__file__), 'seed_data', 'products.json')
 
 # S3 configuration (optional - if not set, uses local images)
 S3_BUCKET_URL = os.environ.get('S3_BUCKET_URL', None)
@@ -64,27 +72,91 @@ def get_image_url(image_path):
             return f"/images/{image_path}"
 
 
-def load_products():
-    """
-    Load products from the JSON file and resolve image URLs.
-    Image URLs are resolved based on S3_BUCKET_URL environment variable.
-    If S3_BUCKET_URL is set, images are fetched from S3.
-    Otherwise, images are served from local infrastructure/images directory.
-    """
+def load_products_from_json():
+    """Load products from the local seed_data JSON file."""
     try:
-        with open(PRODUCTS_FILE, 'r') as f:
-            products = json.load(f)
-        
-        # Transform image URLs based on environment (S3 or local)
-        for product in products:
-            if 'image_url' in product:
-                product['image_url'] = get_image_url(product['image_url'])
-        
-        return products
+        with open(PRODUCTS_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
     except FileNotFoundError:
         return []
     except json.JSONDecodeError:
         return []
+
+
+def _normalize_product_for_json(product):
+    """Convert DynamoDB types (e.g. Decimal) to JSON-serializable types."""
+    from decimal import Decimal
+    result = {}
+    for k, v in product.items():
+        if isinstance(v, Decimal):
+            result[k] = float(v)
+        elif isinstance(v, list):
+            result[k] = [float(x) if isinstance(x, Decimal) else x for x in v]
+        else:
+            result[k] = v
+    return result
+
+
+def load_products_from_dynamodb():
+    """Load products from the DynamoDB products table (used when running on EC2)."""
+    if not DYNAMODB_PRODUCTS_TABLE:
+        return []
+    try:
+        import boto3
+        from boto3.dynamodb.types import TypeDeserializer
+        deserializer = TypeDeserializer()
+        region = os.environ.get('AWS_REGION') or os.environ.get('AWS_DEFAULT_REGION')
+        client = boto3.client('dynamodb', region_name=region) if region else boto3.client('dynamodb')
+        paginator = client.get_paginator('scan')
+        products = []
+        for page in paginator.paginate(TableName=DYNAMODB_PRODUCTS_TABLE):
+            for item in page.get('Items', []):
+                raw = {k: deserializer.deserialize(v) for k, v in item.items()}
+                products.append(_normalize_product_for_json(raw))
+        return products
+    except Exception as e:
+        logger.exception("DynamoDB load_products failed: %s", e)
+        return []
+
+
+def load_products():
+    """
+    Load products from DynamoDB (on EC2) or from the JSON file (locally), then resolve image URLs.
+    Image URLs are resolved based on S3_BUCKET_URL environment variable.
+    If S3_BUCKET_URL is set, images are fetched from S3.
+    Otherwise, images are served from local infrastructure/images directory.
+    """
+    if USE_DYNAMODB and DYNAMODB_PRODUCTS_TABLE:
+        products = load_products_from_dynamodb()
+    else:
+        products = load_products_from_json()
+    for product in products:
+        if product.get('image_url'):
+            product['image_url'] = get_image_url(product['image_url'])
+    return products
+
+
+@app.route('/debug', methods=['GET'])
+def debug():
+    """
+    Diagnostics: data source, table name, product count, and any DynamoDB error.
+    Safe to expose (no secrets). Use to verify DynamoDB is configured and working.
+    """
+    info = {
+        'data_source': 'dynamodb' if (USE_DYNAMODB and DYNAMODB_PRODUCTS_TABLE) else 'json',
+        'dynamodb_table_configured': bool(DYNAMODB_PRODUCTS_TABLE),
+        'use_dynamodb_env': USE_DYNAMODB,
+    }
+    try:
+        products = load_products()
+        info['product_count'] = len(products)
+    except Exception as e:
+        info['error'] = str(e)
+        info['product_count'] = 0
+    # Don't expose full table name in logs; last segment is enough for debugging
+    if DYNAMODB_PRODUCTS_TABLE:
+        info['table_name'] = DYNAMODB_PRODUCTS_TABLE.split('-')[-1] or 'products'
+    return jsonify(info)
 
 
 @app.route('/categories', methods=['GET'])
