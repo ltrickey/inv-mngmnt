@@ -3,6 +3,7 @@ from flask_cors import CORS
 import json
 import logging
 import os
+import time
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -172,10 +173,31 @@ def get_products_by_category_filters_dynamodb(p_category=None, s_category=None, 
                     'Keys': [{'barcode': {'S': b}} for b in chunk],
                 }
             }
-            resp = client.batch_get_item(RequestItems=request_items)
-            for item in resp.get('Responses', {}).get(DYNAMODB_PRODUCTS_TABLE, []):
-                raw = {k: deserializer.deserialize(v) for k, v in item.items()}
-                products.append(_normalize_product_for_json(raw))
+            max_retries = 5
+            retry_delay = 0.5  # seconds, then exponential backoff
+            for attempt in range(max_retries + 1):
+                resp = client.batch_get_item(RequestItems=request_items)
+                for item in resp.get('Responses', {}).get(DYNAMODB_PRODUCTS_TABLE, []):
+                    raw = {k: deserializer.deserialize(v) for k, v in item.items()}
+                    products.append(_normalize_product_for_json(raw))
+                request_items = resp.get('UnprocessedKeys') or {}
+                if not request_items:
+                    break
+                if attempt < max_retries:
+                    logger.warning(
+                        "DynamoDB batch_get_item returned %s unprocessed keys (attempt %s/%s), retrying after %.2fs",
+                        sum(len(v.get('Keys', [])) for v in request_items.values()),
+                        attempt + 1,
+                        max_retries,
+                        retry_delay,
+                    )
+                    time.sleep(retry_delay)
+                    retry_delay = min(retry_delay * 2, 10.0)
+                else:
+                    logger.error(
+                        "DynamoDB batch_get_item still had unprocessed keys after %s retries; some items omitted from results",
+                        max_retries,
+                    )
         return products
     except Exception as e:
         logger.exception("DynamoDB get_products_by_category_filters failed: %s", e)
@@ -322,6 +344,10 @@ def get_products():
 
     if USE_DYNAMODB and DYNAMODB_PRODUCTS_TABLE and has_filters:
         products = get_products_by_category_filters_dynamodb(p_category, s_category, t_category)
+        # DynamoDB filtered path returns raw paths; resolve image URLs once
+        for product in products:
+            if product.get('image_url'):
+                product['image_url'] = get_image_url(product['image_url'])
     else:
         products = load_products()
         if has_filters:
@@ -329,10 +355,8 @@ def get_products():
                 p for p in products
                 if _product_matches_category_filters(p, p_category, s_category, t_category)
             ]
+        # load_products() already resolved image URLs; do not transform again
 
-    for product in products:
-        if product.get('image_url'):
-            product['image_url'] = get_image_url(product['image_url'])
     return jsonify(products)
 
 

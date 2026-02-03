@@ -1,41 +1,85 @@
 import React from 'react'
-import CategoryGroup from './CategoryGroup'
 
 /**
- * Category filter section component
+ * Cascading category dropdowns: primary (always), secondary (when primary selected), tertiary (when secondary selected).
+ * Only one option per level can be selected.
  */
-function CategoryFilter({ categories, selectedCategories, onCategoryToggle }) {
-  // Group categories by level for display
-  const groupedCategories = {
-    primary: categories.filter(cat => cat.level === 'primary'),
-    secondary: categories.filter(cat => cat.level === 'secondary'),
-    tertiary: categories.filter(cat => cat.level === 'tertiary')
-  }
-
+function CategoryFilter({
+  primaryOptions,
+  secondaryOptions,
+  tertiaryOptions,
+  selectedPrimary,
+  selectedSecondary,
+  selectedTertiary,
+  onPrimaryChange,
+  onSecondaryChange,
+  onTertiaryChange,
+}) {
   return (
     <div className="filter-section">
       <h2>Filter by Category</h2>
-      
-      <CategoryGroup
-        title="Primary Categories"
-        categories={groupedCategories.primary}
-        selectedCategories={selectedCategories}
-        onCategoryToggle={onCategoryToggle}
-      />
+      <div className="category-dropdowns">
+        <div className="category-dropdown-group">
+          <label htmlFor="primary-category" className="category-dropdown-label">
+            Primary category
+          </label>
+          <select
+            id="primary-category"
+            className="category-select"
+            value={selectedPrimary}
+            onChange={(e) => onPrimaryChange(e.target.value)}
+          >
+            <option value="">All</option>
+            {primaryOptions.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      <CategoryGroup
-        title="Secondary Categories"
-        categories={groupedCategories.secondary}
-        selectedCategories={selectedCategories}
-        onCategoryToggle={onCategoryToggle}
-      />
+        {selectedPrimary && (
+          <div className="category-dropdown-group">
+            <label htmlFor="secondary-category" className="category-dropdown-label">
+              Secondary category
+            </label>
+            <select
+              id="secondary-category"
+              className="category-select"
+              value={selectedSecondary}
+              onChange={(e) => onSecondaryChange(e.target.value)}
+            >
+              <option value="">All</option>
+              {secondaryOptions.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
-      <CategoryGroup
-        title="Tertiary Categories"
-        categories={groupedCategories.tertiary}
-        selectedCategories={selectedCategories}
-        onCategoryToggle={onCategoryToggle}
-      />
+        {selectedPrimary && selectedSecondary && tertiaryOptions.length > 0 && (
+          <div className="category-dropdown-group">
+            <label htmlFor="tertiary-category" className="category-dropdown-label">
+              Tertiary category
+            </label>
+            <select
+              id="tertiary-category"
+              className="category-select"
+              value={selectedTertiary}
+              onChange={(e) => onTertiaryChange(e.target.value)}
+            >
+              <option value="">All</option>
+              {tertiaryOptions.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
