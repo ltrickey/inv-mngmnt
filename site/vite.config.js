@@ -25,6 +25,10 @@ export default defineConfig({
       '/stock': {
         target: 'http://localhost:8000',
         changeOrigin: true,
+      },
+      '/sales': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
       }
     }
   },

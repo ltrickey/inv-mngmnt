@@ -84,6 +84,7 @@ def get_all_stores():
 
 
 def get_store(store_id):
+    #TODO: call the DynamoDB call to get one store instead of filtering all stores.
     stores = get_all_stores()
     for s in stores:
         if s.get('store_id') == store_id:

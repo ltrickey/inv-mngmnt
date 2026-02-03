@@ -221,6 +221,33 @@ h1 {
   margin-bottom: 10px;
 }
 
+.product-price-current {
+  color: inherit;
+}
+
+.product-price--sale {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 12px;
+}
+
+.product-price-original {
+  text-decoration: line-through;
+  font-size: 0.85em;
+  color: #888;
+  font-weight: normal;
+}
+
+.product-price-badge {
+  font-size: 0.5em;
+  font-weight: 600;
+  color: #c00;
+  background: #ffe5e5;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
 .product-description {
   color: #666;
   margin-bottom: 10px;

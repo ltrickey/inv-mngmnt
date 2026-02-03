@@ -3,7 +3,7 @@ import React from 'react'
 /**
  * Store selector: dropdown of store names; when selected, shows store details in a box.
  */
-function StoreSelector({ stores, selectedStoreId, onStoreChange, loading, error }) {
+function StoreSelector({ stores, selectedStoreId, onStoreChange, loading, error, salesError }) {
   const selectedStore = selectedStoreId
     ? stores.find((s) => s.store_id === selectedStoreId)
     : null
@@ -12,6 +12,9 @@ function StoreSelector({ stores, selectedStoreId, onStoreChange, loading, error 
     <div className="store-selector-section filter-section">
       <h2>Select a store</h2>
       {error && <p className="store-selector-error">{error}</p>}
+      {salesError && selectedStoreId && (
+        <p className="store-selector-error store-selector-sales-error">{salesError}</p>
+      )}
       <div className="store-selector-row">
         <div className="category-dropdown-group">
           <label htmlFor="store-select" className="category-dropdown-label">

@@ -39,6 +39,8 @@ function App() {
   const [storesLoading, setStoresLoading] = useState(true)
   const [storesError, setStoresError] = useState(null)
   const [storeStock, setStoreStock] = useState([])
+  const [storeSales, setStoreSales] = useState([])
+  const [storeSalesError, setStoreSalesError] = useState(null)
 
   // Fetch stores once on mount
   useEffect(() => {
@@ -75,6 +77,28 @@ function App() {
       }
     }
     fetchStock()
+  }, [selectedStoreId])
+
+  // Fetch sales for selected store when store selection changes (for percent_off / sale prices)
+  useEffect(() => {
+    if (!selectedStoreId) {
+      setStoreSales([])
+      setStoreSalesError(null)
+      return
+    }
+    const fetchSales = async () => {
+      try {
+        setStoreSalesError(null)
+        const response = await fetch(`${API_BASE_URL}/sales/${selectedStoreId}`)
+        if (!response.ok) throw new Error(`Sales: ${response.status} ${response.statusText}`)
+        const data = await response.json()
+        setStoreSales(Array.isArray(data) ? data : [])
+      } catch (err) {
+        setStoreSales([])
+        setStoreSalesError(err.message || 'Failed to load sales')
+      }
+    }
+    fetchSales()
   }, [selectedStoreId])
 
   // Fetch products when dropdown selections change; build hierarchy from unfiltered result when no filter applied
@@ -161,6 +185,7 @@ function App() {
         onStoreChange={setSelectedStoreId}
         loading={storesLoading}
         error={storesError}
+        salesError={storeSalesError}
       />
 
       <CategoryFilter
@@ -183,6 +208,7 @@ function App() {
           products={products}
           storeStock={selectedStoreId ? storeStock : null}
           storeName={storeName}
+          storeSales={selectedStoreId ? storeSales : null}
         />
       )}
     </div>
