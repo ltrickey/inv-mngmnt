@@ -83,13 +83,34 @@ def get_all_stores():
     return load_stores_from_json()
 
 
-def get_store(store_id):
-    #TODO: call the DynamoDB call to get one store instead of filtering all stores.
-    stores = get_all_stores()
+def get_store_from_dynamodb(store_id):
+    if not DYNAMODB_STORES_TABLE:
+        return None
+    try:
+        client = _get_dynamodb_client()
+        resp = client.get_item(
+            TableName=DYNAMODB_STORES_TABLE,
+            Key={'store_id': {'S': store_id}}
+        )
+        item = resp.get('Item')
+        return _deserialize_item(item) if item else None
+    except Exception as e:
+        logger.exception("DynamoDB get_store failed: %s", e)
+        return None
+
+
+def get_store_from_json(store_id):
+    stores = load_stores_from_json()
     for s in stores:
         if s.get('store_id') == store_id:
             return s
     return None
+
+
+def get_store(store_id):
+    if USE_DYNAMODB and DYNAMODB_STORES_TABLE:
+        return get_store_from_dynamodb(store_id)
+    return get_store_from_json(store_id)
 
 
 # --- Stock (PK barcode, SK store_id; GSI ByStore: hash store_id, range barcode) ---

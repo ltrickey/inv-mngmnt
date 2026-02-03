@@ -1,112 +1,2502 @@
 [
-  {"store_id": "1234567890", "barcode": "0123456789012", "quantity": 24},
-  {"store_id": "1234567890", "barcode": "4011", "quantity": 45},
-  {"store_id": "1234567890", "barcode": "0123456789013", "quantity": 18},
-  {"store_id": "1234567890", "barcode": "0123456789014", "quantity": 30},
-  {"store_id": "1234567890", "barcode": "4080", "quantity": 22},
-  {"store_id": "1234567890", "barcode": "0123456789015", "quantity": 15},
-  {"store_id": "1234567890", "barcode": "0123456789016", "quantity": 8},
-  {"store_id": "1234567890", "barcode": "4225", "quantity": 12},
-  {"store_id": "1234567890", "barcode": "0123456789017", "quantity": 20},
-  {"store_id": "1234567890", "barcode": "0123456789018", "quantity": 14},
-  {"store_id": "1234567890", "barcode": "0123456789019", "quantity": 0},
-  {"store_id": "1234567890", "barcode": "0123456789020", "quantity": 6},
-  {"store_id": "1234567890", "barcode": "0123456789021", "quantity": 28},
-  {"store_id": "1234567890", "barcode": "0123456789022", "quantity": 16},
-  {"store_id": "1234567890", "barcode": "0123456789023", "quantity": 10},
-  {"store_id": "1234567890", "barcode": "0123456789024", "quantity": 32},
-  {"store_id": "1234567890", "barcode": "0123456789025", "quantity": 9},
-  {"store_id": "1234567890", "barcode": "0123456789026", "quantity": 11},
-  {"store_id": "1234567890", "barcode": "0123456789027", "quantity": 25},
-  {"store_id": "1234567890", "barcode": "0123456789028", "quantity": 7},
-  {"store_id": "1234567890", "barcode": "0123456789029", "quantity": 19},
-  {"store_id": "1234567891", "barcode": "0123456789012", "quantity": 18},
-  {"store_id": "1234567891", "barcode": "4011", "quantity": 30},
-  {"store_id": "1234567891", "barcode": "0123456789013", "quantity": 12},
-  {"store_id": "1234567891", "barcode": "0123456789014", "quantity": 22},
-  {"store_id": "1234567891", "barcode": "4080", "quantity": 0},
-  {"store_id": "1234567891", "barcode": "0123456789015", "quantity": 10},
-  {"store_id": "1234567891", "barcode": "0123456789016", "quantity": 5},
-  {"store_id": "1234567891", "barcode": "4225", "quantity": 8},
-  {"store_id": "1234567891", "barcode": "0123456789017", "quantity": 15},
-  {"store_id": "1234567891", "barcode": "0123456789018", "quantity": 20},
-  {"store_id": "1234567891", "barcode": "0123456789019", "quantity": 14},
-  {"store_id": "1234567891", "barcode": "0123456789020", "quantity": 3},
-  {"store_id": "1234567891", "barcode": "0123456789021", "quantity": 24},
-  {"store_id": "1234567891", "barcode": "0123456789022", "quantity": 11},
-  {"store_id": "1234567891", "barcode": "0123456789023", "quantity": 6},
-  {"store_id": "1234567891", "barcode": "0123456789024", "quantity": 28},
-  {"store_id": "1234567891", "barcode": "0123456789025", "quantity": 0},
-  {"store_id": "1234567891", "barcode": "0123456789026", "quantity": 9},
-  {"store_id": "1234567891", "barcode": "0123456789027", "quantity": 17},
-  {"store_id": "1234567891", "barcode": "0123456789028", "quantity": 4},
-  {"store_id": "1234567891", "barcode": "0123456789029", "quantity": 13},
-  {"store_id": "1234567892", "barcode": "0123456789012", "quantity": 20},
-  {"store_id": "1234567892", "barcode": "4011", "quantity": 38},
-  {"store_id": "1234567892", "barcode": "0123456789013", "quantity": 15},
-  {"store_id": "1234567892", "barcode": "0123456789014", "quantity": 26},
-  {"store_id": "1234567892", "barcode": "4080", "quantity": 19},
-  {"store_id": "1234567892", "barcode": "0123456789015", "quantity": 12},
-  {"store_id": "1234567892", "barcode": "0123456789016", "quantity": 7},
-  {"store_id": "1234567892", "barcode": "4225", "quantity": 10},
-  {"store_id": "1234567892", "barcode": "0123456789017", "quantity": 18},
-  {"store_id": "1234567892", "barcode": "0123456789018", "quantity": 16},
-  {"store_id": "1234567892", "barcode": "0123456789019", "quantity": 8},
-  {"store_id": "1234567892", "barcode": "0123456789020", "quantity": 5},
-  {"store_id": "1234567892", "barcode": "0123456789021", "quantity": 22},
-  {"store_id": "1234567892", "barcode": "0123456789022", "quantity": 14},
-  {"store_id": "1234567892", "barcode": "0123456789023", "quantity": 9},
-  {"store_id": "1234567892", "barcode": "0123456789024", "quantity": 30},
-  {"store_id": "1234567892", "barcode": "0123456789025", "quantity": 11},
-  {"store_id": "1234567892", "barcode": "0123456789026", "quantity": 7},
-  {"store_id": "1234567892", "barcode": "0123456789027", "quantity": 21},
-  {"store_id": "1234567892", "barcode": "0123456789028", "quantity": 6},
-  {"store_id": "1234567892", "barcode": "0123456789029", "quantity": 17},
-  {"store_id": "1234567893", "barcode": "0123456789012", "quantity": 15},
-  {"store_id": "1234567893", "barcode": "4011", "quantity": 42},
-  {"store_id": "1234567893", "barcode": "0123456789013", "quantity": 10},
-  {"store_id": "1234567893", "barcode": "0123456789014", "quantity": 19},
-  {"store_id": "1234567893", "barcode": "4080", "quantity": 25},
-  {"store_id": "1234567893", "barcode": "0123456789015", "quantity": 8},
-  {"store_id": "1234567893", "barcode": "0123456789016", "quantity": 0},
-  {"store_id": "1234567893", "barcode": "4225", "quantity": 14},
-  {"store_id": "1234567893", "barcode": "0123456789017", "quantity": 12},
-  {"store_id": "1234567893", "barcode": "0123456789018", "quantity": 18},
-  {"store_id": "1234567893", "barcode": "0123456789019", "quantity": 22},
-  {"store_id": "1234567893", "barcode": "0123456789020", "quantity": 4},
-  {"store_id": "1234567893", "barcode": "0123456789021", "quantity": 20},
-  {"store_id": "1234567893", "barcode": "0123456789022", "quantity": 9},
-  {"store_id": "1234567893", "barcode": "0123456789023", "quantity": 13},
-  {"store_id": "1234567893", "barcode": "0123456789024", "quantity": 24},
-  {"store_id": "1234567893", "barcode": "0123456789025", "quantity": 7},
-  {"store_id": "1234567893", "barcode": "0123456789026", "quantity": 16},
-  {"store_id": "1234567893", "barcode": "0123456789027", "quantity": 11},
-  {"store_id": "1234567893", "barcode": "0123456789028", "quantity": 5},
-  {"store_id": "1234567893", "barcode": "0123456789029", "quantity": 0},
-  {"store_id": "1234567894", "barcode": "0123456789012", "quantity": 22},
-  {"store_id": "1234567894", "barcode": "4011", "quantity": 35},
-  {"store_id": "1234567894", "barcode": "0123456789013", "quantity": 14},
-  {"store_id": "1234567894", "barcode": "0123456789014", "quantity": 28},
-  {"store_id": "1234567894", "barcode": "4080", "quantity": 20},
-  {"store_id": "1234567894", "barcode": "0123456789015", "quantity": 11},
-  {"store_id": "1234567894", "barcode": "0123456789016", "quantity": 6},
-  {"store_id": "1234567894", "barcode": "4225", "quantity": 9},
-  {"store_id": "1234567894", "barcode": "0123456789017", "quantity": 21},
-  {"store_id": "1234567894", "barcode": "0123456789018", "quantity": 13},
-  {"store_id": "1234567894", "barcode": "0123456789019", "quantity": 17},
-  {"store_id": "1234567894", "barcode": "0123456789020", "quantity": 2},
-  {"store_id": "1234567894", "barcode": "0123456789021", "quantity": 26},
-  {"store_id": "1234567894", "barcode": "0123456789022", "quantity": 15},
-  {"store_id": "1234567894", "barcode": "0123456789023", "quantity": 8},
-  {"store_id": "1234567894", "barcode": "0123456789024", "quantity": 31},
-  {"store_id": "1234567894", "barcode": "0123456789025", "quantity": 10},
-  {"store_id": "1234567894", "barcode": "0123456789026", "quantity": 12},
-  {"store_id": "1234567894", "barcode": "0123456789027", "quantity": 23},
-  {"store_id": "1234567894", "barcode": "0123456789028", "quantity": 3},
-  {"store_id": "1234567894", "barcode": "0123456789029", "quantity": 18},
-  {"store_id": "1234567890", "barcode": "0123456789030", "quantity": 18}, {"store_id": "1234567890", "barcode": "0123456789031", "quantity": 12}, {"store_id": "1234567890", "barcode": "0123456789032", "quantity": 8}, {"store_id": "1234567890", "barcode": "0123456789033", "quantity": 14}, {"store_id": "1234567890", "barcode": "0123456789034", "quantity": 22}, {"store_id": "1234567890", "barcode": "0123456789035", "quantity": 10}, {"store_id": "1234567890", "barcode": "0123456789036", "quantity": 6}, {"store_id": "1234567890", "barcode": "0123456789037", "quantity": 16}, {"store_id": "1234567890", "barcode": "0123456789038", "quantity": 20}, {"store_id": "1234567890", "barcode": "0123456789039", "quantity": 11}, {"store_id": "1234567890", "barcode": "0123456789040", "quantity": 24}, {"store_id": "1234567890", "barcode": "0123456789041", "quantity": 9}, {"store_id": "1234567890", "barcode": "0123456789042", "quantity": 15}, {"store_id": "1234567890", "barcode": "0123456789043", "quantity": 19}, {"store_id": "1234567890", "barcode": "0123456789044", "quantity": 28}, {"store_id": "1234567890", "barcode": "0123456789045", "quantity": 7}, {"store_id": "1234567890", "barcode": "0123456789046", "quantity": 13}, {"store_id": "1234567890", "barcode": "0123456789047", "quantity": 5}, {"store_id": "1234567890", "barcode": "0123456789048", "quantity": 35}, {"store_id": "1234567890", "barcode": "0123456789049", "quantity": 17}, {"store_id": "1234567890", "barcode": "0123456789050", "quantity": 21}, {"store_id": "1234567890", "barcode": "0123456789051", "quantity": 10}, {"store_id": "1234567890", "barcode": "0123456789052", "quantity": 12}, {"store_id": "1234567890", "barcode": "0123456789053", "quantity": 14}, {"store_id": "1234567890", "barcode": "0123456789054", "quantity": 8}, {"store_id": "1234567890", "barcode": "0123456789055", "quantity": 22}, {"store_id": "1234567890", "barcode": "0123456789056", "quantity": 11}, {"store_id": "1234567890", "barcode": "0123456789057", "quantity": 30}, {"store_id": "1234567890", "barcode": "0123456789058", "quantity": 4}, {"store_id": "1234567890", "barcode": "0123456789059", "quantity": 16}, {"store_id": "1234567890", "barcode": "0123456789060", "quantity": 26}, {"store_id": "1234567890", "barcode": "0123456789061", "quantity": 36}, {"store_id": "1234567890", "barcode": "0123456789062", "quantity": 18}, {"store_id": "1234567890", "barcode": "0123456789063", "quantity": 13}, {"store_id": "1234567890", "barcode": "0123456789064", "quantity": 25}, {"store_id": "1234567890", "barcode": "0123456789065", "quantity": 9}, {"store_id": "1234567890", "barcode": "0123456789066", "quantity": 20}, {"store_id": "1234567890", "barcode": "0123456789067", "quantity": 8}, {"store_id": "1234567890", "barcode": "0123456789068", "quantity": 40}, {"store_id": "1234567890", "barcode": "0123456789069", "quantity": 32}, {"store_id": "1234567890", "barcode": "0123456789070", "quantity": 14}, {"store_id": "1234567890", "barcode": "0123456789071", "quantity": 6}, {"store_id": "1234567890", "barcode": "0123456789072", "quantity": 24}, {"store_id": "1234567890", "barcode": "0123456789073", "quantity": 19}, {"store_id": "1234567890", "barcode": "0123456789074", "quantity": 10}, {"store_id": "1234567890", "barcode": "0123456789075", "quantity": 15}, {"store_id": "1234567890", "barcode": "0123456789076", "quantity": 28}, {"store_id": "1234567890", "barcode": "0123456789077", "quantity": 42}, {"store_id": "1234567890", "barcode": "0123456789078", "quantity": 11}, {"store_id": "1234567890", "barcode": "0123456789079", "quantity": 7}, {"store_id": "1234567890", "barcode": "0123456789080", "quantity": 12}, {"store_id": "1234567890", "barcode": "0123456789081", "quantity": 18}, {"store_id": "1234567890", "barcode": "0123456789082", "quantity": 20}, {"store_id": "1234567890", "barcode": "0123456789083", "quantity": 9}, {"store_id": "1234567890", "barcode": "0123456789084", "quantity": 38}, {"store_id": "1234567890", "barcode": "0123456789085", "quantity": 5}, {"store_id": "1234567890", "barcode": "0123456789086", "quantity": 24}, {"store_id": "1234567890", "barcode": "0123456789087", "quantity": 14}, {"store_id": "1234567890", "barcode": "0123456789088", "quantity": 22}, {"store_id": "1234567890", "barcode": "0123456789089", "quantity": 8}, {"store_id": "1234567890", "barcode": "0123456789090", "quantity": 30}, {"store_id": "1234567890", "barcode": "0123456789091", "quantity": 16}, {"store_id": "1234567890", "barcode": "0123456789092", "quantity": 21}, {"store_id": "1234567890", "barcode": "0123456789093", "quantity": 28}, {"store_id": "1234567890", "barcode": "0123456789094", "quantity": 18}, {"store_id": "1234567890", "barcode": "0123456789095", "quantity": 13}, {"store_id": "1234567890", "barcode": "0123456789096", "quantity": 0}, {"store_id": "1234567890", "barcode": "0123456789097", "quantity": 17}, {"store_id": "1234567890", "barcode": "0123456789098", "quantity": 9}, {"store_id": "1234567890", "barcode": "0123456789099", "quantity": 11}, {"store_id": "1234567890", "barcode": "0123456789100", "quantity": 14}, {"store_id": "1234567890", "barcode": "0123456789101", "quantity": 16}, {"store_id": "1234567890", "barcode": "0123456789102", "quantity": 12}, {"store_id": "1234567890", "barcode": "0123456789103", "quantity": 25}, {"store_id": "1234567890", "barcode": "0123456789104", "quantity": 19}, {"store_id": "1234567890", "barcode": "0123456789105", "quantity": 48}, {"store_id": "1234567890", "barcode": "0123456789106", "quantity": 32}, {"store_id": "1234567890", "barcode": "0123456789107", "quantity": 10}, {"store_id": "1234567890", "barcode": "0123456789108", "quantity": 26},
-  {"store_id": "1234567891", "barcode": "0123456789030", "quantity": 14}, {"store_id": "1234567891", "barcode": "0123456789031", "quantity": 0}, {"store_id": "1234567891", "barcode": "0123456789032", "quantity": 6}, {"store_id": "1234567891", "barcode": "0123456789033", "quantity": 11}, {"store_id": "1234567891", "barcode": "0123456789034", "quantity": 18}, {"store_id": "1234567891", "barcode": "0123456789035", "quantity": 7}, {"store_id": "1234567891", "barcode": "0123456789036", "quantity": 4}, {"store_id": "1234567891", "barcode": "0123456789037", "quantity": 12}, {"store_id": "1234567891", "barcode": "0123456789038", "quantity": 16}, {"store_id": "1234567891", "barcode": "0123456789039", "quantity": 8}, {"store_id": "1234567891", "barcode": "0123456789040", "quantity": 20}, {"store_id": "1234567891", "barcode": "0123456789041", "quantity": 6}, {"store_id": "1234567891", "barcode": "0123456789042", "quantity": 13}, {"store_id": "1234567891", "barcode": "0123456789043", "quantity": 15}, {"store_id": "1234567891", "barcode": "0123456789044", "quantity": 22}, {"store_id": "1234567891", "barcode": "0123456789045", "quantity": 5}, {"store_id": "1234567891", "barcode": "0123456789046", "quantity": 10}, {"store_id": "1234567891", "barcode": "0123456789047", "quantity": 3}, {"store_id": "1234567891", "barcode": "0123456789048", "quantity": 28}, {"store_id": "1234567891", "barcode": "0123456789049", "quantity": 14}, {"store_id": "1234567891", "barcode": "0123456789050", "quantity": 17}, {"store_id": "1234567891", "barcode": "0123456789051", "quantity": 8}, {"store_id": "1234567891", "barcode": "0123456789052", "quantity": 9}, {"store_id": "1234567891", "barcode": "0123456789053", "quantity": 11}, {"store_id": "1234567891", "barcode": "0123456789054", "quantity": 6}, {"store_id": "1234567891", "barcode": "0123456789055", "quantity": 18}, {"store_id": "1234567891", "barcode": "0123456789056", "quantity": 8}, {"store_id": "1234567891", "barcode": "0123456789057", "quantity": 24}, {"store_id": "1234567891", "barcode": "0123456789058", "quantity": 2}, {"store_id": "1234567891", "barcode": "0123456789059", "quantity": 12}, {"store_id": "1234567891", "barcode": "0123456789060", "quantity": 20}, {"store_id": "1234567891", "barcode": "0123456789061", "quantity": 30}, {"store_id": "1234567891", "barcode": "0123456789062", "quantity": 14}, {"store_id": "1234567891", "barcode": "0123456789063", "quantity": 10}, {"store_id": "1234567891", "barcode": "0123456789064", "quantity": 19}, {"store_id": "1234567891", "barcode": "0123456789065", "quantity": 7}, {"store_id": "1234567891", "barcode": "0123456789066", "quantity": 16}, {"store_id": "1234567891", "barcode": "0123456789067", "quantity": 5}, {"store_id": "1234567891", "barcode": "0123456789068", "quantity": 32}, {"store_id": "1234567891", "barcode": "0123456789069", "quantity": 28}, {"store_id": "1234567891", "barcode": "0123456789070", "quantity": 11}, {"store_id": "1234567891", "barcode": "0123456789071", "quantity": 4}, {"store_id": "1234567891", "barcode": "0123456789072", "quantity": 20}, {"store_id": "1234567891", "barcode": "0123456789073", "quantity": 15}, {"store_id": "1234567891", "barcode": "0123456789074", "quantity": 8}, {"store_id": "1234567891", "barcode": "0123456789075", "quantity": 12}, {"store_id": "1234567891", "barcode": "0123456789076", "quantity": 22}, {"store_id": "1234567891", "barcode": "0123456789077", "quantity": 35}, {"store_id": "1234567891", "barcode": "0123456789078", "quantity": 9}, {"store_id": "1234567891", "barcode": "0123456789079", "quantity": 5}, {"store_id": "1234567891", "barcode": "0123456789080", "quantity": 10}, {"store_id": "1234567891", "barcode": "0123456789081", "quantity": 14}, {"store_id": "1234567891", "barcode": "0123456789082", "quantity": 16}, {"store_id": "1234567891", "barcode": "0123456789083", "quantity": 7}, {"store_id": "1234567891", "barcode": "0123456789084", "quantity": 30}, {"store_id": "1234567891", "barcode": "0123456789085", "quantity": 3}, {"store_id": "1234567891", "barcode": "0123456789086", "quantity": 20}, {"store_id": "1234567891", "barcode": "0123456789087", "quantity": 11}, {"store_id": "1234567891", "barcode": "0123456789088", "quantity": 18}, {"store_id": "1234567891", "barcode": "0123456789089", "quantity": 6}, {"store_id": "1234567891", "barcode": "0123456789090", "quantity": 24}, {"store_id": "1234567891", "barcode": "0123456789091", "quantity": 13}, {"store_id": "1234567891", "barcode": "0123456789092", "quantity": 17}, {"store_id": "1234567891", "barcode": "0123456789093", "quantity": 22}, {"store_id": "1234567891", "barcode": "0123456789094", "quantity": 14}, {"store_id": "1234567891", "barcode": "0123456789095", "quantity": 10}, {"store_id": "1234567891", "barcode": "0123456789096", "quantity": 4}, {"store_id": "1234567891", "barcode": "0123456789097", "quantity": 13}, {"store_id": "1234567891", "barcode": "0123456789098", "quantity": 7}, {"store_id": "1234567891", "barcode": "0123456789099", "quantity": 8}, {"store_id": "1234567891", "barcode": "0123456789100", "quantity": 11}, {"store_id": "1234567891", "barcode": "0123456789101", "quantity": 12}, {"store_id": "1234567891", "barcode": "0123456789102", "quantity": 9}, {"store_id": "1234567891", "barcode": "0123456789103", "quantity": 20}, {"store_id": "1234567891", "barcode": "0123456789104", "quantity": 15}, {"store_id": "1234567891", "barcode": "0123456789105", "quantity": 40}, {"store_id": "1234567891", "barcode": "0123456789106", "quantity": 26}, {"store_id": "1234567891", "barcode": "0123456789107", "quantity": 8}, {"store_id": "1234567891", "barcode": "0123456789108", "quantity": 20},
-  {"store_id": "1234567892", "barcode": "0123456789030", "quantity": 16}, {"store_id": "1234567892", "barcode": "0123456789031", "quantity": 9}, {"store_id": "1234567892", "barcode": "0123456789032", "quantity": 7}, {"store_id": "1234567892", "barcode": "0123456789033", "quantity": 13}, {"store_id": "1234567892", "barcode": "0123456789034", "quantity": 20}, {"store_id": "1234567892", "barcode": "0123456789035", "quantity": 8}, {"store_id": "1234567892", "barcode": "0123456789036", "quantity": 5}, {"store_id": "1234567892", "barcode": "0123456789037", "quantity": 14}, {"store_id": "1234567892", "barcode": "0123456789038", "quantity": 18}, {"store_id": "1234567892", "barcode": "0123456789039", "quantity": 10}, {"store_id": "1234567892", "barcode": "0123456789040", "quantity": 22}, {"store_id": "1234567892", "barcode": "0123456789041", "quantity": 8}, {"store_id": "1234567892", "barcode": "0123456789042", "quantity": 14}, {"store_id": "1234567892", "barcode": "0123456789043", "quantity": 17}, {"store_id": "1234567892", "barcode": "0123456789044", "quantity": 25}, {"store_id": "1234567892", "barcode": "0123456789045", "quantity": 6}, {"store_id": "1234567892", "barcode": "0123456789046", "quantity": 11}, {"store_id": "1234567892", "barcode": "0123456789047", "quantity": 4}, {"store_id": "1234567892", "barcode": "0123456789048", "quantity": 32}, {"store_id": "1234567892", "barcode": "0123456789049", "quantity": 15}, {"store_id": "1234567892", "barcode": "0123456789050", "quantity": 19}, {"store_id": "1234567892", "barcode": "0123456789051", "quantity": 9}, {"store_id": "1234567892", "barcode": "0123456789052", "quantity": 11}, {"store_id": "1234567892", "barcode": "0123456789053", "quantity": 12}, {"store_id": "1234567892", "barcode": "0123456789054", "quantity": 7}, {"store_id": "1234567892", "barcode": "0123456789055", "quantity": 20}, {"store_id": "1234567892", "barcode": "0123456789056", "quantity": 10}, {"store_id": "1234567892", "barcode": "0123456789057", "quantity": 26}, {"store_id": "1234567892", "barcode": "0123456789058", "quantity": 3}, {"store_id": "1234567892", "barcode": "0123456789059", "quantity": 14}, {"store_id": "1234567892", "barcode": "0123456789060", "quantity": 24}, {"store_id": "1234567892", "barcode": "0123456789061", "quantity": 34}, {"store_id": "1234567892", "barcode": "0123456789062", "quantity": 16}, {"store_id": "1234567892", "barcode": "0123456789063", "quantity": 11}, {"store_id": "1234567892", "barcode": "0123456789064", "quantity": 22}, {"store_id": "1234567892", "barcode": "0123456789065", "quantity": 8}, {"store_id": "1234567892", "barcode": "0123456789066", "quantity": 18}, {"store_id": "1234567892", "barcode": "0123456789067", "quantity": 6}, {"store_id": "1234567892", "barcode": "0123456789068", "quantity": 36}, {"store_id": "1234567892", "barcode": "0123456789069", "quantity": 30}, {"store_id": "1234567892", "barcode": "0123456789070", "quantity": 12}, {"store_id": "1234567892", "barcode": "0123456789071", "quantity": 5}, {"store_id": "1234567892", "barcode": "0123456789072", "quantity": 22}, {"store_id": "1234567892", "barcode": "0123456789073", "quantity": 17}, {"store_id": "1234567892", "barcode": "0123456789074", "quantity": 9}, {"store_id": "1234567892", "barcode": "0123456789075", "quantity": 13}, {"store_id": "1234567892", "barcode": "0123456789076", "quantity": 25}, {"store_id": "1234567892", "barcode": "0123456789077", "quantity": 38}, {"store_id": "1234567892", "barcode": "0123456789078", "quantity": 10}, {"store_id": "1234567892", "barcode": "0123456789079", "quantity": 6}, {"store_id": "1234567892", "barcode": "0123456789080", "quantity": 11}, {"store_id": "1234567892", "barcode": "0123456789081", "quantity": 16}, {"store_id": "1234567892", "barcode": "0123456789082", "quantity": 18}, {"store_id": "1234567892", "barcode": "0123456789083", "quantity": 8}, {"store_id": "1234567892", "barcode": "0123456789084", "quantity": 34}, {"store_id": "1234567892", "barcode": "0123456789085", "quantity": 4}, {"store_id": "1234567892", "barcode": "0123456789086", "quantity": 22}, {"store_id": "1234567892", "barcode": "0123456789087", "quantity": 12}, {"store_id": "1234567892", "barcode": "0123456789088", "quantity": 20}, {"store_id": "1234567892", "barcode": "0123456789089", "quantity": 7}, {"store_id": "1234567892", "barcode": "0123456789090", "quantity": 28}, {"store_id": "1234567892", "barcode": "0123456789091", "quantity": 14}, {"store_id": "1234567892", "barcode": "0123456789092", "quantity": 19}, {"store_id": "1234567892", "barcode": "0123456789093", "quantity": 25}, {"store_id": "1234567892", "barcode": "0123456789094", "quantity": 16}, {"store_id": "1234567892", "barcode": "0123456789095", "quantity": 11}, {"store_id": "1234567892", "barcode": "0123456789096", "quantity": 2}, {"store_id": "1234567892", "barcode": "0123456789097", "quantity": 15}, {"store_id": "1234567892", "barcode": "0123456789098", "quantity": 8}, {"store_id": "1234567892", "barcode": "0123456789099", "quantity": 9}, {"store_id": "1234567892", "barcode": "0123456789100", "quantity": 12}, {"store_id": "1234567892", "barcode": "0123456789101", "quantity": 14}, {"store_id": "1234567892", "barcode": "0123456789102", "quantity": 10}, {"store_id": "1234567892", "barcode": "0123456789103", "quantity": 22}, {"store_id": "1234567892", "barcode": "0123456789104", "quantity": 17}, {"store_id": "1234567892", "barcode": "0123456789105", "quantity": 44}, {"store_id": "1234567892", "barcode": "0123456789106", "quantity": 28}, {"store_id": "1234567892", "barcode": "0123456789107", "quantity": 9}, {"store_id": "1234567892", "barcode": "0123456789108", "quantity": 22},
-  {"store_id": "1234567893", "barcode": "0123456789030", "quantity": 12}, {"store_id": "1234567893", "barcode": "0123456789031", "quantity": 7}, {"store_id": "1234567893", "barcode": "0123456789032", "quantity": 5}, {"store_id": "1234567893", "barcode": "0123456789033", "quantity": 10}, {"store_id": "1234567893", "barcode": "0123456789034", "quantity": 16}, {"store_id": "1234567893", "barcode": "0123456789035", "quantity": 6}, {"store_id": "1234567893", "barcode": "0123456789036", "quantity": 0}, {"store_id": "1234567893", "barcode": "0123456789037", "quantity": 11}, {"store_id": "1234567893", "barcode": "0123456789038", "quantity": 14}, {"store_id": "1234567893", "barcode": "0123456789039", "quantity": 7}, {"store_id": "1234567893", "barcode": "0123456789040", "quantity": 18}, {"store_id": "1234567893", "barcode": "0123456789041", "quantity": 5}, {"store_id": "1234567893", "barcode": "0123456789042", "quantity": 12}, {"store_id": "1234567893", "barcode": "0123456789043", "quantity": 13}, {"store_id": "1234567893", "barcode": "0123456789044", "quantity": 20}, {"store_id": "1234567893", "barcode": "0123456789045", "quantity": 4}, {"store_id": "1234567893", "barcode": "0123456789046", "quantity": 9}, {"store_id": "1234567893", "barcode": "0123456789047", "quantity": 2}, {"store_id": "1234567893", "barcode": "0123456789048", "quantity": 26}, {"store_id": "1234567893", "barcode": "0123456789049", "quantity": 12}, {"store_id": "1234567893", "barcode": "0123456789050", "quantity": 15}, {"store_id": "1234567893", "barcode": "0123456789051", "quantity": 7}, {"store_id": "1234567893", "barcode": "0123456789052", "quantity": 8}, {"store_id": "1234567893", "barcode": "0123456789053", "quantity": 10}, {"store_id": "1234567893", "barcode": "0123456789054", "quantity": 5}, {"store_id": "1234567893", "barcode": "0123456789055", "quantity": 16}, {"store_id": "1234567893", "barcode": "0123456789056", "quantity": 7}, {"store_id": "1234567893", "barcode": "0123456789057", "quantity": 22}, {"store_id": "1234567893", "barcode": "0123456789058", "quantity": 1}, {"store_id": "1234567893", "barcode": "0123456789059", "quantity": 11}, {"store_id": "1234567893", "barcode": "0123456789060", "quantity": 18}, {"store_id": "1234567893", "barcode": "0123456789061", "quantity": 28}, {"store_id": "1234567893", "barcode": "0123456789062", "quantity": 13}, {"store_id": "1234567893", "barcode": "0123456789063", "quantity": 9}, {"store_id": "1234567893", "barcode": "0123456789064", "quantity": 17}, {"store_id": "1234567893", "barcode": "0123456789065", "quantity": 6}, {"store_id": "1234567893", "barcode": "0123456789066", "quantity": 14}, {"store_id": "1234567893", "barcode": "0123456789067", "quantity": 4}, {"store_id": "1234567893", "barcode": "0123456789068", "quantity": 30}, {"store_id": "1234567893", "barcode": "0123456789069", "quantity": 26}, {"store_id": "1234567893", "barcode": "0123456789070", "quantity": 10}, {"store_id": "1234567893", "barcode": "0123456789071", "quantity": 3}, {"store_id": "1234567893", "barcode": "0123456789072", "quantity": 18}, {"store_id": "1234567893", "barcode": "0123456789073", "quantity": 14}, {"store_id": "1234567893", "barcode": "0123456789074", "quantity": 7}, {"store_id": "1234567893", "barcode": "0123456789075", "quantity": 11}, {"store_id": "1234567893", "barcode": "0123456789076", "quantity": 21}, {"store_id": "1234567893", "barcode": "0123456789077", "quantity": 32}, {"store_id": "1234567893", "barcode": "0123456789078", "quantity": 8}, {"store_id": "1234567893", "barcode": "0123456789079", "quantity": 4}, {"store_id": "1234567893", "barcode": "0123456789080", "quantity": 9}, {"store_id": "1234567893", "barcode": "0123456789081", "quantity": 13}, {"store_id": "1234567893", "barcode": "0123456789082", "quantity": 15}, {"store_id": "1234567893", "barcode": "0123456789083", "quantity": 6}, {"store_id": "1234567893", "barcode": "0123456789084", "quantity": 28}, {"store_id": "1234567893", "barcode": "0123456789085", "quantity": 2}, {"store_id": "1234567893", "barcode": "0123456789086", "quantity": 18}, {"store_id": "1234567893", "barcode": "0123456789087", "quantity": 10}, {"store_id": "1234567893", "barcode": "0123456789088", "quantity": 16}, {"store_id": "1234567893", "barcode": "0123456789089", "quantity": 5}, {"store_id": "1234567893", "barcode": "0123456789090", "quantity": 24}, {"store_id": "1234567893", "barcode": "0123456789091", "quantity": 12}, {"store_id": "1234567893", "barcode": "0123456789092", "quantity": 16}, {"store_id": "1234567893", "barcode": "0123456789093", "quantity": 22}, {"store_id": "1234567893", "barcode": "0123456789094", "quantity": 13}, {"store_id": "1234567893", "barcode": "0123456789095", "quantity": 9}, {"store_id": "1234567893", "barcode": "0123456789096", "quantity": 3}, {"store_id": "1234567893", "barcode": "0123456789097", "quantity": 12}, {"store_id": "1234567893", "barcode": "0123456789098", "quantity": 6}, {"store_id": "1234567893", "barcode": "0123456789099", "quantity": 8}, {"store_id": "1234567893", "barcode": "0123456789100", "quantity": 10}, {"store_id": "1234567893", "barcode": "0123456789101", "quantity": 11}, {"store_id": "1234567893", "barcode": "0123456789102", "quantity": 8}, {"store_id": "1234567893", "barcode": "0123456789103", "quantity": 18}, {"store_id": "1234567893", "barcode": "0123456789104", "quantity": 14}, {"store_id": "1234567893", "barcode": "0123456789105", "quantity": 36}, {"store_id": "1234567893", "barcode": "0123456789106", "quantity": 24}, {"store_id": "1234567893", "barcode": "0123456789107", "quantity": 7}, {"store_id": "1234567893", "barcode": "0123456789108", "quantity": 18},
-  {"store_id": "1234567894", "barcode": "0123456789030", "quantity": 15}, {"store_id": "1234567894", "barcode": "0123456789031", "quantity": 10}, {"store_id": "1234567894", "barcode": "0123456789032", "quantity": 9}, {"store_id": "1234567894", "barcode": "0123456789033", "quantity": 12}, {"store_id": "1234567894", "barcode": "0123456789034", "quantity": 19}, {"store_id": "1234567894", "barcode": "0123456789035", "quantity": 8}, {"store_id": "1234567894", "barcode": "0123456789036", "quantity": 5}, {"store_id": "1234567894", "barcode": "0123456789037", "quantity": 13}, {"store_id": "1234567894", "barcode": "0123456789038", "quantity": 17}, {"store_id": "1234567894", "barcode": "0123456789039", "quantity": 9}, {"store_id": "1234567894", "barcode": "0123456789040", "quantity": 21}, {"store_id": "1234567894", "barcode": "0123456789041", "quantity": 7}, {"store_id": "1234567894", "barcode": "0123456789042", "quantity": 14}, {"store_id": "1234567894", "barcode": "0123456789043", "quantity": 16}, {"store_id": "1234567894", "barcode": "0123456789044", "quantity": 24}, {"store_id": "1234567894", "barcode": "0123456789045", "quantity": 6}, {"store_id": "1234567894", "barcode": "0123456789046", "quantity": 12}, {"store_id": "1234567894", "barcode": "0123456789047", "quantity": 4}, {"store_id": "1234567894", "barcode": "0123456789048", "quantity": 30}, {"store_id": "1234567894", "barcode": "0123456789049", "quantity": 16}, {"store_id": "1234567894", "barcode": "0123456789050", "quantity": 18}, {"store_id": "1234567894", "barcode": "0123456789051", "quantity": 9}, {"store_id": "1234567894", "barcode": "0123456789052", "quantity": 11}, {"store_id": "1234567894", "barcode": "0123456789053", "quantity": 13}, {"store_id": "1234567894", "barcode": "0123456789054", "quantity": 7}, {"store_id": "1234567894", "barcode": "0123456789055", "quantity": 19}, {"store_id": "1234567894", "barcode": "0123456789056", "quantity": 10}, {"store_id": "1234567894", "barcode": "0123456789057", "quantity": 28}, {"store_id": "1234567894", "barcode": "0123456789058", "quantity": 3}, {"store_id": "1234567894", "barcode": "0123456789059", "quantity": 13}, {"store_id": "1234567894", "barcode": "0123456789060", "quantity": 22}, {"store_id": "1234567894", "barcode": "0123456789061", "quantity": 32}, {"store_id": "1234567894", "barcode": "0123456789062", "quantity": 15}, {"store_id": "1234567894", "barcode": "0123456789063", "quantity": 11}, {"store_id": "1234567894", "barcode": "0123456789064", "quantity": 21}, {"store_id": "1234567894", "barcode": "0123456789065", "quantity": 8}, {"store_id": "1234567894", "barcode": "0123456789066", "quantity": 17}, {"store_id": "1234567894", "barcode": "0123456789067", "quantity": 6}, {"store_id": "1234567894", "barcode": "0123456789068", "quantity": 34}, {"store_id": "1234567894", "barcode": "0123456789069", "quantity": 29}, {"store_id": "1234567894", "barcode": "0123456789070", "quantity": 12}, {"store_id": "1234567894", "barcode": "0123456789071", "quantity": 5}, {"store_id": "1234567894", "barcode": "0123456789072", "quantity": 21}, {"store_id": "1234567894", "barcode": "0123456789073", "quantity": 16}, {"store_id": "1234567894", "barcode": "0123456789074", "quantity": 9}, {"store_id": "1234567894", "barcode": "0123456789075", "quantity": 12}, {"store_id": "1234567894", "barcode": "0123456789076", "quantity": 24}, {"store_id": "1234567894", "barcode": "0123456789077", "quantity": 40}, {"store_id": "1234567894", "barcode": "0123456789078", "quantity": 10}, {"store_id": "1234567894", "barcode": "0123456789079", "quantity": 6}, {"store_id": "1234567894", "barcode": "0123456789080", "quantity": 11}, {"store_id": "1234567894", "barcode": "0123456789081", "quantity": 15}, {"store_id": "1234567894", "barcode": "0123456789082", "quantity": 17}, {"store_id": "1234567894", "barcode": "0123456789083", "quantity": 8}, {"store_id": "1234567894", "barcode": "0123456789084", "quantity": 32}, {"store_id": "1234567894", "barcode": "0123456789085", "quantity": 4}, {"store_id": "1234567894", "barcode": "0123456789086", "quantity": 21}, {"store_id": "1234567894", "barcode": "0123456789087", "quantity": 11}, {"store_id": "1234567894", "barcode": "0123456789088", "quantity": 19}, {"store_id": "1234567894", "barcode": "0123456789089", "quantity": 7}, {"store_id": "1234567894", "barcode": "0123456789090", "quantity": 26}, {"store_id": "1234567894", "barcode": "0123456789091", "quantity": 14}, {"store_id": "1234567894", "barcode": "0123456789092", "quantity": 18}, {"store_id": "1234567894", "barcode": "0123456789093", "quantity": 24}, {"store_id": "1234567894", "barcode": "0123456789094", "quantity": 15}, {"store_id": "1234567894", "barcode": "0123456789095", "quantity": 10}, {"store_id": "1234567894", "barcode": "0123456789096", "quantity": 5}, {"store_id": "1234567894", "barcode": "0123456789097", "quantity": 14}, {"store_id": "1234567894", "barcode": "0123456789098", "quantity": 8}, {"store_id": "1234567894", "barcode": "0123456789099", "quantity": 10}, {"store_id": "1234567894", "barcode": "0123456789100", "quantity": 13}, {"store_id": "1234567894", "barcode": "0123456789101", "quantity": 15}, {"store_id": "1234567894", "barcode": "0123456789102", "quantity": 11}, {"store_id": "1234567894", "barcode": "0123456789103", "quantity": 21}, {"store_id": "1234567894", "barcode": "0123456789104", "quantity": 16}, {"store_id": "1234567894", "barcode": "0123456789105", "quantity": 42}, {"store_id": "1234567894", "barcode": "0123456789106", "quantity": 27}, {"store_id": "1234567894", "barcode": "0123456789107", "quantity": 9}, {"store_id": "1234567894", "barcode": "0123456789108", "quantity": 24}
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789012",
+    "quantity": 24
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4011",
+    "quantity": 45
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789013",
+    "quantity": 18
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789014",
+    "quantity": 30
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4080",
+    "quantity": 22
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789015",
+    "quantity": 15
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789016",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4225",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789017",
+    "quantity": 20
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4090",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789019",
+    "quantity": 0
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789020",
+    "quantity": 6
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4799",
+    "quantity": 28
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789022",
+    "quantity": 16
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789023",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789024",
+    "quantity": 32
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4021",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4062",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789027",
+    "quantity": 25
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789028",
+    "quantity": 7
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4664",
+    "quantity": 19
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789012",
+    "quantity": 18
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4011",
+    "quantity": 30
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789013",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789014",
+    "quantity": 22
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4080",
+    "quantity": 0
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789015",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789016",
+    "quantity": 5
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4225",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789017",
+    "quantity": 15
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4090",
+    "quantity": 20
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789019",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789020",
+    "quantity": 3
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4799",
+    "quantity": 24
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789022",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789023",
+    "quantity": 6
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789024",
+    "quantity": 28
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4021",
+    "quantity": 0
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4062",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789027",
+    "quantity": 17
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789028",
+    "quantity": 4
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4664",
+    "quantity": 13
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789012",
+    "quantity": 20
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4011",
+    "quantity": 38
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789013",
+    "quantity": 15
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789014",
+    "quantity": 26
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4080",
+    "quantity": 19
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789015",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789016",
+    "quantity": 7
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4225",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789017",
+    "quantity": 18
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4090",
+    "quantity": 16
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789019",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789020",
+    "quantity": 5
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4799",
+    "quantity": 22
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789022",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789023",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789024",
+    "quantity": 30
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4021",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4062",
+    "quantity": 7
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789027",
+    "quantity": 21
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789028",
+    "quantity": 6
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4664",
+    "quantity": 17
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789012",
+    "quantity": 15
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4011",
+    "quantity": 42
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789013",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789014",
+    "quantity": 19
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4080",
+    "quantity": 25
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789015",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789016",
+    "quantity": 0
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4225",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789017",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4090",
+    "quantity": 18
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789019",
+    "quantity": 22
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789020",
+    "quantity": 4
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4799",
+    "quantity": 20
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789022",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789023",
+    "quantity": 13
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789024",
+    "quantity": 24
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4021",
+    "quantity": 7
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4062",
+    "quantity": 16
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789027",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789028",
+    "quantity": 5
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4664",
+    "quantity": 0
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789012",
+    "quantity": 22
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4011",
+    "quantity": 35
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789013",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789014",
+    "quantity": 28
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4080",
+    "quantity": 20
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789015",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789016",
+    "quantity": 6
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4225",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789017",
+    "quantity": 21
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4090",
+    "quantity": 13
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789019",
+    "quantity": 17
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789020",
+    "quantity": 2
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4799",
+    "quantity": 26
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789022",
+    "quantity": 15
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789023",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789024",
+    "quantity": 31
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4021",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4062",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789027",
+    "quantity": 23
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789028",
+    "quantity": 3
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4664",
+    "quantity": 18
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789030",
+    "quantity": 18
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4027",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789032",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789033",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4046",
+    "quantity": 22
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789035",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789036",
+    "quantity": 6
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4783",
+    "quantity": 16
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789038",
+    "quantity": 20
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4076",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789040",
+    "quantity": 24
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789041",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4688",
+    "quantity": 15
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789043",
+    "quantity": 19
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4554",
+    "quantity": 28
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789045",
+    "quantity": 7
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789046",
+    "quantity": 13
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4731",
+    "quantity": 5
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789048",
+    "quantity": 35
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789049",
+    "quantity": 17
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4816",
+    "quantity": 21
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789051",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789052",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4067",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789054",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789055",
+    "quantity": 22
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4028",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789057",
+    "quantity": 30
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789058",
+    "quantity": 4
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4729",
+    "quantity": 16
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789060",
+    "quantity": 26
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789061",
+    "quantity": 36
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789062",
+    "quantity": 18
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4680",
+    "quantity": 13
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789064",
+    "quantity": 25
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789065",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4053",
+    "quantity": 20
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789067",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789068",
+    "quantity": 40
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4048",
+    "quantity": 32
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789070",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789071",
+    "quantity": 6
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4049",
+    "quantity": 24
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789073",
+    "quantity": 19
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789074",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4070",
+    "quantity": 15
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789076",
+    "quantity": 28
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789077",
+    "quantity": 42
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789078",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4550",
+    "quantity": 7
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789080",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4078",
+    "quantity": 18
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789082",
+    "quantity": 20
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789083",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789084",
+    "quantity": 38
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4085",
+    "quantity": 5
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789086",
+    "quantity": 24
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4318",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789088",
+    "quantity": 22
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789089",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4072",
+    "quantity": 30
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789091",
+    "quantity": 16
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4626",
+    "quantity": 21
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789093",
+    "quantity": 28
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789094",
+    "quantity": 18
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4414",
+    "quantity": 13
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789096",
+    "quantity": 0
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789097",
+    "quantity": 17
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4032",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4881",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789100",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4430",
+    "quantity": 16
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789102",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789103",
+    "quantity": 25
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4959",
+    "quantity": 19
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789105",
+    "quantity": 48
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789106",
+    "quantity": 32
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789107",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4889",
+    "quantity": 26
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789030",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4027",
+    "quantity": 0
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789032",
+    "quantity": 6
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789033",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4046",
+    "quantity": 18
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789035",
+    "quantity": 7
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789036",
+    "quantity": 4
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4783",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789038",
+    "quantity": 16
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4076",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789040",
+    "quantity": 20
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789041",
+    "quantity": 6
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4688",
+    "quantity": 13
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789043",
+    "quantity": 15
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4554",
+    "quantity": 22
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789045",
+    "quantity": 5
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789046",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4731",
+    "quantity": 3
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789048",
+    "quantity": 28
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789049",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4816",
+    "quantity": 17
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789051",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789052",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4067",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789054",
+    "quantity": 6
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789055",
+    "quantity": 18
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4028",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789057",
+    "quantity": 24
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789058",
+    "quantity": 2
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4729",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789060",
+    "quantity": 20
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789061",
+    "quantity": 30
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789062",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4680",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789064",
+    "quantity": 19
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789065",
+    "quantity": 7
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4053",
+    "quantity": 16
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789067",
+    "quantity": 5
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789068",
+    "quantity": 32
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4048",
+    "quantity": 28
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789070",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789071",
+    "quantity": 4
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4049",
+    "quantity": 20
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789073",
+    "quantity": 15
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789074",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4070",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789076",
+    "quantity": 22
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789077",
+    "quantity": 35
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789078",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4550",
+    "quantity": 5
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789080",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4078",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789082",
+    "quantity": 16
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789083",
+    "quantity": 7
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789084",
+    "quantity": 30
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4085",
+    "quantity": 3
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789086",
+    "quantity": 20
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4318",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789088",
+    "quantity": 18
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789089",
+    "quantity": 6
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4072",
+    "quantity": 24
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789091",
+    "quantity": 13
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4626",
+    "quantity": 17
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789093",
+    "quantity": 22
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789094",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4414",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789096",
+    "quantity": 4
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789097",
+    "quantity": 13
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4032",
+    "quantity": 7
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4881",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789100",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4430",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789102",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789103",
+    "quantity": 20
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4959",
+    "quantity": 15
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789105",
+    "quantity": 40
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789106",
+    "quantity": 26
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789107",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4889",
+    "quantity": 20
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789030",
+    "quantity": 16
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4027",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789032",
+    "quantity": 7
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789033",
+    "quantity": 13
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4046",
+    "quantity": 20
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789035",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789036",
+    "quantity": 5
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4783",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789038",
+    "quantity": 18
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4076",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789040",
+    "quantity": 22
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789041",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4688",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789043",
+    "quantity": 17
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4554",
+    "quantity": 25
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789045",
+    "quantity": 6
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789046",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4731",
+    "quantity": 4
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789048",
+    "quantity": 32
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789049",
+    "quantity": 15
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4816",
+    "quantity": 19
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789051",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789052",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4067",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789054",
+    "quantity": 7
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789055",
+    "quantity": 20
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4028",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789057",
+    "quantity": 26
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789058",
+    "quantity": 3
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4729",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789060",
+    "quantity": 24
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789061",
+    "quantity": 34
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789062",
+    "quantity": 16
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4680",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789064",
+    "quantity": 22
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789065",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4053",
+    "quantity": 18
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789067",
+    "quantity": 6
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789068",
+    "quantity": 36
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4048",
+    "quantity": 30
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789070",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789071",
+    "quantity": 5
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4049",
+    "quantity": 22
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789073",
+    "quantity": 17
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789074",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4070",
+    "quantity": 13
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789076",
+    "quantity": 25
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789077",
+    "quantity": 38
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789078",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4550",
+    "quantity": 6
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789080",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4078",
+    "quantity": 16
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789082",
+    "quantity": 18
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789083",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789084",
+    "quantity": 34
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4085",
+    "quantity": 4
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789086",
+    "quantity": 22
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4318",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789088",
+    "quantity": 20
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789089",
+    "quantity": 7
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4072",
+    "quantity": 28
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789091",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4626",
+    "quantity": 19
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789093",
+    "quantity": 25
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789094",
+    "quantity": 16
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4414",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789096",
+    "quantity": 2
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789097",
+    "quantity": 15
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4032",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4881",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789100",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4430",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789102",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789103",
+    "quantity": 22
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4959",
+    "quantity": 17
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789105",
+    "quantity": 44
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789106",
+    "quantity": 28
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789107",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4889",
+    "quantity": 22
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789030",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4027",
+    "quantity": 7
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789032",
+    "quantity": 5
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789033",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4046",
+    "quantity": 16
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789035",
+    "quantity": 6
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789036",
+    "quantity": 0
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4783",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789038",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4076",
+    "quantity": 7
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789040",
+    "quantity": 18
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789041",
+    "quantity": 5
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4688",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789043",
+    "quantity": 13
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4554",
+    "quantity": 20
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789045",
+    "quantity": 4
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789046",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4731",
+    "quantity": 2
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789048",
+    "quantity": 26
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789049",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4816",
+    "quantity": 15
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789051",
+    "quantity": 7
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789052",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4067",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789054",
+    "quantity": 5
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789055",
+    "quantity": 16
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4028",
+    "quantity": 7
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789057",
+    "quantity": 22
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789058",
+    "quantity": 1
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4729",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789060",
+    "quantity": 18
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789061",
+    "quantity": 28
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789062",
+    "quantity": 13
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4680",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789064",
+    "quantity": 17
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789065",
+    "quantity": 6
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4053",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789067",
+    "quantity": 4
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789068",
+    "quantity": 30
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4048",
+    "quantity": 26
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789070",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789071",
+    "quantity": 3
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4049",
+    "quantity": 18
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789073",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789074",
+    "quantity": 7
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4070",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789076",
+    "quantity": 21
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789077",
+    "quantity": 32
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789078",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4550",
+    "quantity": 4
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789080",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4078",
+    "quantity": 13
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789082",
+    "quantity": 15
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789083",
+    "quantity": 6
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789084",
+    "quantity": 28
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4085",
+    "quantity": 2
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789086",
+    "quantity": 18
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4318",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789088",
+    "quantity": 16
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789089",
+    "quantity": 5
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4072",
+    "quantity": 24
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789091",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4626",
+    "quantity": 16
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789093",
+    "quantity": 22
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789094",
+    "quantity": 13
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4414",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789096",
+    "quantity": 3
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789097",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4032",
+    "quantity": 6
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4881",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789100",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4430",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789102",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789103",
+    "quantity": 18
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4959",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789105",
+    "quantity": 36
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789106",
+    "quantity": 24
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789107",
+    "quantity": 7
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4889",
+    "quantity": 18
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789030",
+    "quantity": 15
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4027",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789032",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789033",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4046",
+    "quantity": 19
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789035",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789036",
+    "quantity": 5
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4783",
+    "quantity": 13
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789038",
+    "quantity": 17
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4076",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789040",
+    "quantity": 21
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789041",
+    "quantity": 7
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4688",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789043",
+    "quantity": 16
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4554",
+    "quantity": 24
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789045",
+    "quantity": 6
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789046",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4731",
+    "quantity": 4
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789048",
+    "quantity": 30
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789049",
+    "quantity": 16
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4816",
+    "quantity": 18
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789051",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789052",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4067",
+    "quantity": 13
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789054",
+    "quantity": 7
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789055",
+    "quantity": 19
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4028",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789057",
+    "quantity": 28
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789058",
+    "quantity": 3
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4729",
+    "quantity": 13
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789060",
+    "quantity": 22
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789061",
+    "quantity": 32
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789062",
+    "quantity": 15
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4680",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789064",
+    "quantity": 21
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789065",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4053",
+    "quantity": 17
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789067",
+    "quantity": 6
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789068",
+    "quantity": 34
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4048",
+    "quantity": 29
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789070",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789071",
+    "quantity": 5
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4049",
+    "quantity": 21
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789073",
+    "quantity": 16
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789074",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4070",
+    "quantity": 12
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789076",
+    "quantity": 24
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789077",
+    "quantity": 40
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789078",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4550",
+    "quantity": 6
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789080",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4078",
+    "quantity": 15
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789082",
+    "quantity": 17
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789083",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789084",
+    "quantity": 32
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4085",
+    "quantity": 4
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789086",
+    "quantity": 21
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4318",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789088",
+    "quantity": 19
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789089",
+    "quantity": 7
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4072",
+    "quantity": 26
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789091",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4626",
+    "quantity": 18
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789093",
+    "quantity": 24
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789094",
+    "quantity": 15
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4414",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789096",
+    "quantity": 5
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789097",
+    "quantity": 14
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4032",
+    "quantity": 8
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4881",
+    "quantity": 10
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789100",
+    "quantity": 13
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4430",
+    "quantity": 15
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789102",
+    "quantity": 11
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789103",
+    "quantity": 21
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4959",
+    "quantity": 16
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789105",
+    "quantity": 42
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789106",
+    "quantity": 27
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789107",
+    "quantity": 9
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4889",
+    "quantity": 24
+  }
 ]
