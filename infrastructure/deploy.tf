@@ -6,7 +6,8 @@ resource "terraform_data" "deploy_app" {
 
   triggers_replace = [
     aws_instance.product_catalogue.id,
-    aws_instance.product_catalogue.public_ip
+    aws_instance.product_catalogue.public_ip,
+    filesha256("${path.module}/../server/data.py")  # Trigger redeployment when server code changes
   ]
 
   provisioner "local-exec" {

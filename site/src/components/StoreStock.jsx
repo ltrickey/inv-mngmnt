@@ -7,7 +7,7 @@ import React from 'react'
 function StoreStock({ product, storeStock, storeName }) {
   if (!storeName || !storeStock) return null
 
-  const item = storeStock.find((s) => s.barcode === product.barcode)
+  const item = storeStock.find((s) => String(s.barcode) === String(product.barcode))
   const quantity = item ? (item.quantity ?? 0) : null
 
   return (

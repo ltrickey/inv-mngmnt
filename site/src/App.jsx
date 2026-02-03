@@ -104,26 +104,39 @@ function App() {
   // Fetch products when dropdown selections change; build hierarchy from unfiltered result when no filter applied
   useEffect(() => {
     fetchProducts()
-  }, [selectedPrimary, selectedSecondary, selectedTertiary])
+  }, [selectedPrimary, selectedSecondary, selectedTertiary, selectedStoreId])
 
   const fetchProducts = async () => {
     try {
       setLoading(true)
       let url = `${API_BASE_URL}/products`
+      // Only send the most specific category filter (categories are nested):
+      // t_category > s_category > p_category
       const params = []
-      if (selectedPrimary) params.push(`p_category=${encodeURIComponent(selectedPrimary)}`)
-      if (selectedSecondary) params.push(`s_category=${encodeURIComponent(selectedSecondary)}`)
-      if (selectedTertiary) params.push(`t_category=${encodeURIComponent(selectedTertiary)}`)
-      if (params.length > 0) url = `${url}?${params.join('&')}`
+      if (selectedTertiary) {
+        params.push(`t_category=${encodeURIComponent(selectedTertiary)}`)
+      } else if (selectedSecondary) {
+        params.push(`s_category=${encodeURIComponent(selectedSecondary)}`)
+      } else if (selectedPrimary) {
+        params.push(`p_category=${encodeURIComponent(selectedPrimary)}`)
+      }
+      if (params.length > 0) url = `${url}?${params[0]}`
 
       const response = await fetch(url)
       if (!response.ok) throw new Error('Failed to fetch products')
       const data = await response.json()
       setProducts(data)
       setError(null)
-      // When we fetched with no filter, use result to build category hierarchy for dropdowns
+      // When we fetched with no filter, use result to build category hierarchy for dropdowns.
+      // If a store is selected and stock is loaded, build the hierarchy from that store's available products.
       if (params.length === 0) {
-        setCategoryHierarchy(buildCategoryHierarchy(data))
+        const storeBarcodes = selectedStoreId && Array.isArray(storeStock)
+          ? new Set(storeStock.map((s) => String(s.barcode)))
+          : null
+        const hierarchySource = storeBarcodes
+          ? data.filter((p) => storeBarcodes.has(String(p.barcode)))
+          : data
+        setCategoryHierarchy(buildCategoryHierarchy(hierarchySource))
       }
     } catch (err) {
       setError(err.message)
@@ -131,6 +144,34 @@ function App() {
       setLoading(false)
     }
   }
+
+  // When the selected store changes, reset category selections and refresh products (unfiltered),
+  // then rebuild category options based on that store's inventory once stock is available.
+  const handleStoreChange = (storeId) => {
+    setSelectedStoreId(storeId)
+    setSelectedPrimary('')
+    setSelectedSecondary('')
+    setSelectedTertiary('')
+    setCategoryHierarchy({})
+    // fetchProducts will run via the category-selection effect (after state updates),
+    // and categoryHierarchy will be rebuilt once unfiltered products are loaded.
+  }
+
+  // Display only products that exist in the selected store's stock list.
+  // This keeps UI aligned with "products for that store" without changing the API.
+  const visibleProducts = useMemo(() => {
+    if (!selectedStoreId || !Array.isArray(storeStock)) return products
+    const barcodes = new Set(storeStock.map((s) => String(s.barcode)))
+    return products.filter((p) => barcodes.has(String(p.barcode)))
+  }, [products, selectedStoreId, storeStock])
+
+  // If a store is selected and we have stock, rebuild the dropdown hierarchy from that store's products
+  // (only when no category filter is currently applied).
+  useEffect(() => {
+    const hasCategoryFilter = selectedPrimary || selectedSecondary || selectedTertiary
+    if (!selectedStoreId || !Array.isArray(storeStock) || hasCategoryFilter) return
+    setCategoryHierarchy(buildCategoryHierarchy(visibleProducts))
+  }, [selectedStoreId, storeStock, selectedPrimary, selectedSecondary, selectedTertiary, visibleProducts])
 
   const handlePrimaryChange = (value) => {
     setSelectedPrimary(value || '')
@@ -182,7 +223,7 @@ function App() {
       <StoreSelector
         stores={stores}
         selectedStoreId={selectedStoreId}
-        onStoreChange={setSelectedStoreId}
+        onStoreChange={handleStoreChange}
         loading={storesLoading}
         error={storesError}
         salesError={storeSalesError}
@@ -205,7 +246,7 @@ function App() {
 
       {!loading && !error && (
         <ProductsGrid
-          products={products}
+          products={visibleProducts}
           storeStock={selectedStoreId ? storeStock : null}
           storeName={storeName}
           storeSales={selectedStoreId ? storeSales : null}

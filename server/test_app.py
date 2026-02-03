@@ -38,13 +38,12 @@ class TestProductsEndpoint:
         assert all(p.get('primary_category') == 'Dairy' for p in data)
 
     def test_get_products_filter_by_multiple_categories(self, client):
-        """Test filtering by p_category and s_category (match ALL)."""
+        """Test filtering by multiple categories uses the most specific (s_category over p_category)."""
         response = client.get('/products?p_category=Dairy&s_category=Milk')
         assert response.status_code == 200
         data = json.loads(response.data)
         assert isinstance(data, list)
         for product in data:
-            assert product.get('primary_category') == 'Dairy'
             assert product.get('secondary_category') == 'Milk'
 
     def test_get_products_filter_by_nonexistent_category(self, client):

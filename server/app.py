@@ -135,8 +135,10 @@ def _barcodes_from_gsi_query(client, table_name, index_name, key_attr, category_
 def get_products_by_category_filters_dynamodb(p_category=None, s_category=None, t_category=None):
     """
     Get products that match the given primary/secondary/tertiary category filters using DynamoDB GSIs.
-    Each filter queries its corresponding GSI (PrimaryCategory, SecondaryCategory, TertiaryCategory).
-    When multiple filters are set, barcode sets are intersected (product must match ALL).
+    Since categories are nested (tertiary -> secondary -> primary), only query the most specific category:
+    - If tertiary_category is provided, query only TertiaryCategory GSI
+    - Else if secondary_category is provided, query only SecondaryCategory GSI
+    - Else if primary_category is provided, query only PrimaryCategory GSI
     """
     if not DYNAMODB_PRODUCTS_TABLE:
         return []
@@ -149,19 +151,18 @@ def get_products_by_category_filters_dynamodb(p_category=None, s_category=None, 
         from boto3.dynamodb.types import TypeDeserializer
         client = _get_dynamodb_products_client()
         deserializer = TypeDeserializer()
-        #TODO: I don't love this approach, see if we can change data model so we're not joining on client level, but OK for now.
-        barcode_sets = []
-        if p_val:
-            barcode_sets.append(_barcodes_from_gsi_query(client, DYNAMODB_PRODUCTS_TABLE, 'PrimaryCategory', 'primary_category', p_val))
-        if s_val:
-            barcode_sets.append(_barcodes_from_gsi_query(client, DYNAMODB_PRODUCTS_TABLE, 'SecondaryCategory', 'secondary_category', s_val))
+        # Query only the most specific category (categories are nested, so more specific implies less specific)
         if t_val:
-            barcode_sets.append(_barcodes_from_gsi_query(client, DYNAMODB_PRODUCTS_TABLE, 'TertiaryCategory', 'tertiary_category', t_val))
-        if not barcode_sets:
+            # Tertiary is most specific - only query TertiaryCategory GSI
+            result_barcodes = _barcodes_from_gsi_query(client, DYNAMODB_PRODUCTS_TABLE, 'TertiaryCategory', 'tertiary_category', t_val)
+        elif s_val:
+            # Secondary is most specific - only query SecondaryCategory GSI
+            result_barcodes = _barcodes_from_gsi_query(client, DYNAMODB_PRODUCTS_TABLE, 'SecondaryCategory', 'secondary_category', s_val)
+        elif p_val:
+            # Primary is most specific - only query PrimaryCategory GSI
+            result_barcodes = _barcodes_from_gsi_query(client, DYNAMODB_PRODUCTS_TABLE, 'PrimaryCategory', 'primary_category', p_val)
+        else:
             return []
-        result_barcodes = barcode_sets[0]
-        for s in barcode_sets[1:]:
-            result_barcodes = result_barcodes & s
         if not result_barcodes:
             return []
         barcode_list = list(result_barcodes)
@@ -313,13 +314,19 @@ def get_categories():
 
 
 def _product_matches_category_filters(product, p_category=None, s_category=None, t_category=None):
-    """True if the product matches all of the given primary/secondary/tertiary filters."""
-    if p_category and product.get('primary_category') != p_category:
-        return False
-    if s_category and product.get('secondary_category') != s_category:
-        return False
-    if t_category and product.get('tertiary_category') != t_category:
-        return False
+    """
+    True if the product matches the most specific category filter provided.
+    Since categories are nested (tertiary -> secondary -> primary), only check the most specific:
+    - If tertiary_category is provided, check only tertiary_category
+    - Else if secondary_category is provided, check only secondary_category
+    - Else if primary_category is provided, check only primary_category
+    """
+    if t_category:
+        return product.get('tertiary_category') == t_category
+    elif s_category:
+        return product.get('secondary_category') == s_category
+    elif p_category:
+        return product.get('primary_category') == p_category
     return True
 
 
@@ -327,19 +334,27 @@ def _product_matches_category_filters(product, p_category=None, s_category=None,
 def get_products():
     """
     GET endpoint to retrieve products.
-    Optional query params filter by category level; each uses its GSI when using DynamoDB.
+    Optional query params filter by category level; only the most specific category is used.
 
     Query parameters:
         p_category: primary_category (queries PrimaryCategory GSI)
         s_category: secondary_category (queries SecondaryCategory GSI)
         t_category: tertiary_category (queries TertiaryCategory GSI)
 
-    When multiple are provided, only products matching ALL filters are returned.
-    Example: ?p_category=Dairy&s_category=Milk returns products with primary_category=Dairy and secondary_category=Milk.
+    Since categories are nested (tertiary -> secondary -> primary), the API uses only the most specific:
+    - If t_category is provided, p_category and s_category are ignored
+    - Else if s_category is provided, p_category is ignored
+    - Else p_category is used
     """
     p_category = request.args.get('p_category', '').strip() or None
     s_category = request.args.get('s_category', '').strip() or None
     t_category = request.args.get('t_category', '').strip() or None
+    # Only use the most specific filter
+    if t_category:
+        s_category = None
+        p_category = None
+    elif s_category:
+        p_category = None
     has_filters = p_category or s_category or t_category
 
     if USE_DYNAMODB and DYNAMODB_PRODUCTS_TABLE and has_filters:
