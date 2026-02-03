@@ -20,13 +20,11 @@ resource "terraform_data" "deploy_app" {
       echo "=========================================="
       echo "Making scripts executable..."
       chmod +x scripts/package.sh scripts/deploy_remote.sh scripts/deploy.sh scripts/seed_dynamodb.sh
-      echo "Seeding DynamoDB from server/seed_data..."
-      INFRASTRUCTURE_DIR="$INFRA_DIR" ./scripts/seed_dynamodb.sh || { echo "DynamoDB seed failed; stopping deployment."; exit 1; }
       echo ""
       echo "Building and packaging application..."
       ./scripts/package.sh
       echo ""
-      echo "Deploying to EC2 instance..."
+      echo "Deploying to EC2 instance (DynamoDB will be seeded on EC2)..."
       INFRASTRUCTURE_DIR="$INFRA_DIR" ./scripts/deploy_remote.sh
     EOT
   }

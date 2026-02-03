@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # Seed DynamoDB tables from server/seed_data JSON files.
-# Uses Terraform name_prefix for table names. Run from repo root as part of deployment.
-# Requires: jq, aws CLI, Terraform applied (tables exist). Set INFRASTRUCTURE_DIR, SEED_DATA_DIR if needed.
+# Can run locally (with Terraform) or on EC2 (with NAME_PREFIX or DYNAMODB_PRODUCTS_TABLE set).
+# Requires: jq, aws CLI. Set SEED_DATA_DIR if not running from repo/deploy root.
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-INFRASTRUCTURE_DIR="${INFRASTRUCTURE_DIR:-$PROJECT_ROOT/infrastructure}"
 SEED_DATA_DIR="${SEED_DATA_DIR:-$PROJECT_ROOT/server/seed_data}"
+INFRASTRUCTURE_DIR="${INFRASTRUCTURE_DIR:-$PROJECT_ROOT/infrastructure}"
 
 # Convert JSON object to DynamoDB Item format (omit null). Use with: jq -c 'def dynamo_val: ...; def to_item: ...; .[] | to_item'
 JQ_TO_ITEM='
@@ -79,14 +79,16 @@ if [ ! -d "$SEED_DATA_DIR" ]; then
   echo "Error: Seed data directory not found: $SEED_DATA_DIR" >&2
   exit 1
 fi
-if [ ! -f "$INFRASTRUCTURE_DIR/dynamodb.tf" ]; then
-  echo "Error: Infrastructure directory not found or missing dynamodb.tf: $INFRASTRUCTURE_DIR" >&2
-  exit 1
-fi
 
-NAME_PREFIX=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw name_prefix 2>/dev/null) || true
+# Resolve NAME_PREFIX: from env, or from DYNAMODB_PRODUCTS_TABLE (e.g. on EC2), or from Terraform (local)
+if [ -z "$NAME_PREFIX" ] && [ -n "$DYNAMODB_PRODUCTS_TABLE" ]; then
+  NAME_PREFIX="${DYNAMODB_PRODUCTS_TABLE%-products}"
+fi
+if [ -z "$NAME_PREFIX" ] && [ -f "$INFRASTRUCTURE_DIR/dynamodb.tf" ]; then
+  NAME_PREFIX=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw name_prefix 2>/dev/null) || true
+fi
 if [ -z "$NAME_PREFIX" ]; then
-  echo "Error: Could not get name_prefix from Terraform. Run 'terraform apply' in infrastructure first." >&2
+  echo "Error: Set NAME_PREFIX or DYNAMODB_PRODUCTS_TABLE, or run from repo with Terraform applied." >&2
   exit 1
 fi
 

@@ -80,6 +80,23 @@ curl http://localhost:8000/products?category=Fruits&category=Vegetables
 ]
 ```
 
+### GET /debug
+
+Diagnostics endpoint to verify how the server is configured and whether product data loads. Returns JSON with:
+
+- **data_source**: `"dynamodb"` or `"json"`
+- **dynamodb_table_configured**: whether a DynamoDB products table is set
+- **use_dynamodb_env**: whether DynamoDB is enabled via env
+- **product_count**: number of products returned by `load_products()`
+- **table_name**: last segment of the products table name (when using DynamoDB)
+- **error**: present if `load_products()` raised an exception
+
+No secrets are exposed. Useful when deployed (e.g. on EC2) to confirm DynamoDB vs JSON and that products load.
+
+```bash
+curl http://localhost:8000/debug
+```
+
 ## Testing
 
 The project includes unit tests using pytest. To run the tests:

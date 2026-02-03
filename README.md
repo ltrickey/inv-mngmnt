@@ -63,7 +63,7 @@ To deploy to EC2 instances, you need an SSH key pair. The Terraform configuratio
 
 1. **Download the private key file:**
    - Download `vockey.pem` (or your key pair's `.pem` file) from AWS Academy or AWS Console
-   - Save it to `~/.ssh/vockey.pem` (or your preferred location)
+   - Save it to `~/.ssh/vockey.pem` 
 
 2. **Set correct permissions:**
    ```bash
@@ -125,6 +125,7 @@ You will need to input `yes` to allow `terraform apply` to make the required cha
    - Extracts files to `/opt/product_catalogue/`
    - Sets up Python virtual environment
    - Installs Python dependencies (Flask, Gunicorn, etc.)
+   - Seeds DynamoDB tables from `server/seed_data` (on EC2, using instance profile)
    - Creates and enables systemd service
    - Starts the Flask application
 
@@ -175,6 +176,7 @@ The deployment process uses three scripts, each with a specific role:
   - Extracts package to `/opt/product_catalogue/`
   - Creates Python virtual environment
   - Installs Python dependencies
+  - Seeds DynamoDB from `server/seed_data` (when using DynamoDB; installs `jq` if needed)
   - Creates systemd service file
   - Starts and enables Flask service
 - **Runs on:** EC2 instance (executed via SSH from `deploy_remote.sh`)
@@ -221,12 +223,14 @@ ssh -i ~/.ssh/vockey.pem ec2-user@<EC2_HOST> "sudo journalctl -u product_catalog
 
 ### Seeding DynamoDB
 
-DynamoDB tables are seeded from `server/seed_data` **as part of the Terraform deployment workflow**. When you run `terraform apply`, the provisioner runs `scripts/seed_dynamodb.sh` before packaging and deploying to EC2. The script loads `products.json`, `stores.json`, `stock.json`, and `sales.json` into the tables named by Terraform (`name_prefix-products`, `-stores`, `-stock`, `-sales`).
+DynamoDB tables are seeded **on the EC2 instance** during `deploy.sh`, using the instance’s IAM role (no local AWS credentials needed for seeding). The seed script runs after the package is extracted and loads `products.json`, `stores.json`, `stock.json`, and `sales.json` from `server/seed_data` into the tables (`name_prefix-products`, `-stores`, `-stock`, `-sales`). EC2 needs `jq` and the AWS CLI; `deploy.sh` will install `jq` via `yum`/`dnf` if missing.
 
-**Requirements:** `jq` and AWS CLI installed and configured (same credentials as Terraform).
-
-**To seed manually** (e.g. after changing seed data without re-deploying):
+**To seed manually from your machine** (e.g. after changing seed data without re-deploying):
 ```bash
-./scripts/seed_dynamodb.sh
+INFRASTRUCTURE_DIR=./infrastructure ./scripts/seed_dynamodb.sh
 ```
-Optional env vars: `INFRASTRUCTURE_DIR`, `SEED_DATA_DIR`, `AWS_REGION`.
+Or on EC2 (with `DYNAMODB_PRODUCTS_TABLE` set):
+```bash
+SEED_DATA_DIR=/opt/product_catalogue/server/seed_data DYNAMODB_PRODUCTS_TABLE=your-prefix-products /opt/product_catalogue/scripts/seed_dynamodb.sh
+```
+Optional env vars: `NAME_PREFIX` or `DYNAMODB_PRODUCTS_TABLE`, `SEED_DATA_DIR`, `INFRASTRUCTURE_DIR` (for local Terraform output), `AWS_REGION`.

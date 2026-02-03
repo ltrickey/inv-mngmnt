@@ -83,6 +83,13 @@ mkdir -p "$OUTPUT_DIR/runtime_setup"
 cp -r "$SCRIPT_DIR/runtime_setup"/* "$OUTPUT_DIR/runtime_setup/" 2>/dev/null || echo "  → Note: Runtime setup directory not found or empty"
 echo "  → Runtime setup files packaged (will be at /opt/product_catalogue/runtime_setup/ on EC2)"
 
+# Copy seed script (runs on EC2 after deploy to seed DynamoDB)
+echo "Packaging DynamoDB seed script..."
+mkdir -p "$OUTPUT_DIR/scripts"
+cp "$SCRIPT_DIR/seed_dynamodb.sh" "$OUTPUT_DIR/scripts/seed_dynamodb.sh"
+chmod +x "$OUTPUT_DIR/scripts/seed_dynamodb.sh"
+echo "  → Seed script packaged (will run on EC2)"
+
 # ============================================
 # STEP 3: CREATE DEPLOYMENT ARCHIVE
 # ============================================

@@ -79,6 +79,28 @@ else
 fi
 echo "✓ Flask env file created at $FLASK_ENV_FILE"
 
+# Seed DynamoDB from server/seed_data when using DynamoDB (runs on EC2 using instance profile)
+if [ -n "$DYNAMODB_PRODUCTS_TABLE" ] && [ -f "$DEPLOY_DIR/scripts/seed_dynamodb.sh" ]; then
+  echo ""
+  echo "Seeding DynamoDB tables..."
+  if ! command -v jq &>/dev/null; then
+    echo "  Installing jq (required for seed)..."
+    if command -v dnf &>/dev/null; then
+      sudo dnf install -y jq 2>/dev/null || true
+    elif command -v yum &>/dev/null; then
+      sudo yum install -y jq 2>/dev/null || true
+    fi
+  fi
+  if command -v jq &>/dev/null && command -v aws &>/dev/null; then
+    SEED_DATA_DIR="$DEPLOY_DIR/server/seed_data" \
+    DYNAMODB_PRODUCTS_TABLE="$DYNAMODB_PRODUCTS_TABLE" \
+    AWS_REGION="${AWS_REGION:-us-east-1}" \
+    "$DEPLOY_DIR/scripts/seed_dynamodb.sh" || echo "  ⚠ DynamoDB seed failed (tables may already be populated)"
+  else
+    echo "  Skipping seed (jq or aws CLI not available)"
+  fi
+fi
+
 # Set up systemd service for Flask
 echo ""
 echo "Setting up Flask service..."
