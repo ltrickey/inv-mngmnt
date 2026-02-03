@@ -25,6 +25,14 @@ else:
     app = Flask(__name__)
     CORS(app)  # Enable CORS for all routes
 
+# Register blueprints for stores, stock, sales (products/categories stay here)
+from stores import stores_bp
+from stock import stock_bp
+from sales import sales_bp
+app.register_blueprint(stores_bp)
+app.register_blueprint(stock_bp)
+app.register_blueprint(sales_bp)
+
 # Serve static images from infrastructure/images directory
 @app.route('/images/<path:filename>')
 def serve_image(filename):
@@ -60,16 +68,16 @@ def get_image_url(image_path):
     else:
         # Local development: Use Flask static file serving
         # Convert 'infrastructure/images/...' to '/images/...'
+        if image_path.startswith(('http://', 'https://')):
+            return image_path
+        if image_path.startswith('/images/'):
+            return image_path  # Already correct; avoid double /images/
         if image_path.startswith('infrastructure/images/'):
             return image_path.replace('infrastructure/images/', '/images/')
-        elif image_path.startswith('infrastructure/'):
+        if image_path.startswith('infrastructure/'):
             return image_path.replace('infrastructure/', '/')
-        else:
-            # If it's already a full URL (http/https), return as-is
-            if image_path.startswith(('http://', 'https://')):
-                return image_path
-            # Otherwise, assume it's a local path and prepend /images/
-            return f"/images/{image_path}"
+        # Bare filename or relative path
+        return f"/images/{image_path.lstrip('/')}"
 
 
 def load_products_from_json():
@@ -97,16 +105,91 @@ def _normalize_product_for_json(product):
     return result
 
 
+def _get_dynamodb_products_client():
+    import boto3
+    region = os.environ.get('AWS_REGION') or os.environ.get('AWS_DEFAULT_REGION')
+    return boto3.client('dynamodb', region_name=region) if region else boto3.client('dynamodb')
+
+
+def _barcodes_from_gsi_query(client, table_name, index_name, key_attr, category_value):
+    """Query a category GSI and return set of barcodes. category_value must be non-empty (items with null are not in the index)."""
+    barcodes = set()
+    try:
+        paginator = client.get_paginator('query')
+        for page in paginator.paginate(
+            TableName=table_name,
+            IndexName=index_name,
+            KeyConditionExpression=f'{key_attr} = :cat',
+            ExpressionAttributeValues={':cat': {'S': category_value}},
+        ):
+            for item in page.get('Items', []):
+                barcode = item.get('barcode', {}).get('S')
+                if barcode:
+                    barcodes.add(barcode)
+    except Exception as e:
+        logger.warning("DynamoDB GSI query %s failed for %s: %s", index_name, category_value, e)
+    return barcodes
+
+
+def get_products_by_category_filters_dynamodb(p_category=None, s_category=None, t_category=None):
+    """
+    Get products that match the given primary/secondary/tertiary category filters using DynamoDB GSIs.
+    Each filter queries its corresponding GSI (PrimaryCategory, SecondaryCategory, TertiaryCategory).
+    When multiple filters are set, barcode sets are intersected (product must match ALL).
+    """
+    if not DYNAMODB_PRODUCTS_TABLE:
+        return []
+    p_val = str(p_category).strip() if p_category else None
+    s_val = str(s_category).strip() if s_category else None
+    t_val = str(t_category).strip() if t_category else None
+    if not p_val and not s_val and not t_val:
+        return []
+    try:
+        from boto3.dynamodb.types import TypeDeserializer
+        client = _get_dynamodb_products_client()
+        deserializer = TypeDeserializer()
+        #TODO: I don't love this approach, see if we can change data model so we're not joining on client level, but OK for now.
+        barcode_sets = []
+        if p_val:
+            barcode_sets.append(_barcodes_from_gsi_query(client, DYNAMODB_PRODUCTS_TABLE, 'PrimaryCategory', 'primary_category', p_val))
+        if s_val:
+            barcode_sets.append(_barcodes_from_gsi_query(client, DYNAMODB_PRODUCTS_TABLE, 'SecondaryCategory', 'secondary_category', s_val))
+        if t_val:
+            barcode_sets.append(_barcodes_from_gsi_query(client, DYNAMODB_PRODUCTS_TABLE, 'TertiaryCategory', 'tertiary_category', t_val))
+        if not barcode_sets:
+            return []
+        result_barcodes = barcode_sets[0]
+        for s in barcode_sets[1:]:
+            result_barcodes = result_barcodes & s
+        if not result_barcodes:
+            return []
+        barcode_list = list(result_barcodes)
+        products = []
+        for i in range(0, len(barcode_list), 100):
+            chunk = barcode_list[i : i + 100]
+            request_items = {
+                DYNAMODB_PRODUCTS_TABLE: {
+                    'Keys': [{'barcode': {'S': b}} for b in chunk],
+                }
+            }
+            resp = client.batch_get_item(RequestItems=request_items)
+            for item in resp.get('Responses', {}).get(DYNAMODB_PRODUCTS_TABLE, []):
+                raw = {k: deserializer.deserialize(v) for k, v in item.items()}
+                products.append(_normalize_product_for_json(raw))
+        return products
+    except Exception as e:
+        logger.exception("DynamoDB get_products_by_category_filters failed: %s", e)
+        return []
+
+
 def load_products_from_dynamodb():
     """Load products from the DynamoDB products table (used when running on EC2)."""
     if not DYNAMODB_PRODUCTS_TABLE:
         return []
     try:
-        import boto3
         from boto3.dynamodb.types import TypeDeserializer
         deserializer = TypeDeserializer()
-        region = os.environ.get('AWS_REGION') or os.environ.get('AWS_DEFAULT_REGION')
-        client = boto3.client('dynamodb', region_name=region) if region else boto3.client('dynamodb')
+        client = _get_dynamodb_products_client()
         paginator = client.get_paginator('scan')
         products = []
         for page in paginator.paginate(TableName=DYNAMODB_PRODUCTS_TABLE):
@@ -207,37 +290,49 @@ def get_categories():
     return jsonify(categories_list)
 
 
+def _product_matches_category_filters(product, p_category=None, s_category=None, t_category=None):
+    """True if the product matches all of the given primary/secondary/tertiary filters."""
+    if p_category and product.get('primary_category') != p_category:
+        return False
+    if s_category and product.get('secondary_category') != s_category:
+        return False
+    if t_category and product.get('tertiary_category') != t_category:
+        return False
+    return True
+
+
 @app.route('/products', methods=['GET'])
 def get_products():
     """
     GET endpoint to retrieve products.
-    Supports optional 'category' query parameters for filtering (can specify multiple).
-    
+    Optional query params filter by category level; each uses its GSI when using DynamoDB.
+
     Query parameters:
-        category (optional, can be multiple): Filter products by primary, secondary, or tertiary category.
-                                            Products matching any of the specified categories will be returned.
-                                            Example: ?category=dairy&category=beverages
-    
-    Returns:
-        JSON response with list of products
+        p_category: primary_category (queries PrimaryCategory GSI)
+        s_category: secondary_category (queries SecondaryCategory GSI)
+        t_category: tertiary_category (queries TertiaryCategory GSI)
+
+    When multiple are provided, only products matching ALL filters are returned.
+    Example: ?p_category=Dairy&s_category=Milk returns products with primary_category=Dairy and secondary_category=Milk.
     """
-    products = load_products()
-    
-    # Get all category filters from query parameters (supports multiple)
-    categories = request.args.getlist('category')
-    
-    if categories:
-        # Filter products by categories (check primary, secondary, and tertiary)
-        # A product matches if any of its categories match any of the requested categories
-        filtered_products = [
-            product for product in products
-            if (product.get('primary_category') in categories or
-                product.get('secondary_category') in categories or
-                product.get('tertiary_category') in categories)
-        ]
-        return jsonify(filtered_products)
-    
-    # Return all products if no filter is specified
+    p_category = request.args.get('p_category', '').strip() or None
+    s_category = request.args.get('s_category', '').strip() or None
+    t_category = request.args.get('t_category', '').strip() or None
+    has_filters = p_category or s_category or t_category
+
+    if USE_DYNAMODB and DYNAMODB_PRODUCTS_TABLE and has_filters:
+        products = get_products_by_category_filters_dynamodb(p_category, s_category, t_category)
+    else:
+        products = load_products()
+        if has_filters:
+            products = [
+                p for p in products
+                if _product_matches_category_filters(p, p_category, s_category, t_category)
+            ]
+
+    for product in products:
+        if product.get('image_url'):
+            product['image_url'] = get_image_url(product['image_url'])
     return jsonify(products)
 
 

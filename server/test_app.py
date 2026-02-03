@@ -28,64 +28,50 @@ class TestProductsEndpoint:
         assert isinstance(data, list)
         assert len(data) > 0
     
-    def test_get_products_filter_by_single_category(self, client):
-        """Test filtering products by a single category."""
-        response = client.get('/products?category=Dairy')
+    def test_get_products_filter_by_primary_category(self, client):
+        """Test filtering products by primary category (p_category)."""
+        response = client.get('/products?p_category=Dairy')
         assert response.status_code == 200
         data = json.loads(response.data)
         assert isinstance(data, list)
         assert len(data) > 0
-        # Verify all returned products match the category
-        assert all(p.get('primary_category') == 'Dairy' or 
-                  p.get('secondary_category') == 'Dairy' or 
-                  p.get('tertiary_category') == 'Dairy' 
-                  for p in data)
-    
+        assert all(p.get('primary_category') == 'Dairy' for p in data)
+
     def test_get_products_filter_by_multiple_categories(self, client):
-        """Test filtering products by multiple categories."""
-        response = client.get('/products?category=Dairy&category=Beverages')
+        """Test filtering by p_category and s_category (match ALL)."""
+        response = client.get('/products?p_category=Dairy&s_category=Milk')
         assert response.status_code == 200
         data = json.loads(response.data)
         assert isinstance(data, list)
-        assert len(data) > 0
-        # Verify all returned products match at least one category
-        categories = ['Dairy', 'Beverages']
         for product in data:
-            assert (product.get('primary_category') in categories or
-                   product.get('secondary_category') in categories or
-                   product.get('tertiary_category') in categories)
-    
+            assert product.get('primary_category') == 'Dairy'
+            assert product.get('secondary_category') == 'Milk'
+
     def test_get_products_filter_by_nonexistent_category(self, client):
         """Test filtering by a category that doesn't exist."""
-        response = client.get('/products?category=NonexistentCategory')
+        response = client.get('/products?p_category=NonexistentCategory')
         assert response.status_code == 200
         data = json.loads(response.data)
         assert isinstance(data, list)
         assert len(data) == 0
-    
+
     def test_get_products_filter_by_secondary_category(self, client):
-        """Test filtering by secondary category."""
-        response = client.get('/products?category=Milk')
+        """Test filtering by secondary category (s_category)."""
+        response = client.get('/products?s_category=Milk')
         assert response.status_code == 200
         data = json.loads(response.data)
         assert isinstance(data, list)
-        # Should return products with Milk as secondary category
         for product in data:
-            assert (product.get('primary_category') == 'Milk' or
-                   product.get('secondary_category') == 'Milk' or
-                   product.get('tertiary_category') == 'Milk')
-    
+            assert product.get('secondary_category') == 'Milk'
+
     def test_get_products_filter_by_tertiary_category(self, client):
-        """Test filtering by tertiary category."""
-        response = client.get('/products?category=Bananas')
+        """Test filtering by tertiary category (t_category)."""
+        response = client.get('/products?t_category=Bananas')
         assert response.status_code == 200
         data = json.loads(response.data)
         assert isinstance(data, list)
-        # Should return products with Bananas as tertiary category
         for product in data:
-            assert (product.get('primary_category') == 'Bananas' or
-                   product.get('secondary_category') == 'Bananas' or
-                   product.get('tertiary_category') == 'Bananas')
+            assert product.get('tertiary_category') == 'Bananas'
     
     def test_get_products_response_format(self, client):
         """Test that product response has all required fields."""

@@ -19,10 +19,10 @@ function App() {
     fetchCategories()
   }, [])
 
-  // Fetch products when selected categories change
+  // Fetch products when selected categories or categories list (for level lookup) change
   useEffect(() => {
     fetchProducts()
-  }, [selectedCategories])
+  }, [selectedCategories, categories])
 
   const fetchCategories = async () => {
     try {
@@ -43,12 +43,20 @@ function App() {
     try {
       setLoading(true)
       let url = `${API_BASE_URL}/products`
-      
-      if (selectedCategories.length > 0) {
-        const categoryParams = selectedCategories
-          .map(cat => `category=${encodeURIComponent(cat)}`)
-          .join('&')
-        url = `${url}?${categoryParams}`
+      // API uses p_category (primary), s_category (secondary), t_category (tertiary) – one per level
+      if (selectedCategories.length > 0 && categories.length > 0) {
+        const byLevel = { primary: null, secondary: null, tertiary: null }
+        for (const name of selectedCategories) {
+          const cat = categories.find(c => c.name === name)
+          if (cat && byLevel[cat.level] === null) {
+            byLevel[cat.level] = name
+          }
+        }
+        const params = []
+        if (byLevel.primary) params.push(`p_category=${encodeURIComponent(byLevel.primary)}`)
+        if (byLevel.secondary) params.push(`s_category=${encodeURIComponent(byLevel.secondary)}`)
+        if (byLevel.tertiary) params.push(`t_category=${encodeURIComponent(byLevel.tertiary)}`)
+        if (params.length > 0) url = `${url}?${params.join('&')}`
       }
 
       const response = await fetch(url)
