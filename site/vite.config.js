@@ -17,6 +17,14 @@ export default defineConfig({
       '/images': {
         target: 'http://localhost:8000',
         changeOrigin: true,
+      },
+      '/stores': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+      '/stock': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
       }
     }
   },

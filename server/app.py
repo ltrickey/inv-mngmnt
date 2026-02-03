@@ -370,6 +370,23 @@ if IS_PRODUCTION:
         # API routes are already handled above, so this only catches non-API routes
         # Serve index.html for all routes (React Router handles client-side routing)
         return send_from_directory(REACT_BUILD_DIR, 'index.html')
+else:
+    # Development: no React build; avoid 404 when someone hits Flask root or favicon
+    @app.route('/')
+    def dev_root():
+        """In dev, frontend is served by Vite (e.g. port 3000). Use http:// (not https://)."""
+        return (
+            '<!DOCTYPE html><html><head><meta charset="utf-8"><title>API</title></head><body>'
+            '<p>Backend API only. In development, open the <strong>frontend</strong> at '
+            '<a href="http://localhost:3000">http://localhost:3000</a>.</p>'
+            '<p>Use <strong>http://</strong> (not https://) when connecting to this server.</p>'
+            '</body></html>'
+        ), 200, {'Content-Type': 'text/html; charset=utf-8'}
+
+    @app.route('/favicon.ico')
+    def favicon():
+        """Avoid 404 for browser favicon requests."""
+        return '', 204
 
 
 if __name__ == '__main__':

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import CategoryFilter from './components/CategoryFilter'
+import StoreSelector from './components/StoreSelector'
 import ProductsGrid from './components/ProductsGrid'
 import Loading from './components/Loading'
 import Error from './components/Error'
@@ -33,6 +34,48 @@ function App() {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [stores, setStores] = useState([])
+  const [selectedStoreId, setSelectedStoreId] = useState(null)
+  const [storesLoading, setStoresLoading] = useState(true)
+  const [storesError, setStoresError] = useState(null)
+  const [storeStock, setStoreStock] = useState([])
+
+  // Fetch stores once on mount
+  useEffect(() => {
+    const fetchStores = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/stores`)
+        if (!response.ok) throw new Error('Failed to fetch stores')
+        const data = await response.json()
+        setStores(data)
+        setStoresError(null)
+      } catch (err) {
+        setStoresError(err.message)
+      } finally {
+        setStoresLoading(false)
+      }
+    }
+    fetchStores()
+  }, [])
+
+  // Fetch stock for selected store when store selection changes
+  useEffect(() => {
+    if (!selectedStoreId) {
+      setStoreStock([])
+      return
+    }
+    const fetchStock = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/stock/${selectedStoreId}`)
+        if (!response.ok) throw new Error('Failed to fetch stock')
+        const data = await response.json()
+        setStoreStock(data)
+      } catch (err) {
+        setStoreStock([])
+      }
+    }
+    fetchStock()
+  }, [selectedStoreId])
 
   // Fetch products when dropdown selections change; build hierarchy from unfiltered result when no filter applied
   useEffect(() => {
@@ -102,9 +145,23 @@ function App() {
     }
   }, [tertiaryOptions, selectedTertiary])
 
+  const selectedStore = useMemo(
+    () => (selectedStoreId ? stores.find((s) => s.store_id === selectedStoreId) : null),
+    [stores, selectedStoreId]
+  )
+  const storeName = selectedStore ? selectedStore.store_name : null
+
   return (
     <div className="app">
       <h1>Products Catalog</h1>
+
+      <StoreSelector
+        stores={stores}
+        selectedStoreId={selectedStoreId}
+        onStoreChange={setSelectedStoreId}
+        loading={storesLoading}
+        error={storesError}
+      />
 
       <CategoryFilter
         primaryOptions={primaryOptions}
@@ -121,7 +178,13 @@ function App() {
       {loading && <Loading />}
       {error && <Error message={error} />}
 
-      {!loading && !error && <ProductsGrid products={products} />}
+      {!loading && !error && (
+        <ProductsGrid
+          products={products}
+          storeStock={selectedStoreId ? storeStock : null}
+          storeName={storeName}
+        />
+      )}
     </div>
   )
 }
