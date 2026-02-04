@@ -252,6 +252,13 @@ function App() {
           storeSales={selectedStoreId ? storeSales : null}
         />
       )}
+
+      <footer className="app-footer" style={{ marginTop: '2rem', padding: '0.5rem', fontSize: '0.875rem', opacity: 0.85 }}>
+        Photos from{' '}
+        <a href="https://www.pexels.com" target="_blank" rel="noopener noreferrer">
+          Pexels
+        </a>
+      </footer>
     </div>
   )
 }

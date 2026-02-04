@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Fetch free-to-use product images from Pexels for the 79 new products.
-Saves images to infrastructure/images/ with the filenames expected by products.json.
+Fetch free-to-use product images from Pexels for all products in products.json.
+Replaces placeholder or missing images with real photos. Saves to infrastructure/images/
+with the filenames expected by products.json.
 
 Requirements:
   - Pexels API key (free): https://www.pexels.com/api/
@@ -30,23 +31,19 @@ PROJECT_ROOT = SCRIPT_DIR.parent
 SEED_DATA = PROJECT_ROOT / "server" / "seed_data" / "products.json"
 IMAGES_DIR = PROJECT_ROOT / "infrastructure" / "images"
 
-NEW_BARCODE_MIN = "0123456789030"
-NEW_BARCODE_MAX = "0123456789108"
-
-# Optional: override search query for products where "name" gives poor results
+# Override search query for products where "name" gives poor or irrelevant results
 SEARCH_OVERRIDES = {
+    # Dairy / beverages
     "Half and Half": "half and half cream",
-    "Canned Tuna": "canned tuna can",
-    "Canned Tomatoes": "canned tomatoes",
-    "Canned Chickpeas": "chickpeas can",
-    "Black Beans": "black beans can",
     "Sparkling Water": "sparkling water bottles",
     "Green Tea": "green tea bags",
     "Vegetable Oil": "vegetable oil bottle",
     "Yogurt Drink": "yogurt drink bottle",
-    "Frozen Peas": "frozen peas bag",
+    "Coconut Milk": "coconut milk can",
+    "Ice Cream": "vanilla ice cream",
     "Cola": "cola cans",
     "Cereal": "oat cereal box",
+    # Condiments / pantry
     "Hot Sauce": "hot sauce bottle",
     "Soy Sauce": "soy sauce bottle",
     "Ketchup": "ketchup bottle",
@@ -54,15 +51,54 @@ SEARCH_OVERRIDES = {
     "Salsa": "salsa jar",
     "Maple Syrup": "maple syrup bottle",
     "Peanut Butter": "peanut butter jar",
-    "Coconut Milk": "coconut milk can",
-    "Ice Cream": "vanilla ice cream",
+    # Canned / packaged
+    "Canned Tuna": "canned tuna can",
+    "Canned Tomatoes": "canned tomatoes",
+    "Canned Chickpeas": "chickpeas can",
+    "Black Beans": "black beans can",
+    "Frozen Peas": "frozen peas bag",
     "Corn on the Cob": "corn on the cob",
+    # Produce (better Pexels results)
+    "Organic Bananas": "organic bananas fruit",
+    "Organic Apples": "organic apples fruit",
+    "Organic Carrots": "organic carrots vegetable",
+    "Organic Spinach": "fresh spinach leaves",
+    "Strawberries": "fresh strawberries fruit",
+    "Blueberries": "fresh blueberries fruit",
+    "Avocados": "ripe avocados",
+    "Kale": "kale vegetable",
+    "Green Beans": "green beans vegetable",
+    "Bell Peppers": "bell peppers vegetable",
+    "Cucumber": "fresh cucumber",
+    "Raspberries": "fresh raspberries",
+    "Cauliflower": "cauliflower vegetable",
+    "Sweet Potato": "sweet potato vegetable",
+    "Zucchini": "zucchini vegetable",
+    "Garlic": "garlic bulbs",
+    "Lemon": "lemons citrus",
+    "Lime": "limes citrus",
+    "Celery": "celery stalks",
+    "Potatoes": "potatoes vegetable",
+    "Corn": "fresh corn ears",
+    "Asparagus": "asparagus vegetable",
+    "Cantaloupe": "cantaloupe melon",
+    "Lettuce": "lettuce vegetable",
+    "Mushrooms": "fresh mushrooms",
+    "Brussels Sprouts": "brussels sprouts",
+    "Onions": "yellow onions",
+    "Pear": "pear fruit",
+    "Pineapple": "fresh pineapple",
+    "Mango": "fresh mango fruit",
+    "Cilantro": "cilantro herb",
+    "Eggplant": "eggplant vegetable",
+    "Watermelon": "watermelon slice",
+    "Grapes": "fresh grapes fruit",
 }
 
 
 def search_pexels(api_key: str, query: str) -> dict:
     url = "https://api.pexels.com/v1/search?" + urllib.parse.urlencode(
-        {"query": query, "per_page": 1, "orientation": "landscape"}
+        {"query": query, "per_page": 1, "orientation": "square"}
     )
     headers = {
         "Authorization": api_key,
@@ -112,9 +148,6 @@ def main() -> None:
 
     fetched = 0
     for p in products:
-        barcode = p.get("barcode", "")
-        if not (NEW_BARCODE_MIN <= barcode <= NEW_BARCODE_MAX):
-            continue
         name = p.get("name", "Product")
         image_url = p.get("image_url")
         if not image_url:
