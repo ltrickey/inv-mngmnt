@@ -267,6 +267,7 @@ def get_sales_for_store(store_id):
 def get_sale(store_id, barcode):
     data = _inventory_api_get(f"/inventory/{store_id}/{barcode}")
     if data is not None:
+        print(data)
         return data if (data.get('percent_off') or 0) > 0 else None
     if USE_DYNAMODB and DYNAMODB_PRODUCTS_BY_STORE_TABLE:
         return get_sale_from_dynamodb(store_id, barcode)
