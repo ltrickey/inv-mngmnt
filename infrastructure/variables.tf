@@ -4,10 +4,22 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "iam_role_name" {
+  description = "Name of the IAM role to use for EC2 instances. Defaults to 'LabRole' (AWS Academy). The role must have permissions for DynamoDB, CloudWatch, etc."
+  type        = string
+  default     = "LabRole"
+}
+
 variable "iam_instance_profile_name" {
-  description = "Name of the IAM instance profile to use for EC2 instances"
+  description = "Name of the IAM instance profile to use for EC2 instances. Defaults to 'LabInstanceProfile' (AWS Academy default). Override via -var or terraform.tfvars"
   type        = string
   default     = "LabInstanceProfile"
+}
+
+variable "create_instance_profile" {
+  description = "Whether to create a new instance profile or use an existing one. Set to true for custom AWS accounts if you want Terraform to create the profile."
+  type        = bool
+  default     = false
 }
 
 variable "ec2_key_pair" {

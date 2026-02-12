@@ -79,6 +79,19 @@ class InventoryDAO(InventoryItem):
     def get_by_store_id_and_barcode(self, store_id: str, barcode: str) -> InventoryItem:
         pass
 
+    @abstractmethod
+    def deduct_quantity(self, store_id: str, barcode: str, quantity: int) -> bool:
+        pass
+
+    # Deduct quantities of multiple products from a given store's inventory.  Return true if successfulf
+    @abstractmethod
+    def deduct_quantities(self, store_id: str, items: List[InventoryItem])-> bool:
+        pass
+
+
+  
+
+
 
 # Concrete DAO for accessing inventory Data from DynamoDB
 class InventoryDAODynamoDB(InventoryDAO):
@@ -143,4 +156,4 @@ class InventoryDAOJson(InventoryDAO):
         for r in rows:
             if r.get("store_id") == store_id and r.get("barcode") == barcode:
                 return InventoryItem(**r)
-        raise HTTPException(status_code=404, detail="Inventory item not found")
+        raise HTTPException(status_code=404, detail="Inventory item not found")  # pyright: ignore[reportUndefinedVariable]

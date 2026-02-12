@@ -1,5 +1,5 @@
 #!/bin/bash
-# Remote deployment script - handles all EC2 interaction
+# Remote deployment script for Inventory API - handles all EC2 interaction
 # This script copies the package to EC2 and runs deployment
 
 set -e
@@ -8,19 +8,19 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 # Allow INFRASTRUCTURE_DIR to be overridden by environment variable (useful when called from Terraform)
 INFRASTRUCTURE_DIR="${INFRASTRUCTURE_DIR:-$PROJECT_ROOT/infrastructure}"
-OUTPUT_DIR="$PROJECT_ROOT/deploy"
-PACKAGE_NAME="product_catalogue.zip"
+OUTPUT_DIR="$PROJECT_ROOT/deploy/inventory_api"
+PACKAGE_NAME="inventory_api.zip"
 EC2_USER="ec2-user"
 
 echo "=========================================="
-echo "REMOTE DEPLOYMENT TO EC2"
+echo "REMOTE DEPLOYMENT TO EC2 (INVENTORY API)"
 echo "=========================================="
 
 # Check if package exists
 PACKAGE_PATH="$OUTPUT_DIR/$PACKAGE_NAME"
 if [ ! -f "$PACKAGE_PATH" ]; then
     echo "Error: Package not found at $PACKAGE_PATH"
-    echo "Please run ./scripts/package.sh first to build and package the application"
+    echo "Please run ./scripts/package_inventory_api.sh first to build and package the application"
     exit 1
 fi
 
@@ -36,18 +36,20 @@ fi
 
 # Retry mechanism: Wait for Terraform outputs to become available
 # This is needed because terraform_data runs immediately after EC2 creation, and outputs may not be ready yet
-echo "Retrieving EC2 instance details from Terraform output..."
+echo "Retrieving Inventory API EC2 instance details from Terraform output..."
 EC2_PUBLIC_IP=""
 EC2_PUBLIC_DNS=""
+EC2_PRIVATE_IP=""
 KEY_PAIR=""
 
 for i in {1..30}; do
-    EC2_PUBLIC_IP=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw ec2_instance_public_ip 2>/dev/null || echo "")
-    EC2_PUBLIC_DNS=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw ec2_instance_public_dns 2>/dev/null || echo "")
+    EC2_PUBLIC_IP=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw inventory_api_public_ip 2>/dev/null || echo "")
+    EC2_PUBLIC_DNS=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw inventory_api_public_dns 2>/dev/null || echo "")
+    EC2_PRIVATE_IP=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw inventory_api_private_ip 2>/dev/null || echo "")
     KEY_PAIR=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw ec2_key_pair 2>/dev/null || echo "vockey")
     
     if [ -n "$EC2_PUBLIC_IP" ] || [ -n "$EC2_PUBLIC_DNS" ]; then
-        echo "✓ EC2 instance details retrieved"
+        echo "✓ Inventory API EC2 instance details retrieved"
         break
     fi
     
@@ -58,7 +60,7 @@ for i in {1..30}; do
 done
 
 if [ -z "$EC2_PUBLIC_IP" ] && [ -z "$EC2_PUBLIC_DNS" ]; then
-    echo "Error: Could not retrieve EC2 instance details from Terraform output after 30 attempts."
+    echo "Error: Could not retrieve Inventory API EC2 instance details from Terraform output after 30 attempts."
     echo "Current directory: $(pwd)"
     echo "Infrastructure directory: $INFRASTRUCTURE_DIR"
     echo "Terraform state file exists: $([ -f "$INFRASTRUCTURE_DIR/terraform.tfstate" ] && echo 'yes' || echo 'no')"
@@ -71,7 +73,8 @@ if [ -z "$EC2_PUBLIC_IP" ] && [ -z "$EC2_PUBLIC_DNS" ]; then
 fi
 
 EC2_HOST="${EC2_PUBLIC_DNS:-$EC2_PUBLIC_IP}"
-echo "EC2 Instance: $EC2_HOST"
+echo "Inventory API EC2 Instance: $EC2_HOST"
+echo "Inventory API Private IP: $EC2_PRIVATE_IP"
 echo ""
 
 # Find SSH key
@@ -103,7 +106,7 @@ echo "Package: $PACKAGE_PATH"
 echo ""
 echo "COPY DESTINATION ON EC2:"
 echo "  Temporary location: /tmp/$PACKAGE_NAME"
-echo "  (Will be extracted to: /opt/product_catalogue/)"
+echo "  (Will be extracted to: /opt/inventory_api/)"
 echo ""
 
 echo "Copying package to EC2 instance..."
@@ -140,10 +143,9 @@ for i in {1..30}; do
     sleep 2
 done
 
-# Get DynamoDB table name, region, and inventory API URL for Flask
+# Get DynamoDB table name and region for Inventory API
 NAME_PREFIX=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw name_prefix 2>/dev/null || echo "")
 AWS_REGION=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw aws_region 2>/dev/null || echo "us-east-1")
-INVENTORY_API_URL=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw inventory_api_url 2>/dev/null || echo "")
 DYNAMODB_PRODUCTS_TABLE=""
 [ -n "$NAME_PREFIX" ] && DYNAMODB_PRODUCTS_TABLE="${NAME_PREFIX}-products"
 
@@ -156,18 +158,18 @@ echo "DEPLOYING ON EC2 INSTANCE"
 echo "=========================================="
 echo ""
 
-# Run deployment commands remotely via SSH (pass DynamoDB table so Flask uses it on EC2)
+# Run deployment commands remotely via SSH (pass DynamoDB table so API uses it on EC2)
 ssh -i "$SSH_KEY" \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null \
     "$EC2_USER@$EC2_HOST" << REMOTE_DEPLOY
     set -e
     export DYNAMODB_PRODUCTS_TABLE="$DYNAMODB_PRODUCTS_TABLE"
+    export NAME_PREFIX="$NAME_PREFIX"
     export AWS_REGION="$AWS_REGION"
-    export INVENTORY_API_URL="$INVENTORY_API_URL"
 
-    PACKAGE_NAME="product_catalogue.zip"
-    DEPLOY_DIR="/opt/product_catalogue"
+    PACKAGE_NAME="inventory_api.zip"
+    DEPLOY_DIR="/opt/inventory_api"
 
     echo "=========================================="
     echo "EXTRACTING PACKAGE ON EC2"
@@ -193,7 +195,7 @@ ssh -i "$SSH_KEY" \
     echo "RUNNING DEPLOYMENT SCRIPT"
     echo "=========================================="
 
-    # Run deployment script (with DynamoDB env vars so it writes Flask env file)
+    # Run deployment script (with DynamoDB env vars so it writes API env file)
     cd "\$DEPLOY_DIR"
     sudo -E ./deploy.sh
 REMOTE_DEPLOY
@@ -203,7 +205,11 @@ if [ $? -eq 0 ]; then
     echo "=========================================="
     echo "DEPLOYMENT COMPLETE"
     echo "=========================================="
-    echo "Service URL: http://$EC2_HOST:8000"
+    echo "Inventory API URL (internal): http://$EC2_PRIVATE_IP:9000"
+    echo "Health Check: http://$EC2_PRIVATE_IP:9000/health"
+    echo ""
+    echo "Note: The Inventory API is only accessible from the product catalogue instance"
+    echo "      via the private IP address within the VPC."
     echo ""
 else
     echo ""
