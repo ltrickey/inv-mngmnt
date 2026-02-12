@@ -223,13 +223,13 @@ ssh -i ~/.ssh/vockey.pem ec2-user@<EC2_HOST> "sudo journalctl -u product_catalog
 
 ### Seeding DynamoDB
 
-DynamoDB tables are seeded **on the EC2 instance** during `deploy.sh`, using the instance’s IAM role (no local AWS credentials needed for seeding). The seed script runs after the package is extracted and loads `products.json`, `stores.json`, `stock.json`, and `sales.json` from `server/seed_data` into the tables (`name_prefix-products`, `-stores`, `-stock`, `-sales`). EC2 needs `jq` and the AWS CLI; `deploy.sh` will install `jq` via `yum`/`dnf` if missing.
+DynamoDB tables are seeded **on the EC2 instance** during `deploy.sh`, using the instance's IAM role (no local AWS credentials needed for seeding). The seed script runs after the package is extracted and loads `products.json`, `stores.json`, `products_by_store.json`, and `categories.json` from `server/seed_data` into the tables (`name_prefix-products`, `-stores`, `-products-by-store`, and `categories`). EC2 needs `jq` and the AWS CLI; `deploy.sh` will install `jq` via `yum`/`dnf` if missing. In `products.json`, each product has a **category_path** field: `"<secondary>#<tertiary>#<barcode>"` (e.g. `"Cheese#NONE#0123456789017"`). Missing secondary or tertiary categories are stored as the literal `"NONE"`.
 
 **To seed manually from your machine** (e.g. after changing seed data without re-deploying):
 ```bash
 INFRASTRUCTURE_DIR=./infrastructure ./scripts/seed_dynamodb.sh
 ```
-Or on EC2 (with `DYNAMODB_PRODUCTS_TABLE` set):
+Or on EC2 (with `DYNAMODB_PRODUCTS_TABLE` set in the environment or in the Flask env file):
 ```bash
 SEED_DATA_DIR=/opt/product_catalogue/server/seed_data DYNAMODB_PRODUCTS_TABLE=your-prefix-products /opt/product_catalogue/scripts/seed_dynamodb.sh
 ```

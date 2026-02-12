@@ -1,0 +1,597 @@
+[
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789012",
+    "quantity": 24,
+    "percent_off": 10,
+    "price": 4.49
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4011",
+    "quantity": 45,
+    "percent_off": 15,
+    "price": 2.12
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789013",
+    "quantity": 18,
+    "percent_off": 20,
+    "price": 3.19
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789014",
+    "quantity": 30,
+    "percent_off": 25,
+    "price": 4.12
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4080",
+    "quantity": 22,
+    "percent_off": 5,
+    "price": 3.79
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789015",
+    "quantity": 15,
+    "percent_off": 0,
+    "price": 8.99
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789016",
+    "quantity": 8,
+    "percent_off": 30,
+    "price": 9.09
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4225",
+    "quantity": 12,
+    "percent_off": 0,
+    "price": 2.99
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789017",
+    "quantity": 20,
+    "percent_off": 0,
+    "price": 6.99
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789019",
+    "quantity": 0,
+    "percent_off": 0,
+    "price": 4.49
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789020",
+    "quantity": 6,
+    "percent_off": 0,
+    "price": 7.99
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789022",
+    "quantity": 16,
+    "percent_off": 0,
+    "price": 4.99
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789023",
+    "quantity": 10,
+    "percent_off": 0,
+    "price": 2.99
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789024",
+    "quantity": 32,
+    "percent_off": 0,
+    "price": 9.99
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "4021",
+    "quantity": 9,
+    "percent_off": 0,
+    "price": 0.10
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789027",
+    "quantity": 25,
+    "percent_off": 0,
+    "price": 3.49
+  },
+  {
+    "store_id": "1234567890",
+    "barcode": "0123456789028",
+    "quantity": 7,
+    "percent_off": 0,
+    "price": 4.49
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789012",
+    "quantity": 18,
+    "percent_off": 15,
+    "price": 4.24
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4011",
+    "quantity": 30,
+    "percent_off": 0,
+    "price": 2.49
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789013",
+    "quantity": 12,
+    "percent_off": 0,
+    "price": 3.99
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789014",
+    "quantity": 22,
+    "percent_off": 0,
+    "price": 5.49
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4080",
+    "quantity": 0,
+    "percent_off": 20,
+    "price": 3.19
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789015",
+    "quantity": 10,
+    "percent_off": 25,
+    "price": 6.74
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789016",
+    "quantity": 5,
+    "percent_off": 40,
+    "price": 7.79
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4225",
+    "quantity": 8,
+    "percent_off": 10,
+    "price": 2.69
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789017",
+    "quantity": 15,
+    "percent_off": 50,
+    "price": 3.5
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789019",
+    "quantity": 14,
+    "percent_off": 0,
+    "price": 4.49
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789020",
+    "quantity": 3,
+    "percent_off": 0,
+    "price": 7.99
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789022",
+    "quantity": 11,
+    "percent_off": 0,
+    "price": 4.99
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789023",
+    "quantity": 6,
+    "percent_off": 0,
+    "price": 2.99
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789024",
+    "quantity": 28,
+    "percent_off": 0,
+    "price": 9.99
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "4021",
+    "quantity": 0,
+    "percent_off": 0,
+    "price": 0.10
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789027",
+    "quantity": 17,
+    "percent_off": 0,
+    "price": 3.49
+  },
+  {
+    "store_id": "1234567891",
+    "barcode": "0123456789028",
+    "quantity": 4,
+    "percent_off": 0,
+    "price": 4.49
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789012",
+    "quantity": 20,
+    "percent_off": 0,
+    "price": 4.99
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4011",
+    "quantity": 38,
+    "percent_off": 10,
+    "price": 2.24
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789013",
+    "quantity": 15,
+    "percent_off": 0,
+    "price": 3.99
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789014",
+    "quantity": 26,
+    "percent_off": 20,
+    "price": 4.39
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4080",
+    "quantity": 19,
+    "percent_off": 0,
+    "price": 3.99
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789015",
+    "quantity": 12,
+    "percent_off": 0,
+    "price": 8.99
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789016",
+    "quantity": 7,
+    "percent_off": 0,
+    "price": 12.99
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4225",
+    "quantity": 10,
+    "percent_off": 0,
+    "price": 2.99
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789017",
+    "quantity": 18,
+    "percent_off": 0,
+    "price": 6.99
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789019",
+    "quantity": 8,
+    "percent_off": 60,
+    "price": 1.8
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789020",
+    "quantity": 5,
+    "percent_off": 15,
+    "price": 6.79
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789022",
+    "quantity": 14,
+    "percent_off": 75,
+    "price": 1.25
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789023",
+    "quantity": 9,
+    "percent_off": 0,
+    "price": 2.99
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789024",
+    "quantity": 30,
+    "percent_off": 40,
+    "price": 5.99
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "4021",
+    "quantity": 11,
+    "percent_off": 0,
+    "price": 0.10
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789027",
+    "quantity": 21,
+    "percent_off": 50,
+    "price": 1.75
+  },
+  {
+    "store_id": "1234567892",
+    "barcode": "0123456789028",
+    "quantity": 6,
+    "percent_off": 0,
+    "price": 4.49
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789012",
+    "quantity": 15,
+    "percent_off": 5,
+    "price": 4.74
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4011",
+    "quantity": 42,
+    "percent_off": 0,
+    "price": 2.49
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789013",
+    "quantity": 10,
+    "percent_off": 0,
+    "price": 3.99
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789014",
+    "quantity": 19,
+    "percent_off": 0,
+    "price": 5.49
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4080",
+    "quantity": 25,
+    "percent_off": 30,
+    "price": 2.79
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789015",
+    "quantity": 8,
+    "percent_off": 0,
+    "price": 8.99
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789016",
+    "quantity": 0,
+    "percent_off": 0,
+    "price": 12.99
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4225",
+    "quantity": 14,
+    "percent_off": 45,
+    "price": 1.64
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789017",
+    "quantity": 12,
+    "percent_off": 20,
+    "price": 5.59
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789019",
+    "quantity": 22,
+    "percent_off": 0,
+    "price": 4.49
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789020",
+    "quantity": 4,
+    "percent_off": 0,
+    "price": 7.99
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789022",
+    "quantity": 9,
+    "percent_off": 0,
+    "price": 4.99
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789023",
+    "quantity": 13,
+    "percent_off": 80,
+    "price": 0.6
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789024",
+    "quantity": 24,
+    "percent_off": 35,
+    "price": 6.49
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "4021",
+    "quantity": 7,
+    "percent_off": 0,
+    "price": 0.10
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789027",
+    "quantity": 11,
+    "percent_off": 0,
+    "price": 3.49
+  },
+  {
+    "store_id": "1234567893",
+    "barcode": "0123456789028",
+    "quantity": 5,
+    "percent_off": 0,
+    "price": 4.49
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789012",
+    "quantity": 22,
+    "percent_off": 0,
+    "price": 4.99
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4011",
+    "quantity": 35,
+    "percent_off": 20,
+    "price": 1.99
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789013",
+    "quantity": 14,
+    "percent_off": 15,
+    "price": 3.39
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789014",
+    "quantity": 28,
+    "percent_off": 0,
+    "price": 5.49
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4080",
+    "quantity": 20,
+    "percent_off": 0,
+    "price": 3.99
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789015",
+    "quantity": 11,
+    "percent_off": 30,
+    "price": 6.29
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789016",
+    "quantity": 6,
+    "percent_off": 0,
+    "price": 12.99
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4225",
+    "quantity": 9,
+    "percent_off": 0,
+    "price": 2.99
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789017",
+    "quantity": 21,
+    "percent_off": 0,
+    "price": 6.99
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789019",
+    "quantity": 17,
+    "percent_off": 0,
+    "price": 4.49
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789020",
+    "quantity": 2,
+    "percent_off": 0,
+    "price": 7.99
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789022",
+    "quantity": 15,
+    "percent_off": 0,
+    "price": 4.99
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789023",
+    "quantity": 8,
+    "percent_off": 0,
+    "price": 2.99
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789024",
+    "quantity": 31,
+    "percent_off": 0,
+    "price": 9.99
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "4021",
+    "quantity": 10,
+    "percent_off": 90,
+    "price": 0.10
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789027",
+    "quantity": 23,
+    "percent_off": 65,
+    "price": 1.22
+  },
+  {
+    "store_id": "1234567894",
+    "barcode": "0123456789028",
+    "quantity": 3,
+    "percent_off": 40,
+    "price": 2.69
+  }
+]

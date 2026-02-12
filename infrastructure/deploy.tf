@@ -6,9 +6,7 @@ resource "terraform_data" "deploy_app" {
 
   triggers_replace = [
     aws_instance.product_catalogue.id,
-    aws_instance.product_catalogue.public_ip,
-    filesha256("${path.module}/../server/data.py"),  # Trigger redeployment when server code changes
-    base64sha256(join(",", sort(fileset("${path.module}/images", "**"))))  # Redeploy when images change (e.g. produce PLU renames)
+    aws_instance.product_catalogue.public_ip
   ]
 
   provisioner "local-exec" {

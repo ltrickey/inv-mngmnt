@@ -23,11 +23,30 @@ def to_item: to_entries | map(select(.value != null)) | map({key: .key, value: (
 .[] | to_item
 '
 
+# For products: add top-level primary_category from category.primary so GSI_Category works
+JQ_TO_ITEM_PRODUCTS='
+def dynamo_val:
+  if type == "string" then {S: .}
+  elif type == "number" then {N: (.|tostring)}
+  elif type == "boolean" then {BOOL: .}
+  elif type == "array" then {L: [.[] | dynamo_val]}
+  elif type == "object" then {M: (to_entries | map({key: .key, value: (.value | dynamo_val)}) | from_entries)}
+  else empty end;
+def to_item: to_entries | map(select(.value != null)) | map({key: .key, value: (.value | dynamo_val)}) | from_entries;
+.[] | (. + {primary_category: .category.primary}) | to_item
+'
+
 seed_table() {
   local table_suffix="$1"
   local file="$2"
   local label="$3"
-  local table_name="${NAME_PREFIX}-${table_suffix}"
+  local jq_program="${4:-$JQ_TO_ITEM}"
+  local table_name
+  if [ "$table_suffix" = "categories" ]; then
+    table_name="categories"
+  else
+    table_name="${NAME_PREFIX}-${table_suffix}"
+  fi
 
   if [ ! -f "$file" ]; then
     echo "  Skipping $label: file not found $file"
@@ -42,8 +61,6 @@ seed_table() {
     [ -z "$line" ] && continue
     batch+=("$line")
     if [ "${#batch[@]}" -eq "$batch_size" ]; then
-      # Build RequestItems: { "table-name": [ { PutRequest: { Item: ... } }, ... ] }
-      # Join with comma between elements only (items contain commas; don't use trailing-comma strip)
       local first="${batch[0]}"
       local rest=("${batch[@]:1}")
       local items_json="[$first$(printf ',%s' "${rest[@]}")]"
@@ -55,7 +72,7 @@ seed_table() {
       count=$((count + ${#batch[@]}))
       batch=()
     fi
-  done < <(jq -c "$JQ_TO_ITEM" "$file")
+  done < <(jq -c "$jq_program" "$file")
 
   if [ "${#batch[@]}" -gt 0 ]; then
     local first="${batch[0]}"
@@ -108,8 +125,8 @@ if [ -z "$AWS_REGION" ] && [ -z "$AWS_DEFAULT_REGION" ]; then
 fi
 
 echo "Seeding DynamoDB (prefix=$NAME_PREFIX) from $SEED_DATA_DIR"
-seed_table "products" "$SEED_DATA_DIR/products.json" "Products"
-seed_table "stores"   "$SEED_DATA_DIR/stores.json"   "Stores"
-seed_table "stock"    "$SEED_DATA_DIR/stock.json"    "Stock"
-seed_table "sales"    "$SEED_DATA_DIR/sales.json"   "Sales"
+seed_table "products"           "$SEED_DATA_DIR/products.json"           "Products"           "$JQ_TO_ITEM_PRODUCTS"
+seed_table "stores"             "$SEED_DATA_DIR/stores.json"             "Stores"
+seed_table "products_by_store"  "$SEED_DATA_DIR/products_by_store.json"  "Products by store"
+seed_table "categories"         "$SEED_DATA_DIR/categories.json"         "Categories"
 echo "DynamoDB seeding complete."

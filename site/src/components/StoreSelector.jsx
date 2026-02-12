@@ -1,48 +1,45 @@
 import React from 'react'
 
 /**
- * Store selector: dropdown of store names; when selected, shows store details in a box.
+ * Store dropdown: select a store to see stock and sales for that location.
  */
-function StoreSelector({ stores, selectedStoreId, onStoreChange, loading, error, salesError }) {
-  const selectedStore = selectedStoreId
-    ? stores.find((s) => s.store_id === selectedStoreId)
-    : null
-
+function StoreSelector({
+  stores,
+  selectedStoreId,
+  onStoreChange,
+  loading,
+  error,
+  salesError,
+}) {
   return (
-    <div className="store-selector-section filter-section">
-      <h2>Select a store</h2>
-      {error && <p className="store-selector-error">{error}</p>}
-      {salesError && selectedStoreId && (
-        <p className="store-selector-error store-selector-sales-error">{salesError}</p>
+    <div className="filter-section store-selector">
+      <h2>Select Store</h2>
+      {loading && <p className="store-selector-loading">Loading stores…</p>}
+      {error && <p className="store-selector-error" role="alert">{error}</p>}
+      {salesError && (
+        <p className="store-selector-sales-error" role="alert">
+          Sales: {salesError}
+        </p>
       )}
-      <div className="store-selector-row">
+      {!loading && !error && (
         <div className="category-dropdown-group">
           <label htmlFor="store-select" className="category-dropdown-label">
             Store
           </label>
           <select
             id="store-select"
-            className="category-select store-select"
-            value={selectedStoreId || ''}
+            className="category-select"
+            value={selectedStoreId ?? ''}
             onChange={(e) => onStoreChange(e.target.value || null)}
-            disabled={loading}
           >
-            <option value="">Choose a store…</option>
-            {stores.map((store) => (
-              <option key={store.store_id} value={store.store_id}>
-                {store.store_name}
-              </option>
-            ))}
+            <option value="">No store selected</option>
+            {Array.isArray(stores) &&
+              stores.map((store) => (
+                <option key={store.store_id} value={store.store_id}>
+                  {store.store_name || store.store_id}
+                </option>
+              ))}
           </select>
-        </div>
-      </div>
-      {selectedStore && (
-        <div className="store-info-box">
-          <h3 className="store-info-title">{selectedStore.store_name}</h3>
-          <dl className="store-info-dl">
-            <dt>Address</dt>
-            <dd>{selectedStore.store_address}</dd>
-          </dl>
         </div>
       )}
     </div>

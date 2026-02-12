@@ -26,9 +26,6 @@ logs/
 *.swo
 *~
 
-# Python venv (used by scripts/run_generate_product_images.sh)
-.venv/
-
 # Temporary files
 *.tmp
 *.temp

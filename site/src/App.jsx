@@ -8,19 +8,20 @@ import Error from './components/Error'
 // Use relative URLs to go through Vite proxy
 const API_BASE_URL = ''
 
-/** Build { primary: { secondary: [tertiary, ...] } } from product list */
+/** Build { primary: { secondary: [tertiary, ...] } } from product list. Supports both flat (primary_category) and nested (category.primary) shapes. */
 function buildCategoryHierarchy(products) {
   const hierarchy = {}
   if (!products || !products.length) return hierarchy
   products.forEach((p) => {
-    const pri = p.primary_category
-    const sec = p.secondary_category
-    const ter = p.tertiary_category
+    const cat = p.category || {}
+    const pri = p.primary_category ?? cat.primary
+    const sec = p.secondary_category ?? cat.secondary
+    const ter = p.tertiary_category ?? cat.tertiary
     if (!pri) return
     if (!hierarchy[pri]) hierarchy[pri] = {}
-    if (sec) {
+    if (sec && sec !== 'NONE') {
       if (!hierarchy[pri][sec]) hierarchy[pri][sec] = []
-      if (ter && !hierarchy[pri][sec].includes(ter)) hierarchy[pri][sec].push(ter)
+      if (ter && ter !== 'NONE' && !hierarchy[pri][sec].includes(ter)) hierarchy[pri][sec].push(ter)
     }
   })
   return hierarchy

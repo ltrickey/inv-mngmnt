@@ -17,15 +17,15 @@ function ProductsGrid({ products, storeStock, storeName, storeSales }) {
   return (
     <div className="products-grid">
       {products.map(product => {
-        const sale = storeSales?.find(
-          (s) => String(s.barcode) === String(product.barcode) && s.percent_off != null
-        ) ?? null
+        const sale = storeSales?.find((s) => String(s.barcode) === String(product.barcode) && s.percent_off != null) ?? null
+        const storeRow = storeStock?.find((s) => String(s.barcode) === String(product.barcode)) ?? null
         return (
           <ProductCard
             key={`${product.barcode}-${product.barcode_type}`}
             product={product}
             storeStock={storeStock}
             storeName={storeName}
+            storeRow={storeRow}
             sale={sale}
           />
         )

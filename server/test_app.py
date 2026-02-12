@@ -35,7 +35,8 @@ class TestProductsEndpoint:
         data = json.loads(response.data)
         assert isinstance(data, list)
         assert len(data) > 0
-        assert all(p.get('primary_category') == 'Dairy' for p in data)
+        def _p(p): c = p.get('category') or {}; return c.get('primary') or p.get('primary_category')
+        assert all(_p(p) == 'Dairy' for p in data)
 
     def test_get_products_filter_by_multiple_categories(self, client):
         """Test filtering by multiple categories uses the most specific (s_category over p_category)."""
@@ -44,7 +45,8 @@ class TestProductsEndpoint:
         data = json.loads(response.data)
         assert isinstance(data, list)
         for product in data:
-            assert product.get('secondary_category') == 'Milk'
+            c = product.get('category') or {}
+            assert (c.get('secondary') or product.get('secondary_category')) == 'Milk'
 
     def test_get_products_filter_by_nonexistent_category(self, client):
         """Test filtering by a category that doesn't exist."""
@@ -61,7 +63,8 @@ class TestProductsEndpoint:
         data = json.loads(response.data)
         assert isinstance(data, list)
         for product in data:
-            assert product.get('secondary_category') == 'Milk'
+            c = product.get('category') or {}
+            assert (c.get('secondary') or product.get('secondary_category')) == 'Milk'
 
     def test_get_products_filter_by_tertiary_category(self, client):
         """Test filtering by tertiary category (t_category)."""
@@ -70,7 +73,8 @@ class TestProductsEndpoint:
         data = json.loads(response.data)
         assert isinstance(data, list)
         for product in data:
-            assert product.get('tertiary_category') == 'Bananas'
+            c = product.get('category') or {}
+            assert (c.get('tertiary') or product.get('tertiary_category')) == 'Bananas'
     
     def test_get_products_response_format(self, client):
         """Test that product response has all required fields."""
@@ -81,8 +85,7 @@ class TestProductsEndpoint:
         
         product = data[0]
         required_fields = ['barcode', 'name', 'description', 'ingredients', 
-                          'price', 'image_url', 'primary_category', 
-                          'secondary_category', 'tertiary_category']
+                          'image_url', 'category']
         for field in required_fields:
             assert field in product
 

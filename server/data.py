@@ -19,13 +19,12 @@ def _dynamodb_table_suffix(suffix):
     return DYNAMODB_PRODUCTS_TABLE[:-len('-products')] + suffix
 
 DYNAMODB_STORES_TABLE = _dynamodb_table_suffix('-stores')
-DYNAMODB_STOCK_TABLE = _dynamodb_table_suffix('-stock')
-DYNAMODB_SALES_TABLE = _dynamodb_table_suffix('-sales')
+DYNAMODB_PRODUCTS_BY_STORE_TABLE = _dynamodb_table_suffix('-products_by_store')
+DYNAMODB_CATEGORIES_TABLE = 'categories'  # fixed name, not prefixed
 
 _SEED_DIR = os.path.join(os.path.dirname(__file__), 'seed_data')
 STORES_FILE = os.path.join(_SEED_DIR, 'stores.json')
-STOCK_FILE = os.path.join(_SEED_DIR, 'stock.json')
-SALES_FILE = os.path.join(_SEED_DIR, 'sales.json')
+PRODUCTS_BY_STORE_FILE = os.path.join(_SEED_DIR, 'products_by_store.json')
 
 
 def _get_dynamodb_client():
@@ -113,14 +112,18 @@ def get_store(store_id):
     return get_store_from_json(store_id)
 
 
-# --- Stock (PK barcode, SK store_id; GSI ByStore: hash store_id, range barcode) ---
+# --- Products by store (stock + sale price per store; PK barcode, SK store_id; GSI ByStore) ---
 
-def load_stock_from_json():
+def _load_products_by_store_from_json():
     try:
-        with open(STOCK_FILE, 'r', encoding='utf-8') as f:
+        with open(PRODUCTS_BY_STORE_FILE, 'r', encoding='utf-8') as f:
             return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError):
         return []
+
+
+def load_stock_from_json():
+    return _load_products_by_store_from_json()
 
 
 def get_stock_for_store_from_json(store_id):
@@ -137,15 +140,14 @@ def get_stock_item_from_json(store_id, barcode):
 
 
 def get_stock_for_store_from_dynamodb(store_id):
-    if not DYNAMODB_STOCK_TABLE:
+    if not DYNAMODB_PRODUCTS_BY_STORE_TABLE:
         return []
     try:
         client = _get_dynamodb_client()
         paginator = client.get_paginator('query')
         items = []
         for page in paginator.paginate(
-            TableName=DYNAMODB_STOCK_TABLE,
-            IndexName='ByStore',
+            TableName=DYNAMODB_PRODUCTS_BY_STORE_TABLE,
             KeyConditionExpression='store_id = :sid',
             ExpressionAttributeValues={':sid': {'S': store_id}}
         ):
@@ -158,13 +160,13 @@ def get_stock_for_store_from_dynamodb(store_id):
 
 
 def get_stock_item_from_dynamodb(store_id, barcode):
-    if not DYNAMODB_STOCK_TABLE:
+    if not DYNAMODB_PRODUCTS_BY_STORE_TABLE:
         return None
     try:
         client = _get_dynamodb_client()
         resp = client.get_item(
-            TableName=DYNAMODB_STOCK_TABLE,
-            Key={'barcode': {'S': barcode}, 'store_id': {'S': store_id}}
+            TableName=DYNAMODB_PRODUCTS_BY_STORE_TABLE,
+            Key={'store_id': {'S': store_id}, 'barcode': {'S': barcode}}
         )
         item = resp.get('Item')
         return _deserialize_item(item) if item else None
@@ -174,83 +176,90 @@ def get_stock_item_from_dynamodb(store_id, barcode):
 
 
 def get_stock_for_store(store_id):
-    if USE_DYNAMODB and DYNAMODB_STOCK_TABLE:
+    if USE_DYNAMODB and DYNAMODB_PRODUCTS_BY_STORE_TABLE:
         return get_stock_for_store_from_dynamodb(store_id)
     return get_stock_for_store_from_json(store_id)
 
 
 def get_stock_item(store_id, barcode):
-    if USE_DYNAMODB and DYNAMODB_STOCK_TABLE:
+    if USE_DYNAMODB and DYNAMODB_PRODUCTS_BY_STORE_TABLE:
         return get_stock_item_from_dynamodb(store_id, barcode)
     return get_stock_item_from_json(store_id, barcode)
 
 
-# --- Sales (PK store_id, SK barcode) ---
+# --- Sales (derived from products_by_store: items with percent_off > 0) ---
 
 def load_sales_from_json():
-    try:
-        with open(SALES_FILE, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return []
+    rows = _load_products_by_store_from_json()
+    return [r for r in rows if (r.get('percent_off') or 0) > 0]
 
 
 def get_sales_for_store_from_json(store_id):
-    rows = load_sales_from_json()
-    return [r for r in rows if r.get('store_id') == store_id]
+    rows = _load_products_by_store_from_json()
+    return [r for r in rows if r.get('store_id') == store_id and (r.get('percent_off') or 0) > 0]
 
 
 def get_sale_from_json(store_id, barcode):
-    rows = load_sales_from_json()
+    rows = _load_products_by_store_from_json()
     for r in rows:
-        if r.get('store_id') == store_id and r.get('barcode') == barcode:
+        if r.get('store_id') == store_id and r.get('barcode') == barcode and (r.get('percent_off') or 0) > 0:
             return r
     return None
 
 
 def get_sales_for_store_from_dynamodb(store_id):
-    if not DYNAMODB_SALES_TABLE:
+    """Sales = products_by_store rows for this store with percent_off > 0."""
+    if not DYNAMODB_PRODUCTS_BY_STORE_TABLE:
         return []
     try:
-        client = _get_dynamodb_client()
-        paginator = client.get_paginator('query')
-        items = []
-        for page in paginator.paginate(
-            TableName=DYNAMODB_SALES_TABLE,
-            KeyConditionExpression='store_id = :sid',
-            ExpressionAttributeValues={':sid': {'S': store_id}}
-        ):
-            for item in page.get('Items', []):
-                items.append(_deserialize_item(item))
-        return items
+        items = get_stock_for_store_from_dynamodb(store_id)
+        return [r for r in items if (r.get('percent_off') or 0) > 0]
     except Exception as e:
         logger.exception("DynamoDB get_sales_for_store failed: %s", e)
         return []
 
 
 def get_sale_from_dynamodb(store_id, barcode):
-    if not DYNAMODB_SALES_TABLE:
+    if not DYNAMODB_PRODUCTS_BY_STORE_TABLE:
         return None
     try:
-        client = _get_dynamodb_client()
-        resp = client.get_item(
-            TableName=DYNAMODB_SALES_TABLE,
-            Key={'store_id': {'S': store_id}, 'barcode': {'S': barcode}}
-        )
-        item = resp.get('Item')
-        return _deserialize_item(item) if item else None
+        item = get_stock_item_from_dynamodb(store_id, barcode)
+        return item if item and (item.get('percent_off') or 0) > 0 else None
     except Exception as e:
         logger.exception("DynamoDB get_sale failed: %s", e)
         return None
 
 
 def get_sales_for_store(store_id):
-    if USE_DYNAMODB and DYNAMODB_SALES_TABLE:
+    if USE_DYNAMODB and DYNAMODB_PRODUCTS_BY_STORE_TABLE:
         return get_sales_for_store_from_dynamodb(store_id)
     return get_sales_for_store_from_json(store_id)
 
 
 def get_sale(store_id, barcode):
-    if USE_DYNAMODB and DYNAMODB_SALES_TABLE:
+    if USE_DYNAMODB and DYNAMODB_PRODUCTS_BY_STORE_TABLE:
         return get_sale_from_dynamodb(store_id, barcode)
     return get_sale_from_json(store_id, barcode)
+
+
+# --- Categories (from categories table when using DynamoDB) ---
+
+def load_categories_from_json():
+    """Categories are derived from products in JSON mode; see app.get_categories."""
+    return []
+
+
+def load_categories_from_dynamodb():
+    if not DYNAMODB_CATEGORIES_TABLE:
+        return []
+    try:
+        client = _get_dynamodb_client()
+        paginator = client.get_paginator('scan')
+        items = []
+        for page in paginator.paginate(TableName=DYNAMODB_CATEGORIES_TABLE):
+            for item in page.get('Items', []):
+                items.append(_deserialize_item(item))
+        return items
+    except Exception as e:
+        logger.exception("DynamoDB load_categories failed: %s", e)
+        return []

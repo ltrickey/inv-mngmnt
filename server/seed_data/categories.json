@@ -1,0 +1,322 @@
+[
+  {
+    "primary_category": "Beverages",
+    "path": "Beverages",
+    "level": 1
+  },
+  {
+    "primary_category": "Dairy",
+    "path": "Dairy",
+    "level": 1
+  },
+  {
+    "primary_category": "Dry Goods",
+    "path": "Dry Goods",
+    "level": 1
+  },
+  {
+    "primary_category": "Meat",
+    "path": "Meat",
+    "level": 1
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce",
+    "level": 1
+  },
+  {
+    "primary_category": "Seafood",
+    "path": "Seafood",
+    "level": 1
+  },
+  {
+    "primary_category": "Beverages",
+    "path": "Beverages#Coffee",
+    "level": 2
+  },
+  {
+    "primary_category": "Beverages",
+    "path": "Beverages#Juice",
+    "level": 2
+  },
+  {
+    "primary_category": "Beverages",
+    "path": "Beverages#Non-Dairy",
+    "level": 2
+  },
+  {
+    "primary_category": "Beverages",
+    "path": "Beverages#Soda",
+    "level": 2
+  },
+  {
+    "primary_category": "Beverages",
+    "path": "Beverages#Tea",
+    "level": 2
+  },
+  {
+    "primary_category": "Beverages",
+    "path": "Beverages#Water",
+    "level": 2
+  },
+  {
+    "primary_category": "Dairy",
+    "path": "Dairy#Butter",
+    "level": 2
+  },
+  {
+    "primary_category": "Dairy",
+    "path": "Dairy#Cheese",
+    "level": 2
+  },
+  {
+    "primary_category": "Dairy",
+    "path": "Dairy#Cultured",
+    "level": 2
+  },
+  {
+    "primary_category": "Dairy",
+    "path": "Dairy#Eggs",
+    "level": 2
+  },
+  {
+    "primary_category": "Dairy",
+    "path": "Dairy#Frozen",
+    "level": 2
+  },
+  {
+    "primary_category": "Dairy",
+    "path": "Dairy#Milk",
+    "level": 2
+  },
+  {
+    "primary_category": "Dairy",
+    "path": "Dairy#Yogurt",
+    "level": 2
+  },
+  {
+    "primary_category": "Dry Goods",
+    "path": "Dry Goods#Bread",
+    "level": 2
+  },
+  {
+    "primary_category": "Dry Goods",
+    "path": "Dry Goods#Canned",
+    "level": 2
+  },
+  {
+    "primary_category": "Dry Goods",
+    "path": "Dry Goods#Cereal",
+    "level": 2
+  },
+  {
+    "primary_category": "Dry Goods",
+    "path": "Dry Goods#Condiments",
+    "level": 2
+  },
+  {
+    "primary_category": "Dry Goods",
+    "path": "Dry Goods#Frozen",
+    "level": 2
+  },
+  {
+    "primary_category": "Dry Goods",
+    "path": "Dry Goods#Oils",
+    "level": 2
+  },
+  {
+    "primary_category": "Dry Goods",
+    "path": "Dry Goods#Pasta",
+    "level": 2
+  },
+  {
+    "primary_category": "Dry Goods",
+    "path": "Dry Goods#Spreads",
+    "level": 2
+  },
+  {
+    "primary_category": "Meat",
+    "path": "Meat#Beef",
+    "level": 2
+  },
+  {
+    "primary_category": "Meat",
+    "path": "Meat#Lamb",
+    "level": 2
+  },
+  {
+    "primary_category": "Meat",
+    "path": "Meat#Pork",
+    "level": 2
+  },
+  {
+    "primary_category": "Meat",
+    "path": "Meat#Poultry",
+    "level": 2
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce#Fresh Fruit",
+    "level": 2
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce#Fresh Vegetables",
+    "level": 2
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce#Herbs",
+    "level": 2
+  },
+  {
+    "primary_category": "Seafood",
+    "path": "Seafood#Canned",
+    "level": 2
+  },
+  {
+    "primary_category": "Seafood",
+    "path": "Seafood#Fish",
+    "level": 2
+  },
+  {
+    "primary_category": "Seafood",
+    "path": "Seafood#Shellfish",
+    "level": 2
+  },
+  {
+    "primary_category": "Dry Goods",
+    "path": "Dry Goods#Bread#Whole Grain",
+    "level": 3
+  },
+  {
+    "primary_category": "Meat",
+    "path": "Meat#Poultry#Chicken",
+    "level": 3
+  },
+  {
+    "primary_category": "Meat",
+    "path": "Meat#Poultry#Turkey",
+    "level": 3
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce#Fresh Fruit#Apples",
+    "level": 3
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce#Fresh Fruit#Avocados",
+    "level": 3
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce#Fresh Fruit#Bananas",
+    "level": 3
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce#Fresh Fruit#Berries",
+    "level": 3
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce#Fresh Fruit#Citrus",
+    "level": 3
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce#Fresh Fruit#Grapes",
+    "level": 3
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce#Fresh Fruit#Melons",
+    "level": 3
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce#Fresh Fruit#Pears",
+    "level": 3
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce#Fresh Fruit#Strawberries",
+    "level": 3
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce#Fresh Fruit#Tropical",
+    "level": 3
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce#Fresh Vegetables#Beans",
+    "level": 3
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce#Fresh Vegetables#Broccoli",
+    "level": 3
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce#Fresh Vegetables#Carrots",
+    "level": 3
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce#Fresh Vegetables#Cruciferous",
+    "level": 3
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce#Fresh Vegetables#Leafy Greens",
+    "level": 3
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce#Fresh Vegetables#Onions",
+    "level": 3
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce#Fresh Vegetables#Peppers",
+    "level": 3
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce#Fresh Vegetables#Root Vegetables",
+    "level": 3
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce#Fresh Vegetables#Spinach",
+    "level": 3
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce#Fresh Vegetables#Squash",
+    "level": 3
+  },
+  {
+    "primary_category": "Produce",
+    "path": "Produce#Fresh Vegetables#Tomatoes",
+    "level": 3
+  },
+  {
+    "primary_category": "Seafood",
+    "path": "Seafood#Fish#Cod",
+    "level": 3
+  },
+  {
+    "primary_category": "Seafood",
+    "path": "Seafood#Fish#Salmon",
+    "level": 3
+  },
+  {
+    "primary_category": "Seafood",
+    "path": "Seafood#Fish#Tilapia",
+    "level": 3
+  }
+]

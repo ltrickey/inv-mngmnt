@@ -9,8 +9,9 @@ Queries:
 1. Get all of the sales from sales DB (inlude this in stock?) (Pagination)
 
 
-Tables
+Data Model
 **Products** - includes product details.  Called Scan at page load.
 **Stores** - Lists store info and id.  Once a user selects a store id from the dropdown menu, we query the stock table with a Scan call on the secondary index of store_id.  We now have a list of all the product stock based on store ids
+**
 **Stock** - Lists stock information based on store_id and barcode
 **Sales** - Lists sale info based on store_id and barcode.  Thought about combining this with stock, but stock will have many more writes/reads -> needs to support higher throughput.  sales will have high read but lower writes, maybe only 1/day where as stock may have 10 TPS

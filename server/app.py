@@ -30,16 +30,22 @@ else:
 from stores import stores_bp
 from stock import stock_bp
 from sales import sales_bp
+from data import load_categories_from_dynamodb
 app.register_blueprint(stores_bp)
 app.register_blueprint(stock_bp)
 app.register_blueprint(sales_bp)
 
 # Serve static images from infrastructure/images directory
+IMAGES_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'infrastructure', 'images')
+PLACEHOLDER_IMAGE = 'placeholder.png'
+
 @app.route('/images/<path:filename>')
 def serve_image(filename):
-    """Serve images from infrastructure/images directory."""
-    images_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'infrastructure', 'images')
-    return send_from_directory(images_dir, filename)
+    """Serve images from infrastructure/images directory; fallback to placeholder if missing."""
+    path = os.path.join(IMAGES_DIR, filename)
+    if not os.path.isfile(path):
+        filename = PLACEHOLDER_IMAGE
+    return send_from_directory(IMAGES_DIR, filename)
 
 # Path to the products JSON file (used when running locally, not using DynamoDB)
 PRODUCTS_FILE = os.path.join(os.path.dirname(__file__), 'seed_data', 'products.json')
@@ -51,6 +57,8 @@ S3_BUCKET_URL = os.environ.get('S3_BUCKET_URL', None)
 def get_image_url(image_path):
     """
     Get the full image URL based on environment configuration.
+    If the image file does not exist on disk, returns the placeholder image URL
+    so the API never points to a missing file (avoids 404s after re-seeds or renames).
     
     If S3_BUCKET_URL is set, prepends it to the image path for S3 storage.
     Otherwise, returns a Flask-served URL for local testing.
@@ -68,17 +76,20 @@ def get_image_url(image_path):
         return f"{S3_BUCKET_URL.rstrip('/')}/{s3_path}"
     else:
         # Local development: Use Flask static file serving
-        # Convert 'infrastructure/images/...' to '/images/...'
         if image_path.startswith(('http://', 'https://')):
             return image_path
         if image_path.startswith('/images/'):
-            return image_path  # Already correct; avoid double /images/
-        if image_path.startswith('infrastructure/images/'):
-            return image_path.replace('infrastructure/images/', '/images/')
-        if image_path.startswith('infrastructure/'):
-            return image_path.replace('infrastructure/', '/')
-        # Bare filename or relative path
-        return f"/images/{image_path.lstrip('/')}"
+            filename = image_path.replace('/images/', '')
+        elif image_path.startswith('infrastructure/images/'):
+            filename = image_path.replace('infrastructure/images/', '')
+        elif image_path.startswith('infrastructure/'):
+            filename = image_path.replace('infrastructure/', '')
+        else:
+            filename = image_path.lstrip('/')
+        # If the file does not exist (e.g. old DynamoDB image_url, renamed file), use placeholder
+        if filename and not os.path.isfile(os.path.join(IMAGES_DIR, filename)):
+            filename = PLACEHOLDER_IMAGE
+        return f"/images/{filename}"
 
 
 def load_products_from_json():
@@ -112,33 +123,10 @@ def _get_dynamodb_products_client():
     return boto3.client('dynamodb', region_name=region) if region else boto3.client('dynamodb')
 
 
-def _barcodes_from_gsi_query(client, table_name, index_name, key_attr, category_value):
-    """Query a category GSI and return set of barcodes. category_value must be non-empty (items with null are not in the index)."""
-    barcodes = set()
-    try:
-        paginator = client.get_paginator('query')
-        for page in paginator.paginate(
-            TableName=table_name,
-            IndexName=index_name,
-            KeyConditionExpression=f'{key_attr} = :cat',
-            ExpressionAttributeValues={':cat': {'S': category_value}},
-        ):
-            for item in page.get('Items', []):
-                barcode = item.get('barcode', {}).get('S')
-                if barcode:
-                    barcodes.add(barcode)
-    except Exception as e:
-        logger.warning("DynamoDB GSI query %s failed for %s: %s", index_name, category_value, e)
-    return barcodes
-
-
 def get_products_by_category_filters_dynamodb(p_category=None, s_category=None, t_category=None):
     """
-    Get products that match the given primary/secondary/tertiary category filters using DynamoDB GSIs.
-    Since categories are nested (tertiary -> secondary -> primary), only query the most specific category:
-    - If tertiary_category is provided, query only TertiaryCategory GSI
-    - Else if secondary_category is provided, query only SecondaryCategory GSI
-    - Else if primary_category is provided, query only PrimaryCategory GSI
+    Get products matching category filters using GSI_Category (primary_category, category_path).
+    category_path format: "secondary#tertiary#barcode" (e.g. "Milk#NONE#0123456789012").
     """
     if not DYNAMODB_PRODUCTS_TABLE:
         return []
@@ -151,55 +139,60 @@ def get_products_by_category_filters_dynamodb(p_category=None, s_category=None, 
         from boto3.dynamodb.types import TypeDeserializer
         client = _get_dynamodb_products_client()
         deserializer = TypeDeserializer()
-        # Query only the most specific category (categories are nested, so more specific implies less specific)
-        if t_val:
-            # Tertiary is most specific - only query TertiaryCategory GSI
-            result_barcodes = _barcodes_from_gsi_query(client, DYNAMODB_PRODUCTS_TABLE, 'TertiaryCategory', 'tertiary_category', t_val)
-        elif s_val:
-            # Secondary is most specific - only query SecondaryCategory GSI
-            result_barcodes = _barcodes_from_gsi_query(client, DYNAMODB_PRODUCTS_TABLE, 'SecondaryCategory', 'secondary_category', s_val)
-        elif p_val:
-            # Primary is most specific - only query PrimaryCategory GSI
-            result_barcodes = _barcodes_from_gsi_query(client, DYNAMODB_PRODUCTS_TABLE, 'PrimaryCategory', 'primary_category', p_val)
-        else:
-            return []
-        if not result_barcodes:
-            return []
-        barcode_list = list(result_barcodes)
-        products = []
-        for i in range(0, len(barcode_list), 100):
-            chunk = barcode_list[i : i + 100]
-            request_items = {
-                DYNAMODB_PRODUCTS_TABLE: {
-                    'Keys': [{'barcode': {'S': b}} for b in chunk],
-                }
+        items = []
+
+        if p_val:
+            # Query GSI_Category by primary_category; optionally filter by category_path prefix
+            key_condition = 'primary_category = :p'
+            expr_vals = {':p': {'S': p_val}}
+            filter_expr = None
+            if t_val and s_val:
+                filter_expr = 'begins_with(category_path, :prefix)'
+                expr_vals[':prefix'] = {'S': s_val + '#' + t_val + '#'}
+            elif s_val:
+                filter_expr = 'begins_with(category_path, :prefix)'
+                expr_vals[':prefix'] = {'S': s_val + '#'}
+            elif t_val:
+                # Tertiary only: category_path contains "#t_val#"
+                filter_expr = 'contains(category_path, :ter)'
+                expr_vals[':ter'] = {'S': '#' + t_val + '#'}
+
+            paginator = client.get_paginator('query')
+            paginate_kw = {
+                'TableName': DYNAMODB_PRODUCTS_TABLE,
+                'IndexName': 'GSI_Category',
+                'KeyConditionExpression': key_condition,
+                'ExpressionAttributeValues': expr_vals,
             }
-            max_retries = 5
-            retry_delay = 0.5  # seconds, then exponential backoff
-            for attempt in range(max_retries + 1):
-                resp = client.batch_get_item(RequestItems=request_items)
-                for item in resp.get('Responses', {}).get(DYNAMODB_PRODUCTS_TABLE, []):
+            if filter_expr:
+                paginate_kw['FilterExpression'] = filter_expr
+            for page in paginator.paginate(**paginate_kw):
+                for item in page.get('Items', []):
                     raw = {k: deserializer.deserialize(v) for k, v in item.items()}
-                    products.append(_normalize_product_for_json(raw))
-                request_items = resp.get('UnprocessedKeys') or {}
-                if not request_items:
-                    break
-                if attempt < max_retries:
-                    logger.warning(
-                        "DynamoDB batch_get_item returned %s unprocessed keys (attempt %s/%s), retrying after %.2fs",
-                        sum(len(v.get('Keys', [])) for v in request_items.values()),
-                        attempt + 1,
-                        max_retries,
-                        retry_delay,
-                    )
-                    time.sleep(retry_delay)
-                    retry_delay = min(retry_delay * 2, 10.0)
-                else:
-                    logger.error(
-                        "DynamoDB batch_get_item still had unprocessed keys after %s retries; some items omitted from results",
-                        max_retries,
-                    )
-        return products
+                    items.append(_normalize_product_for_json(raw))
+        else:
+            # Secondary or tertiary only (no primary): scan with filter
+            filter_parts = []
+            expr_vals = {}
+            if s_val:
+                filter_parts.append('begins_with(category_path, :sec)')
+                expr_vals[':sec'] = {'S': s_val + '#'}
+            if t_val:
+                filter_parts.append('contains(category_path, :ter)')
+                expr_vals[':ter'] = {'S': '#' + t_val + '#'}
+            if not expr_vals:
+                return []
+            paginator = client.get_paginator('scan')
+            for page in paginator.paginate(
+                TableName=DYNAMODB_PRODUCTS_TABLE,
+                FilterExpression=' AND '.join(filter_parts),
+                ExpressionAttributeValues=expr_vals,
+            ):
+                for item in page.get('Items', []):
+                    raw = {k: deserializer.deserialize(v) for k, v in item.items()}
+                    items.append(_normalize_product_for_json(raw))
+
+        return items
     except Exception as e:
         logger.exception("DynamoDB get_products_by_category_filters failed: %s", e)
         return []
@@ -269,64 +262,64 @@ def debug():
 def get_categories():
     """
     GET endpoint to retrieve all available categories.
-    Returns unique categories with their level (primary, secondary, tertiary).
+    Returns list of { name, level } where level is 'primary', 'secondary', or 'tertiary'.
+    When using DynamoDB, reads from the categories table; otherwise derives from products.
     """
+    if USE_DYNAMODB and DYNAMODB_PRODUCTS_TABLE:
+        rows = load_categories_from_dynamodb()
+        level_map = {1: 'primary', 2: 'secondary', 3: 'tertiary'}
+        categories_list = [
+            {'name': r.get('path') or '', 'level': level_map.get(int(r.get('level', 0)), 'primary')}
+            for r in rows
+        ]
+        categories_list.sort(key=lambda x: (['primary', 'secondary', 'tertiary'].index(x['level']), x['name']))
+        return jsonify(categories_list)
+
     products = load_products()
     primary_categories = set()
     secondary_categories = set()
     tertiary_categories = set()
-    
     for product in products:
-        if product.get('primary_category'):
-            primary_categories.add(product.get('primary_category'))
-        if product.get('secondary_category'):
-            secondary_categories.add(product.get('secondary_category'))
-        if product.get('tertiary_category'):
-            tertiary_categories.add(product.get('tertiary_category'))
-    
-    # Build categories list with levels
-    # TODO: Update this logic as we use data stores.
-    # If a category appears at multiple levels, use the highest level (primary > secondary > tertiary)
+        cat = product.get('category') or {}
+        p = cat.get('primary') or product.get('primary_category')
+        s = cat.get('secondary') or product.get('secondary_category')
+        t = cat.get('tertiary') or product.get('tertiary_category')
+        if p:
+            primary_categories.add(p)
+        if s:
+            secondary_categories.add(s)
+        if t:
+            tertiary_categories.add(t)
     categories_dict = {}
-    
-    # First add primary categories
     for cat in primary_categories:
         categories_dict[cat] = 'primary'
-    
-    # Add secondary categories that aren't primary
     for cat in secondary_categories:
         if cat not in categories_dict:
             categories_dict[cat] = 'secondary'
-    
-    # Add tertiary categories that aren't primary or secondary
     for cat in tertiary_categories:
         if cat not in categories_dict:
             categories_dict[cat] = 'tertiary'
-    
-    # Convert to list of objects with name and level
     categories_list = [{'name': name, 'level': level} for name, level in categories_dict.items()]
-    
-    # Sort by level (primary first, then secondary, then tertiary), then by name
     level_order = {'primary': 0, 'secondary': 1, 'tertiary': 2}
     categories_list.sort(key=lambda x: (level_order[x['level']], x['name']))
-    
     return jsonify(categories_list)
 
 
 def _product_matches_category_filters(product, p_category=None, s_category=None, t_category=None):
     """
     True if the product matches the most specific category filter provided.
-    Since categories are nested (tertiary -> secondary -> primary), only check the most specific:
-    - If tertiary_category is provided, check only tertiary_category
-    - Else if secondary_category is provided, check only secondary_category
-    - Else if primary_category is provided, check only primary_category
+    Supports both category: { primary, secondary, tertiary } and flat primary_category etc.
     """
+    cat = product.get('category') or {}
+    t_val = cat.get('tertiary') or product.get('tertiary_category')
+    s_val = cat.get('secondary') or product.get('secondary_category')
+    p_val = cat.get('primary') or product.get('primary_category')
     if t_category:
-        return product.get('tertiary_category') == t_category
+        return t_val == t_category
     elif s_category:
-        return product.get('secondary_category') == s_category
+        return s_val == s_category
     elif p_category:
-        return product.get('primary_category') == p_category
+        return p_val == p_category
     return True
 
 

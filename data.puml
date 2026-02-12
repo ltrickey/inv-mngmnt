@@ -1,0 +1,56 @@
+@startuml data
+
+' configuration
+hide circle
+skinparam linetype ortho
+left to right direction
+
+' gradient
+!define TABLE_GRADIENT_BACKGROUND #F2F2F2-fcffd6
+
+' couleur solide
+!define NEW_TABLE_BACKGROUND #6fe890
+
+skinparam class {
+    BackgroundColor TABLE_GRADIENT_BACKGROUND
+    BorderColor Black
+    ArrowColor Blue
+ FontSize 13
+}
+
+entity "store" as store {
+    store_id: string,
+    store_name: string,
+    store_address: "123 Main St, Anytown, USA" 
+  },
+}
+
+
+entity "product" as product {
+  barcode: string
+  --
+  barcode_type: enum (GTIN or PLU)
+  name: string,
+  description: string,
+  ingredients: List of Strings
+  price: double,
+  image_url: string,
+  category: {
+    primary: String,
+    secondary: Optional String, must have primary,
+    tertiary: Optional String, must have secondary
+  } 
+}
+
+' Since both sales and stock need to search by store and product, 
+' Connecting these two
+entity products_by_store {
+  store_id: string,
+  barcode: string, 
+  --
+  percent_off: Integer between 1-99,
+  quantity: Integer, 
+  price: double,
+}
+
+@enduml

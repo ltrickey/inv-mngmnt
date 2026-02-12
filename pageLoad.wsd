@@ -1,8 +1,26 @@
-@startuml "Page Load"
-actor User
-participant ReactApp #LightBlue
-participant FlaskAPI #LightGreen
-database DynamoDB #DarkSalmon
+' @startuml "Page Load"
+
+
+
+' package Restaurant {
+'   usecase UC1 as "You can use
+' several lines to define your usecase.
+' You can also use separators.
+' --
+' Several separators are possible.
+' ==
+' And you can add titles:
+' ..Conclusion..
+' This allows large description."
+'   usecase "Pay for Food" as UC2
+'   usecase "Drink" as UC3
+'   usecase "Review" as UC4
+' }
+' skinparam actorStyle awesome
+' actor User
+' participant ReactApp #LightBlue
+' participant FlaskAPI #LightGreen
+' database DynamoDB #DarkSalmon
 
 
 ' CLI -> CLI : Verify photo format & dimensions
@@ -33,4 +51,129 @@ database DynamoDB #DarkSalmon
 '   CLI -> User : New Image Destination (url or filepath)
 ' deactivate CLI
 ' end
-@enduml
+' @startuml
+' left to right direction
+' actor Guest as g
+' package Professional {
+'   actor Chef as c
+'   actor "Food Critic" as fc
+' }
+' package Restaurant {
+'   usecase "Eat Food" as UC1
+'   usecase "Pay for Food" as UC2
+'   usecase "Drink" as UC3
+'   usecase "Review" as UC4
+' }
+' fc --> UC4
+' g --> UC1
+' g --> UC2
+' g --> UC3
+
+' :Main Admin: as Admin
+' (Use the application) as (Use)
+
+' User <|-- Admin
+' (Start) <|-- (Use)
+' @enduml
+
+' @startuml
+' :Main Admin: as Admin
+' (Use the application) as (Use)
+
+' User -> (Start)
+' User --> (Use)
+
+' Admin ---> (Use)
+
+' note right of Admin : This is an example.
+
+' note right of (Use)
+'   A note can also
+'   be on several lines
+' end note
+
+' note "This note is connected\nto several objects." as N2
+' (Start) .. N2
+' N2 .. (Use)
+' @enduml
+
+' @startuml
+
+' (First usecase)/
+' (Another usecase)/ as (UC2)
+' usecase/ UC3
+' usecase/ (Last\nusecase) as UC4
+
+' @enduml
+
+' CLASS STUFF
+' @startuml
+' abstract        abstract
+' abstract class  "abstract class"
+' annotation      annotation
+' circle          circle
+' ()              circle_short_form
+' class           class
+' diamond         diamond
+' <>              diamond_short_form
+' entity          entity
+' enum            enum
+' interface       interface
+' protocol        protocol
+' struct          struct
+' @enduml
+
+' OBJECT FOR DATABSAE?
+' Relations between objects
+
+' Relations between objects are defined using the following symbols :
+
+' Type	Symbol	Image
+' Extension	<|--	
+' Composition	*--	
+' Aggregation	o--	
+' It is possible to replace -- by .. to have a dotted line.
+
+' Knowing those rules, it is possible to draw the following drawings.
+
+' It is possible a add a label on the relation, using : followed by the text of the label.
+
+' For cardinality, you can use double-quotes "" on each side of the relation.
+' @startuml
+' object Object01
+' object Object02
+' object Object03
+' object Object04
+' object Object05
+' object Object06
+' object Object07
+' object Object08
+
+' Object01 <|-- Object02
+' Object03 *-- Object04
+' Object05 o-- "4" Object06
+' Object07 .. Object08 : some labels
+' @enduml
+
+' @startuml
+' object London
+
+' map CapitalCity {
+'  UK *-> London
+'  USA => Washington
+'  Germany => Berlin
+' }
+' @enduml
+
+' @startuml
+' object Foo
+' map Bar {
+'   abc=>
+'   def=>
+' }
+' object Baz
+
+' Bar::abc --> Baz : Label one
+' Foo --> Bar::def : Label two
+' @enduml
+

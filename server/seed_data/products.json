@@ -7,11 +7,13 @@
     "ingredients": [
       "Organic whole milk"
     ],
-    "price": 4.99,
     "image_url": "infrastructure/images/0123456789012-organic-whole-milk.jpg",
-    "primary_category": "Dairy",
-    "secondary_category": "Milk",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dairy",
+      "secondary": "Milk",
+      "tertiary": "NONE"
+    },
+    "category_path": "Milk#NONE#0123456789012"
   },
   {
     "barcode": "4011",
@@ -21,11 +23,13 @@
     "ingredients": [
       "Organic bananas"
     ],
-    "price": 2.49,
     "image_url": "infrastructure/images/4011-organic-bananas.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Fruit",
-    "tertiary_category": "Bananas"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Fruit",
+      "tertiary": "Bananas"
+    },
+    "category_path": "Fresh Fruit#Bananas#4011"
   },
   {
     "barcode": "0123456789013",
@@ -39,11 +43,13 @@
       "Salt",
       "Honey"
     ],
-    "price": 3.99,
     "image_url": "infrastructure/images/0123456789013-whole-wheat-bread.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Bread",
-    "tertiary_category": "Whole Grain"
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Bread",
+      "tertiary": "Whole Grain"
+    },
+    "category_path": "Bread#Whole Grain#0123456789013"
   },
   {
     "barcode": "0123456789014",
@@ -54,11 +60,13 @@
       "Pasteurized milk",
       "Live active cultures"
     ],
-    "price": 5.49,
     "image_url": "infrastructure/images/0123456789014-greek-yogurt.jpg",
-    "primary_category": "Dairy",
-    "secondary_category": "Yogurt",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dairy",
+      "secondary": "Yogurt",
+      "tertiary": "NONE"
+    },
+    "category_path": "Yogurt#NONE#0123456789014"
   },
   {
     "barcode": "4080",
@@ -68,11 +76,13 @@
     "ingredients": [
       "Organic apples"
     ],
-    "price": 3.99,
     "image_url": "infrastructure/images/4080-organic-apples.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Fruit",
-    "tertiary_category": "Apples"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Fruit",
+      "tertiary": "Apples"
+    },
+    "category_path": "Fresh Fruit#Apples#4080"
   },
   {
     "barcode": "0123456789015",
@@ -82,11 +92,13 @@
     "ingredients": [
       "Chicken breast"
     ],
-    "price": 8.99,
     "image_url": "infrastructure/images/0123456789015-chicken-breast.jpg",
-    "primary_category": "Meat",
-    "secondary_category": "Poultry",
-    "tertiary_category": "Chicken"
+    "category": {
+      "primary": "Meat",
+      "secondary": "Poultry",
+      "tertiary": "Chicken"
+    },
+    "category_path": "Poultry#Chicken#0123456789015"
   },
   {
     "barcode": "0123456789016",
@@ -96,11 +108,13 @@
     "ingredients": [
       "Salmon"
     ],
-    "price": 12.99,
     "image_url": "infrastructure/images/0123456789016-salmon-fillet.jpg",
-    "primary_category": "Seafood",
-    "secondary_category": "Fish",
-    "tertiary_category": "Salmon"
+    "category": {
+      "primary": "Seafood",
+      "secondary": "Fish",
+      "tertiary": "Salmon"
+    },
+    "category_path": "Fish#Salmon#0123456789016"
   },
   {
     "barcode": "4225",
@@ -110,11 +124,13 @@
     "ingredients": [
       "Organic carrots"
     ],
-    "price": 2.99,
     "image_url": "infrastructure/images/4225-organic-carrots.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Vegetables",
-    "tertiary_category": "Carrots"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Vegetables",
+      "tertiary": "Carrots"
+    },
+    "category_path": "Fresh Vegetables#Carrots#4225"
   },
   {
     "barcode": "0123456789017",
@@ -127,11 +143,13 @@
       "Salt",
       "Enzymes"
     ],
-    "price": 6.99,
     "image_url": "infrastructure/images/0123456789017-cheddar-cheese.jpg",
-    "primary_category": "Dairy",
-    "secondary_category": "Cheese",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dairy",
+      "secondary": "Cheese",
+      "tertiary": "NONE"
+    },
+    "category_path": "Cheese#NONE#0123456789017"
   },
   {
     "barcode": "4090",
@@ -141,11 +159,13 @@
     "ingredients": [
       "Organic spinach"
     ],
-    "price": 3.49,
     "image_url": "infrastructure/images/4090-organic-spinach.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Vegetables",
-    "tertiary_category": "Spinach"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Vegetables",
+      "tertiary": "Spinach"
+    },
+    "category_path": "Fresh Vegetables#Spinach#4090"
   },
   {
     "barcode": "0123456789019",
@@ -155,11 +175,13 @@
     "ingredients": [
       "Orange juice"
     ],
-    "price": 4.49,
     "image_url": "infrastructure/images/0123456789019-orange-juice.jpg",
-    "primary_category": "Beverages",
-    "secondary_category": "Juice",
-    "tertiary_category": null
+    "category": {
+      "primary": "Beverages",
+      "secondary": "Juice",
+      "tertiary": "NONE"
+    },
+    "category_path": "Juice#NONE#0123456789019"
   },
   {
     "barcode": "0123456789020",
@@ -169,11 +191,13 @@
     "ingredients": [
       "Ground beef"
     ],
-    "price": 7.99,
     "image_url": "infrastructure/images/0123456789020-ground-beef.jpg",
-    "primary_category": "Meat",
-    "secondary_category": "Beef",
-    "tertiary_category": null
+    "category": {
+      "primary": "Meat",
+      "secondary": "Beef",
+      "tertiary": "NONE"
+    },
+    "category_path": "Beef#NONE#0123456789020"
   },
   {
     "barcode": "4799",
@@ -183,11 +207,13 @@
     "ingredients": [
       "Tomatoes"
     ],
-    "price": 3.29,
     "image_url": "infrastructure/images/4799-tomatoes.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Vegetables",
-    "tertiary_category": "Tomatoes"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Vegetables",
+      "tertiary": "Tomatoes"
+    },
+    "category_path": "Fresh Vegetables#Tomatoes#4799"
   },
   {
     "barcode": "0123456789022",
@@ -197,11 +223,13 @@
     "ingredients": [
       "Eggs"
     ],
-    "price": 4.99,
     "image_url": "infrastructure/images/0123456789022-eggs.jpg",
-    "primary_category": "Dairy",
-    "secondary_category": "Eggs",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dairy",
+      "secondary": "Eggs",
+      "tertiary": "NONE"
+    },
+    "category_path": "Eggs#NONE#0123456789022"
   },
   {
     "barcode": "0123456789023",
@@ -212,11 +240,13 @@
       "Durum wheat semolina",
       "Water"
     ],
-    "price": 2.99,
     "image_url": "infrastructure/images/0123456789023-pasta.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Pasta",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Pasta",
+      "tertiary": "NONE"
+    },
+    "category_path": "Pasta#NONE#0123456789023"
   },
   {
     "barcode": "0123456789024",
@@ -226,11 +256,13 @@
     "ingredients": [
       "Olive oil"
     ],
-    "price": 9.99,
     "image_url": "infrastructure/images/0123456789024-olive-oil.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Oils",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Oils",
+      "tertiary": "NONE"
+    },
+    "category_path": "Oils#NONE#0123456789024"
   },
   {
     "barcode": "4021",
@@ -240,11 +272,13 @@
     "ingredients": [
       "Organic strawberries"
     ],
-    "price": 5.99,
     "image_url": "infrastructure/images/4021-strawberries.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Fruit",
-    "tertiary_category": "Strawberries"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Fruit",
+      "tertiary": "Strawberries"
+    },
+    "category_path": "Fresh Fruit#Strawberries#4021"
   },
   {
     "barcode": "4062",
@@ -254,11 +288,13 @@
     "ingredients": [
       "Organic broccoli"
     ],
-    "price": 3.79,
     "image_url": "infrastructure/images/4062-broccoli.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Vegetables",
-    "tertiary_category": "Broccoli"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Vegetables",
+      "tertiary": "Broccoli"
+    },
+    "category_path": "Fresh Vegetables#Broccoli#4062"
   },
   {
     "barcode": "0123456789027",
@@ -268,11 +304,13 @@
     "ingredients": [
       "White rice"
     ],
-    "price": 3.49,
     "image_url": "infrastructure/images/0123456789027-rice.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Cereal",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Cereal",
+      "tertiary": "NONE"
+    },
+    "category_path": "Cereal#NONE#0123456789027"
   },
   {
     "barcode": "0123456789028",
@@ -283,11 +321,13 @@
       "Cream",
       "Salt"
     ],
-    "price": 4.49,
     "image_url": "infrastructure/images/0123456789028-butter.jpg",
-    "primary_category": "Dairy",
-    "secondary_category": "Butter",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dairy",
+      "secondary": "Butter",
+      "tertiary": "NONE"
+    },
+    "category_path": "Butter#NONE#0123456789028"
   },
   {
     "barcode": "4664",
@@ -297,11 +337,13 @@
     "ingredients": [
       "Onions"
     ],
-    "price": 2.99,
     "image_url": "infrastructure/images/4664-onions.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Vegetables",
-    "tertiary_category": "Onions"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Vegetables",
+      "tertiary": "Onions"
+    },
+    "category_path": "Fresh Vegetables#Onions#4664"
   },
   {
     "barcode": "0123456789030",
@@ -313,11 +355,13 @@
       "Water",
       "Calcium"
     ],
-    "price": 3.99,
     "image_url": "infrastructure/images/0123456789030-almond-milk.jpg",
-    "primary_category": "Dairy",
-    "secondary_category": "Milk",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dairy",
+      "secondary": "Milk",
+      "tertiary": "NONE"
+    },
+    "category_path": "Milk#NONE#0123456789030"
   },
   {
     "barcode": "4027",
@@ -327,11 +371,13 @@
     "ingredients": [
       "Organic blueberries"
     ],
-    "price": 4.99,
     "image_url": "infrastructure/images/4027-blueberries.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Fruit",
-    "tertiary_category": "Berries"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Fruit",
+      "tertiary": "Berries"
+    },
+    "category_path": "Fresh Fruit#Berries#4027"
   },
   {
     "barcode": "0123456789032",
@@ -344,11 +390,13 @@
       "Salt",
       "Starter"
     ],
-    "price": 5.49,
     "image_url": "infrastructure/images/0123456789032-sourdough-bread.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Bread",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Bread",
+      "tertiary": "NONE"
+    },
+    "category_path": "Bread#NONE#0123456789032"
   },
   {
     "barcode": "0123456789033",
@@ -359,11 +407,13 @@
       "Pasteurized milk",
       "Cultures"
     ],
-    "price": 4.29,
     "image_url": "infrastructure/images/0123456789033-cottage-cheese.jpg",
-    "primary_category": "Dairy",
-    "secondary_category": "Cheese",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dairy",
+      "secondary": "Cheese",
+      "tertiary": "NONE"
+    },
+    "category_path": "Cheese#NONE#0123456789033"
   },
   {
     "barcode": "4046",
@@ -373,11 +423,13 @@
     "ingredients": [
       "Avocados"
     ],
-    "price": 2.49,
     "image_url": "infrastructure/images/4046-avocados.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Fruit",
-    "tertiary_category": "Avocados"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Fruit",
+      "tertiary": "Avocados"
+    },
+    "category_path": "Fresh Fruit#Avocados#4046"
   },
   {
     "barcode": "0123456789035",
@@ -387,11 +439,13 @@
     "ingredients": [
       "Pork"
     ],
-    "price": 6.99,
     "image_url": "infrastructure/images/0123456789035-pork-chop.jpg",
-    "primary_category": "Meat",
-    "secondary_category": "Pork",
-    "tertiary_category": null
+    "category": {
+      "primary": "Meat",
+      "secondary": "Pork",
+      "tertiary": "NONE"
+    },
+    "category_path": "Pork#NONE#0123456789035"
   },
   {
     "barcode": "0123456789036",
@@ -401,11 +455,13 @@
     "ingredients": [
       "Shrimp"
     ],
-    "price": 14.99,
     "image_url": "infrastructure/images/0123456789036-shrimp.jpg",
-    "primary_category": "Seafood",
-    "secondary_category": "Shellfish",
-    "tertiary_category": null
+    "category": {
+      "primary": "Seafood",
+      "secondary": "Shellfish",
+      "tertiary": "NONE"
+    },
+    "category_path": "Shellfish#NONE#0123456789036"
   },
   {
     "barcode": "4783",
@@ -415,11 +471,13 @@
     "ingredients": [
       "Organic kale"
     ],
-    "price": 2.99,
     "image_url": "infrastructure/images/4783-kale.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Vegetables",
-    "tertiary_category": "Leafy Greens"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Vegetables",
+      "tertiary": "Leafy Greens"
+    },
+    "category_path": "Fresh Vegetables#Leafy Greens#4783"
   },
   {
     "barcode": "0123456789038",
@@ -431,11 +489,13 @@
       "Cream",
       "Salt"
     ],
-    "price": 3.49,
     "image_url": "infrastructure/images/0123456789038-cream-cheese.jpg",
-    "primary_category": "Dairy",
-    "secondary_category": "Cheese",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dairy",
+      "secondary": "Cheese",
+      "tertiary": "NONE"
+    },
+    "category_path": "Cheese#NONE#0123456789038"
   },
   {
     "barcode": "4076",
@@ -445,11 +505,13 @@
     "ingredients": [
       "Organic green beans"
     ],
-    "price": 3.29,
     "image_url": "infrastructure/images/4076-green-beans.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Vegetables",
-    "tertiary_category": "Beans"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Vegetables",
+      "tertiary": "Beans"
+    },
+    "category_path": "Fresh Vegetables#Beans#4076"
   },
   {
     "barcode": "0123456789040",
@@ -459,11 +521,13 @@
     "ingredients": [
       "Apple juice"
     ],
-    "price": 3.99,
     "image_url": "infrastructure/images/0123456789040-apple-juice.jpg",
-    "primary_category": "Beverages",
-    "secondary_category": "Juice",
-    "tertiary_category": null
+    "category": {
+      "primary": "Beverages",
+      "secondary": "Juice",
+      "tertiary": "NONE"
+    },
+    "category_path": "Juice#NONE#0123456789040"
   },
   {
     "barcode": "0123456789041",
@@ -473,11 +537,13 @@
     "ingredients": [
       "Turkey breast"
     ],
-    "price": 7.49,
     "image_url": "infrastructure/images/0123456789041-turkey-breast.jpg",
-    "primary_category": "Meat",
-    "secondary_category": "Poultry",
-    "tertiary_category": "Turkey"
+    "category": {
+      "primary": "Meat",
+      "secondary": "Poultry",
+      "tertiary": "Turkey"
+    },
+    "category_path": "Poultry#Turkey#0123456789041"
   },
   {
     "barcode": "4688",
@@ -487,11 +553,13 @@
     "ingredients": [
       "Bell peppers"
     ],
-    "price": 3.99,
     "image_url": "infrastructure/images/4688-bell-peppers.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Vegetables",
-    "tertiary_category": "Peppers"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Vegetables",
+      "tertiary": "Peppers"
+    },
+    "category_path": "Fresh Vegetables#Peppers#4688"
   },
   {
     "barcode": "0123456789043",
@@ -502,11 +570,13 @@
       "Milk",
       "Cream"
     ],
-    "price": 3.29,
     "image_url": "infrastructure/images/0123456789043-half-and-half.jpg",
-    "primary_category": "Dairy",
-    "secondary_category": "Milk",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dairy",
+      "secondary": "Milk",
+      "tertiary": "NONE"
+    },
+    "category_path": "Milk#NONE#0123456789043"
   },
   {
     "barcode": "4554",
@@ -516,11 +586,13 @@
     "ingredients": [
       "Cucumber"
     ],
-    "price": 1.99,
     "image_url": "infrastructure/images/4554-cucumber.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Vegetables",
-    "tertiary_category": null
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Vegetables",
+      "tertiary": "NONE"
+    },
+    "category_path": "Fresh Vegetables#NONE#4554"
   },
   {
     "barcode": "0123456789045",
@@ -530,11 +602,13 @@
     "ingredients": [
       "Tilapia"
     ],
-    "price": 5.99,
     "image_url": "infrastructure/images/0123456789045-tilapia-fillet.jpg",
-    "primary_category": "Seafood",
-    "secondary_category": "Fish",
-    "tertiary_category": "Tilapia"
+    "category": {
+      "primary": "Seafood",
+      "secondary": "Fish",
+      "tertiary": "Tilapia"
+    },
+    "category_path": "Fish#Tilapia#0123456789045"
   },
   {
     "barcode": "0123456789046",
@@ -546,11 +620,13 @@
       "Water",
       "Shortening"
     ],
-    "price": 2.79,
     "image_url": "infrastructure/images/0123456789046-tortillas.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Bread",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Bread",
+      "tertiary": "NONE"
+    },
+    "category_path": "Bread#NONE#0123456789046"
   },
   {
     "barcode": "4731",
@@ -560,11 +636,13 @@
     "ingredients": [
       "Organic raspberries"
     ],
-    "price": 5.49,
     "image_url": "infrastructure/images/4731-raspberries.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Fruit",
-    "tertiary_category": "Berries"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Fruit",
+      "tertiary": "Berries"
+    },
+    "category_path": "Fresh Fruit#Berries#4731"
   },
   {
     "barcode": "0123456789048",
@@ -576,11 +654,13 @@
       "Water",
       "Salt"
     ],
-    "price": 1.49,
     "image_url": "infrastructure/images/0123456789048-black-beans.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Canned",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Canned",
+      "tertiary": "NONE"
+    },
+    "category_path": "Canned#NONE#0123456789048"
   },
   {
     "barcode": "0123456789049",
@@ -592,11 +672,13 @@
       "Cultures",
       "Rennet"
     ],
-    "price": 5.99,
     "image_url": "infrastructure/images/0123456789049-mozzarella.jpg",
-    "primary_category": "Dairy",
-    "secondary_category": "Cheese",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dairy",
+      "secondary": "Cheese",
+      "tertiary": "NONE"
+    },
+    "category_path": "Cheese#NONE#0123456789049"
   },
   {
     "barcode": "4816",
@@ -606,11 +688,13 @@
     "ingredients": [
       "Organic sweet potatoes"
     ],
-    "price": 2.79,
     "image_url": "infrastructure/images/4816-sweet-potato.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Vegetables",
-    "tertiary_category": "Root Vegetables"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Vegetables",
+      "tertiary": "Root Vegetables"
+    },
+    "category_path": "Fresh Vegetables#Root Vegetables#4816"
   },
   {
     "barcode": "0123456789051",
@@ -621,11 +705,13 @@
       "Cranberry juice",
       "Apple juice"
     ],
-    "price": 4.49,
     "image_url": "infrastructure/images/0123456789051-cranberry-juice.jpg",
-    "primary_category": "Beverages",
-    "secondary_category": "Juice",
-    "tertiary_category": null
+    "category": {
+      "primary": "Beverages",
+      "secondary": "Juice",
+      "tertiary": "NONE"
+    },
+    "category_path": "Juice#NONE#0123456789051"
   },
   {
     "barcode": "0123456789052",
@@ -638,11 +724,13 @@
       "Sugar",
       "Smoke"
     ],
-    "price": 6.99,
     "image_url": "infrastructure/images/0123456789052-bacon.jpg",
-    "primary_category": "Meat",
-    "secondary_category": "Pork",
-    "tertiary_category": null
+    "category": {
+      "primary": "Meat",
+      "secondary": "Pork",
+      "tertiary": "NONE"
+    },
+    "category_path": "Pork#NONE#0123456789052"
   },
   {
     "barcode": "4067",
@@ -652,11 +740,13 @@
     "ingredients": [
       "Organic zucchini"
     ],
-    "price": 2.29,
     "image_url": "infrastructure/images/4067-zucchini.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Vegetables",
-    "tertiary_category": "Squash"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Vegetables",
+      "tertiary": "Squash"
+    },
+    "category_path": "Fresh Vegetables#Squash#4067"
   },
   {
     "barcode": "0123456789054",
@@ -666,11 +756,13 @@
     "ingredients": [
       "Organic quinoa"
     ],
-    "price": 6.99,
     "image_url": "infrastructure/images/0123456789054-quinoa.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Cereal",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Cereal",
+      "tertiary": "NONE"
+    },
+    "category_path": "Cereal#NONE#0123456789054"
   },
   {
     "barcode": "0123456789055",
@@ -681,11 +773,13 @@
       "Cream",
       "Cultures"
     ],
-    "price": 2.99,
     "image_url": "infrastructure/images/0123456789055-sour-cream.jpg",
-    "primary_category": "Dairy",
-    "secondary_category": "Cultured",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dairy",
+      "secondary": "Cultured",
+      "tertiary": "NONE"
+    },
+    "category_path": "Cultured#NONE#0123456789055"
   },
   {
     "barcode": "4028",
@@ -695,11 +789,13 @@
     "ingredients": [
       "Grapes"
     ],
-    "price": 4.49,
     "image_url": "infrastructure/images/4028-grapes.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Fruit",
-    "tertiary_category": "Grapes"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Fruit",
+      "tertiary": "Grapes"
+    },
+    "category_path": "Fresh Fruit#Grapes#4028"
   },
   {
     "barcode": "0123456789057",
@@ -711,11 +807,13 @@
       "Tomato juice",
       "Citric acid"
     ],
-    "price": 2.29,
     "image_url": "infrastructure/images/0123456789057-canned-tomatoes.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Canned",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Canned",
+      "tertiary": "NONE"
+    },
+    "category_path": "Canned#NONE#0123456789057"
   },
   {
     "barcode": "0123456789058",
@@ -725,11 +823,13 @@
     "ingredients": [
       "Lamb"
     ],
-    "price": 15.99,
     "image_url": "infrastructure/images/0123456789058-lamb-chops.jpg",
-    "primary_category": "Meat",
-    "secondary_category": "Lamb",
-    "tertiary_category": null
+    "category": {
+      "primary": "Meat",
+      "secondary": "Lamb",
+      "tertiary": "NONE"
+    },
+    "category_path": "Lamb#NONE#0123456789058"
   },
   {
     "barcode": "4729",
@@ -739,11 +839,13 @@
     "ingredients": [
       "Organic cauliflower"
     ],
-    "price": 3.49,
     "image_url": "infrastructure/images/4729-cauliflower.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Vegetables",
-    "tertiary_category": "Cruciferous"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Vegetables",
+      "tertiary": "Cruciferous"
+    },
+    "category_path": "Fresh Vegetables#Cruciferous#4729"
   },
   {
     "barcode": "0123456789060",
@@ -753,11 +855,13 @@
     "ingredients": [
       "Soybean oil"
     ],
-    "price": 4.99,
     "image_url": "infrastructure/images/0123456789060-vegetable-oil.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Oils",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Oils",
+      "tertiary": "NONE"
+    },
+    "category_path": "Oils#NONE#0123456789060"
   },
   {
     "barcode": "0123456789061",
@@ -767,11 +871,13 @@
     "ingredients": [
       "Carbonated water"
     ],
-    "price": 4.99,
     "image_url": "infrastructure/images/0123456789061-sparkling-water.jpg",
-    "primary_category": "Beverages",
-    "secondary_category": "Water",
-    "tertiary_category": null
+    "category": {
+      "primary": "Beverages",
+      "secondary": "Water",
+      "tertiary": "NONE"
+    },
+    "category_path": "Water#NONE#0123456789061"
   },
   {
     "barcode": "0123456789062",
@@ -782,11 +888,13 @@
       "Peanuts",
       "Salt"
     ],
-    "price": 5.49,
     "image_url": "infrastructure/images/0123456789062-peanut-butter.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Spreads",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Spreads",
+      "tertiary": "NONE"
+    },
+    "category_path": "Spreads#NONE#0123456789062"
   },
   {
     "barcode": "4680",
@@ -796,11 +904,13 @@
     "ingredients": [
       "Mushrooms"
     ],
-    "price": 3.99,
     "image_url": "infrastructure/images/4680-mushrooms.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Vegetables",
-    "tertiary_category": null
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Vegetables",
+      "tertiary": "NONE"
+    },
+    "category_path": "Fresh Vegetables#NONE#4680"
   },
   {
     "barcode": "0123456789064",
@@ -811,11 +921,13 @@
       "Coconut",
       "Water"
     ],
-    "price": 2.99,
     "image_url": "infrastructure/images/0123456789064-coconut-milk.jpg",
-    "primary_category": "Beverages",
-    "secondary_category": "Non-Dairy",
-    "tertiary_category": null
+    "category": {
+      "primary": "Beverages",
+      "secondary": "Non-Dairy",
+      "tertiary": "NONE"
+    },
+    "category_path": "Non-Dairy#NONE#0123456789064"
   },
   {
     "barcode": "0123456789065",
@@ -828,11 +940,13 @@
       "Almonds",
       "Oil"
     ],
-    "price": 5.99,
     "image_url": "infrastructure/images/0123456789065-granola.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Cereal",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Cereal",
+      "tertiary": "NONE"
+    },
+    "category_path": "Cereal#NONE#0123456789065"
   },
   {
     "barcode": "4053",
@@ -842,11 +956,13 @@
     "ingredients": [
       "Lemons"
     ],
-    "price": 3.49,
     "image_url": "infrastructure/images/4053-lemon.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Fruit",
-    "tertiary_category": "Citrus"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Fruit",
+      "tertiary": "Citrus"
+    },
+    "category_path": "Fresh Fruit#Citrus#4053"
   },
   {
     "barcode": "0123456789067",
@@ -858,11 +974,13 @@
       "Spices",
       "Salt"
     ],
-    "price": 5.49,
     "image_url": "infrastructure/images/0123456789067-turkey-sausage.jpg",
-    "primary_category": "Meat",
-    "secondary_category": "Poultry",
-    "tertiary_category": "Turkey"
+    "category": {
+      "primary": "Meat",
+      "secondary": "Poultry",
+      "tertiary": "Turkey"
+    },
+    "category_path": "Poultry#Turkey#0123456789067"
   },
   {
     "barcode": "0123456789068",
@@ -874,11 +992,13 @@
       "Water",
       "Salt"
     ],
-    "price": 3.99,
     "image_url": "infrastructure/images/0123456789068-canned-tuna.jpg",
-    "primary_category": "Seafood",
-    "secondary_category": "Canned",
-    "tertiary_category": null
+    "category": {
+      "primary": "Seafood",
+      "secondary": "Canned",
+      "tertiary": "NONE"
+    },
+    "category_path": "Canned#NONE#0123456789068"
   },
   {
     "barcode": "4048",
@@ -888,11 +1008,13 @@
     "ingredients": [
       "Garlic"
     ],
-    "price": 1.99,
     "image_url": "infrastructure/images/4048-garlic.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Vegetables",
-    "tertiary_category": null
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Vegetables",
+      "tertiary": "NONE"
+    },
+    "category_path": "Fresh Vegetables#NONE#4048"
   },
   {
     "barcode": "0123456789070",
@@ -902,11 +1024,13 @@
     "ingredients": [
       "Honey"
     ],
-    "price": 7.99,
     "image_url": "infrastructure/images/0123456789070-honey.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Condiments",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Condiments",
+      "tertiary": "NONE"
+    },
+    "category_path": "Condiments#NONE#0123456789070"
   },
   {
     "barcode": "0123456789071",
@@ -919,11 +1043,13 @@
       "Sugar",
       "Vanilla"
     ],
-    "price": 5.99,
     "image_url": "infrastructure/images/0123456789071-ice-cream.jpg",
-    "primary_category": "Dairy",
-    "secondary_category": "Frozen",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dairy",
+      "secondary": "Frozen",
+      "tertiary": "NONE"
+    },
+    "category_path": "Frozen#NONE#0123456789071"
   },
   {
     "barcode": "4049",
@@ -933,11 +1059,13 @@
     "ingredients": [
       "Limes"
     ],
-    "price": 2.49,
     "image_url": "infrastructure/images/4049-lime.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Fruit",
-    "tertiary_category": "Citrus"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Fruit",
+      "tertiary": "Citrus"
+    },
+    "category_path": "Fresh Fruit#Citrus#4049"
   },
   {
     "barcode": "0123456789073",
@@ -950,11 +1078,13 @@
       "Peppers",
       "Cilantro"
     ],
-    "price": 3.49,
     "image_url": "infrastructure/images/0123456789073-salsa.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Condiments",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Condiments",
+      "tertiary": "NONE"
+    },
+    "category_path": "Condiments#NONE#0123456789073"
   },
   {
     "barcode": "0123456789074",
@@ -964,11 +1094,13 @@
     "ingredients": [
       "Ground turkey"
     ],
-    "price": 6.49,
     "image_url": "infrastructure/images/0123456789074-ground-turkey.jpg",
-    "primary_category": "Meat",
-    "secondary_category": "Poultry",
-    "tertiary_category": "Turkey"
+    "category": {
+      "primary": "Meat",
+      "secondary": "Poultry",
+      "tertiary": "Turkey"
+    },
+    "category_path": "Poultry#Turkey#0123456789074"
   },
   {
     "barcode": "4070",
@@ -978,11 +1110,13 @@
     "ingredients": [
       "Celery"
     ],
-    "price": 2.29,
     "image_url": "infrastructure/images/4070-celery.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Vegetables",
-    "tertiary_category": null
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Vegetables",
+      "tertiary": "NONE"
+    },
+    "category_path": "Fresh Vegetables#NONE#4070"
   },
   {
     "barcode": "0123456789076",
@@ -992,11 +1126,13 @@
     "ingredients": [
       "Whole grain oats"
     ],
-    "price": 3.99,
     "image_url": "infrastructure/images/0123456789076-oatmeal.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Cereal",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Cereal",
+      "tertiary": "NONE"
+    },
+    "category_path": "Cereal#NONE#0123456789076"
   },
   {
     "barcode": "0123456789077",
@@ -1006,11 +1142,13 @@
     "ingredients": [
       "Green tea"
     ],
-    "price": 4.29,
     "image_url": "infrastructure/images/0123456789077-green-tea.jpg",
-    "primary_category": "Beverages",
-    "secondary_category": "Tea",
-    "tertiary_category": null
+    "category": {
+      "primary": "Beverages",
+      "secondary": "Tea",
+      "tertiary": "NONE"
+    },
+    "category_path": "Tea#NONE#0123456789077"
   },
   {
     "barcode": "0123456789078",
@@ -1022,11 +1160,13 @@
       "Salt",
       "Cultures"
     ],
-    "price": 4.99,
     "image_url": "infrastructure/images/0123456789078-feta-cheese.jpg",
-    "primary_category": "Dairy",
-    "secondary_category": "Cheese",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dairy",
+      "secondary": "Cheese",
+      "tertiary": "NONE"
+    },
+    "category_path": "Cheese#NONE#0123456789078"
   },
   {
     "barcode": "4550",
@@ -1036,11 +1176,13 @@
     "ingredients": [
       "Brussels sprouts"
     ],
-    "price": 3.99,
     "image_url": "infrastructure/images/4550-brussels-sprouts.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Vegetables",
-    "tertiary_category": "Cruciferous"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Vegetables",
+      "tertiary": "Cruciferous"
+    },
+    "category_path": "Fresh Vegetables#Cruciferous#4550"
   },
   {
     "barcode": "0123456789080",
@@ -1050,11 +1192,13 @@
     "ingredients": [
       "Maple syrup"
     ],
-    "price": 9.99,
     "image_url": "infrastructure/images/0123456789080-maple-syrup.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Condiments",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Condiments",
+      "tertiary": "NONE"
+    },
+    "category_path": "Condiments#NONE#0123456789080"
   },
   {
     "barcode": "4078",
@@ -1064,11 +1208,13 @@
     "ingredients": [
       "Corn"
     ],
-    "price": 2.99,
     "image_url": "infrastructure/images/4078-corn.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Vegetables",
-    "tertiary_category": null
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Vegetables",
+      "tertiary": "NONE"
+    },
+    "category_path": "Fresh Vegetables#NONE#4078"
   },
   {
     "barcode": "0123456789082",
@@ -1078,11 +1224,13 @@
     "ingredients": [
       "Coffee"
     ],
-    "price": 8.99,
     "image_url": "infrastructure/images/0123456789082-coffee.jpg",
-    "primary_category": "Beverages",
-    "secondary_category": "Coffee",
-    "tertiary_category": null
+    "category": {
+      "primary": "Beverages",
+      "secondary": "Coffee",
+      "tertiary": "NONE"
+    },
+    "category_path": "Coffee#NONE#0123456789082"
   },
   {
     "barcode": "0123456789083",
@@ -1094,11 +1242,13 @@
       "Spices",
       "Salt"
     ],
-    "price": 5.99,
     "image_url": "infrastructure/images/0123456789083-italian-sausage.jpg",
-    "primary_category": "Meat",
-    "secondary_category": "Pork",
-    "tertiary_category": null
+    "category": {
+      "primary": "Meat",
+      "secondary": "Pork",
+      "tertiary": "NONE"
+    },
+    "category_path": "Pork#NONE#0123456789083"
   },
   {
     "barcode": "0123456789084",
@@ -1109,11 +1259,13 @@
       "Chickpeas",
       "Water"
     ],
-    "price": 1.29,
     "image_url": "infrastructure/images/0123456789084-chickpeas.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Canned",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Canned",
+      "tertiary": "NONE"
+    },
+    "category_path": "Canned#NONE#0123456789084"
   },
   {
     "barcode": "4085",
@@ -1123,11 +1275,13 @@
     "ingredients": [
       "Asparagus"
     ],
-    "price": 4.99,
     "image_url": "infrastructure/images/4085-asparagus.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Vegetables",
-    "tertiary_category": null
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Vegetables",
+      "tertiary": "NONE"
+    },
+    "category_path": "Fresh Vegetables#NONE#4085"
   },
   {
     "barcode": "0123456789086",
@@ -1139,11 +1293,13 @@
       "Milk",
       "Cultures"
     ],
-    "price": 1.99,
     "image_url": "infrastructure/images/0123456789086-yogurt-drink.jpg",
-    "primary_category": "Dairy",
-    "secondary_category": "Yogurt",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dairy",
+      "secondary": "Yogurt",
+      "tertiary": "NONE"
+    },
+    "category_path": "Yogurt#NONE#0123456789086"
   },
   {
     "barcode": "4318",
@@ -1153,11 +1309,13 @@
     "ingredients": [
       "Cantaloupe"
     ],
-    "price": 3.99,
     "image_url": "infrastructure/images/4318-cantaloupe.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Fruit",
-    "tertiary_category": "Melons"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Fruit",
+      "tertiary": "Melons"
+    },
+    "category_path": "Fresh Fruit#Melons#4318"
   },
   {
     "barcode": "0123456789088",
@@ -1169,11 +1327,13 @@
       "Vinegar",
       "Salt"
     ],
-    "price": 3.29,
     "image_url": "infrastructure/images/0123456789088-mustard.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Condiments",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Condiments",
+      "tertiary": "NONE"
+    },
+    "category_path": "Condiments#NONE#0123456789088"
   },
   {
     "barcode": "0123456789089",
@@ -1183,11 +1343,13 @@
     "ingredients": [
       "Cod"
     ],
-    "price": 9.99,
     "image_url": "infrastructure/images/0123456789089-cod-fillet.jpg",
-    "primary_category": "Seafood",
-    "secondary_category": "Fish",
-    "tertiary_category": "Cod"
+    "category": {
+      "primary": "Seafood",
+      "secondary": "Fish",
+      "tertiary": "Cod"
+    },
+    "category_path": "Fish#Cod#0123456789089"
   },
   {
     "barcode": "4072",
@@ -1197,11 +1359,13 @@
     "ingredients": [
       "Potatoes"
     ],
-    "price": 3.49,
     "image_url": "infrastructure/images/4072-potatoes.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Vegetables",
-    "tertiary_category": "Root Vegetables"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Vegetables",
+      "tertiary": "Root Vegetables"
+    },
+    "category_path": "Fresh Vegetables#Root Vegetables#4072"
   },
   {
     "barcode": "0123456789091",
@@ -1214,11 +1378,13 @@
       "Sugar",
       "Salt"
     ],
-    "price": 3.99,
     "image_url": "infrastructure/images/0123456789091-ketchup.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Condiments",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Condiments",
+      "tertiary": "NONE"
+    },
+    "category_path": "Condiments#NONE#0123456789091"
   },
   {
     "barcode": "4626",
@@ -1228,11 +1394,13 @@
     "ingredients": [
       "Romaine lettuce"
     ],
-    "price": 2.99,
     "image_url": "infrastructure/images/4626-lettuce.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Vegetables",
-    "tertiary_category": "Leafy Greens"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Vegetables",
+      "tertiary": "Leafy Greens"
+    },
+    "category_path": "Fresh Vegetables#Leafy Greens#4626"
   },
   {
     "barcode": "0123456789093",
@@ -1244,11 +1412,13 @@
       "Vinegar",
       "Salt"
     ],
-    "price": 2.49,
     "image_url": "infrastructure/images/0123456789093-hot-sauce.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Condiments",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Condiments",
+      "tertiary": "NONE"
+    },
+    "category_path": "Condiments#NONE#0123456789093"
   },
   {
     "barcode": "0123456789094",
@@ -1260,11 +1430,13 @@
       "Wheat",
       "Salt"
     ],
-    "price": 2.99,
     "image_url": "infrastructure/images/0123456789094-soy-sauce.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Condiments",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Condiments",
+      "tertiary": "NONE"
+    },
+    "category_path": "Condiments#NONE#0123456789094"
   },
   {
     "barcode": "4414",
@@ -1274,11 +1446,13 @@
     "ingredients": [
       "Pears"
     ],
-    "price": 3.49,
     "image_url": "infrastructure/images/4414-pear.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Fruit",
-    "tertiary_category": "Pears"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Fruit",
+      "tertiary": "Pears"
+    },
+    "category_path": "Fresh Fruit#Pears#4414"
   },
   {
     "barcode": "0123456789096",
@@ -1291,11 +1465,13 @@
       "Yeast",
       "Salt"
     ],
-    "price": 2.99,
     "image_url": "infrastructure/images/0123456789096-baguette.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Bread",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Bread",
+      "tertiary": "NONE"
+    },
+    "category_path": "Bread#NONE#0123456789096"
   },
   {
     "barcode": "0123456789097",
@@ -1308,11 +1484,13 @@
       "Olive oil",
       "Lemon"
     ],
-    "price": 4.49,
     "image_url": "infrastructure/images/0123456789097-hummus.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Spreads",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Spreads",
+      "tertiary": "NONE"
+    },
+    "category_path": "Spreads#NONE#0123456789097"
   },
   {
     "barcode": "4032",
@@ -1322,11 +1500,13 @@
     "ingredients": [
       "Watermelon"
     ],
-    "price": 4.99,
     "image_url": "infrastructure/images/4032-watermelon.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Fruit",
-    "tertiary_category": "Melons"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Fruit",
+      "tertiary": "Melons"
+    },
+    "category_path": "Fresh Fruit#Melons#4032"
   },
   {
     "barcode": "4881",
@@ -1336,11 +1516,13 @@
     "ingredients": [
       "Eggplant"
     ],
-    "price": 2.49,
     "image_url": "infrastructure/images/4881-eggplant.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Vegetables",
-    "tertiary_category": null
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Vegetables",
+      "tertiary": "NONE"
+    },
+    "category_path": "Fresh Vegetables#NONE#4881"
   },
   {
     "barcode": "0123456789100",
@@ -1352,11 +1534,13 @@
       "Cultures",
       "Salt"
     ],
-    "price": 3.99,
     "image_url": "infrastructure/images/0123456789100-cottage-cheese-2percent.jpg",
-    "primary_category": "Dairy",
-    "secondary_category": "Cheese",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dairy",
+      "secondary": "Cheese",
+      "tertiary": "NONE"
+    },
+    "category_path": "Cheese#NONE#0123456789100"
   },
   {
     "barcode": "4430",
@@ -1366,11 +1550,13 @@
     "ingredients": [
       "Pineapple"
     ],
-    "price": 3.99,
     "image_url": "infrastructure/images/4430-pineapple.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Fruit",
-    "tertiary_category": "Tropical"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Fruit",
+      "tertiary": "Tropical"
+    },
+    "category_path": "Fresh Fruit#Tropical#4430"
   },
   {
     "barcode": "0123456789102",
@@ -1380,11 +1566,13 @@
     "ingredients": [
       "Chicken thighs"
     ],
-    "price": 4.99,
     "image_url": "infrastructure/images/0123456789102-chicken-thighs.jpg",
-    "primary_category": "Meat",
-    "secondary_category": "Poultry",
-    "tertiary_category": "Chicken"
+    "category": {
+      "primary": "Meat",
+      "secondary": "Poultry",
+      "tertiary": "Chicken"
+    },
+    "category_path": "Poultry#Chicken#0123456789102"
   },
   {
     "barcode": "0123456789103",
@@ -1396,11 +1584,13 @@
       "Sugar",
       "Salt"
     ],
-    "price": 4.49,
     "image_url": "infrastructure/images/0123456789103-cereal.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Cereal",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Cereal",
+      "tertiary": "NONE"
+    },
+    "category_path": "Cereal#NONE#0123456789103"
   },
   {
     "barcode": "4959",
@@ -1410,11 +1600,13 @@
     "ingredients": [
       "Mangoes"
     ],
-    "price": 2.99,
     "image_url": "infrastructure/images/4959-mango.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Fresh Fruit",
-    "tertiary_category": "Tropical"
+    "category": {
+      "primary": "Produce",
+      "secondary": "Fresh Fruit",
+      "tertiary": "Tropical"
+    },
+    "category_path": "Fresh Fruit#Tropical#4959"
   },
   {
     "barcode": "0123456789105",
@@ -1426,11 +1618,13 @@
       "Sugar",
       "Caramel color"
     ],
-    "price": 5.99,
     "image_url": "infrastructure/images/0123456789105-cola.jpg",
-    "primary_category": "Beverages",
-    "secondary_category": "Soda",
-    "tertiary_category": null
+    "category": {
+      "primary": "Beverages",
+      "secondary": "Soda",
+      "tertiary": "NONE"
+    },
+    "category_path": "Soda#NONE#0123456789105"
   },
   {
     "barcode": "0123456789106",
@@ -1440,11 +1634,13 @@
     "ingredients": [
       "Peas"
     ],
-    "price": 2.49,
     "image_url": "infrastructure/images/0123456789106-frozen-peas.jpg",
-    "primary_category": "Dry Goods",
-    "secondary_category": "Frozen",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dry Goods",
+      "secondary": "Frozen",
+      "tertiary": "NONE"
+    },
+    "category_path": "Frozen#NONE#0123456789106"
   },
   {
     "barcode": "0123456789107",
@@ -1456,11 +1652,13 @@
       "Vinegar",
       "Salt"
     ],
-    "price": 4.49,
     "image_url": "infrastructure/images/0123456789107-ricotta.jpg",
-    "primary_category": "Dairy",
-    "secondary_category": "Cheese",
-    "tertiary_category": null
+    "category": {
+      "primary": "Dairy",
+      "secondary": "Cheese",
+      "tertiary": "NONE"
+    },
+    "category_path": "Cheese#NONE#0123456789107"
   },
   {
     "barcode": "4889",
@@ -1470,10 +1668,12 @@
     "ingredients": [
       "Cilantro"
     ],
-    "price": 1.49,
     "image_url": "infrastructure/images/4889-cilantro.jpg",
-    "primary_category": "Produce",
-    "secondary_category": "Herbs",
-    "tertiary_category": null
+    "category": {
+      "primary": "Produce",
+      "secondary": "Herbs",
+      "tertiary": "NONE"
+    },
+    "category_path": "Herbs#NONE#4889"
   }
 ]

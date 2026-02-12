@@ -5,7 +5,7 @@ import ProductInfo from './ProductInfo'
 /**
  * Product card component displaying a single product
  */
-function ProductCard({ product, storeStock, storeName, sale }) {
+function ProductCard({ product, storeStock, storeName, storeRow, sale }) {
   return (
     <div className="product-card">
       <ProductImage imageUrl={product.image_url} productName={product.name} />
@@ -13,6 +13,7 @@ function ProductCard({ product, storeStock, storeName, sale }) {
         product={product}
         storeStock={storeStock}
         storeName={storeName}
+        storeRow={storeRow}
         sale={sale}
       />
     </div>
