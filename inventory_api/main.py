@@ -1,10 +1,19 @@
-from typing import List, Optional
+from typing import List
 
+import json
 import os
+from pathlib import Path
 
 import boto3
 from boto3.dynamodb.types import TypeDeserializer
 from fastapi import FastAPI, HTTPException
+
+# Load .env file if it exists (for local development)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # python-dotenv not installed, skip .env loading
 
 
 def _get_dynamodb_client():
@@ -22,6 +31,7 @@ def _dynamodb_table_suffix(products_table: str, suffix: str) -> str:
     return products_table[: -len("-products")] + suffix
 
 
+USE_DYNAMODB = os.environ.get("USE_DYNAMODB", "").lower() in ("1", "true", "yes")
 DYNAMODB_PRODUCTS_TABLE = os.environ.get("DYNAMODB_PRODUCTS_TABLE", "").strip()
 NAME_PREFIX = os.environ.get("NAME_PREFIX", "").strip()
 
@@ -29,6 +39,9 @@ if not DYNAMODB_PRODUCTS_TABLE and NAME_PREFIX:
     DYNAMODB_PRODUCTS_TABLE = f"{NAME_PREFIX}-products"
 
 PRODUCTS_BY_STORE_TABLE = _dynamodb_table_suffix(DYNAMODB_PRODUCTS_TABLE, "-products_by_store")
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PRODUCTS_BY_STORE_FILE = PROJECT_ROOT / "seed_data" / "products_by_store.json"
 
 deserializer = TypeDeserializer()
 
@@ -59,6 +72,7 @@ app = FastAPI(
 def health():
     return {
         "status": "ok",
+        "mode": "dynamodb" if (USE_DYNAMODB and PRODUCTS_BY_STORE_TABLE) else "json",
         "products_table": DYNAMODB_PRODUCTS_TABLE or None,
         "products_by_store_table": PRODUCTS_BY_STORE_TABLE or None,
     }
@@ -67,11 +81,20 @@ def health():
 @app.get("/inventory/{store_id}")
 def list_inventory_for_store(store_id: str):
     """
-    Return all inventory rows for a given store_id from the products_by_store table.
+    Return all inventory rows for a given store_id.
+    - When USE_DYNAMODB=1 and PRODUCTS_BY_STORE_TABLE is set, read from DynamoDB.
+    - Otherwise, read from local seed_data/products_by_store.json.
     """
-    if not PRODUCTS_BY_STORE_TABLE:
-        raise HTTPException(status_code=500, detail="PRODUCTS_BY_STORE_TABLE not configured")
+    # Local / dev mode: JSON file
+    if not USE_DYNAMODB or not PRODUCTS_BY_STORE_TABLE:
+        try:
+            with PRODUCTS_BY_STORE_FILE.open("r", encoding="utf-8") as f:
+                rows = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            rows = []
+        return [r for r in rows if r.get("store_id") == store_id]
 
+    # DynamoDB mode
     try:
         client = _get_dynamodb_client()
         paginator = client.get_paginator("query")
@@ -93,9 +116,19 @@ def get_inventory_item(store_id: str, barcode: str):
     """
     Return a single inventory row for (store_id, barcode) or 404 if not found.
     """
-    if not PRODUCTS_BY_STORE_TABLE:
-        raise HTTPException(status_code=500, detail="PRODUCTS_BY_STORE_TABLE not configured")
+    # Local / dev mode: JSON file
+    if not USE_DYNAMODB or not PRODUCTS_BY_STORE_TABLE:
+        try:
+            with PRODUCTS_BY_STORE_FILE.open("r", encoding="utf-8") as f:
+                rows = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            rows = []
+        for r in rows:
+            if r.get("store_id") == store_id and r.get("barcode") == barcode:
+                return r
+        raise HTTPException(status_code=404, detail="Inventory item not found")
 
+    # DynamoDB mode
     try:
         client = _get_dynamodb_client()
         resp = client.get_item(

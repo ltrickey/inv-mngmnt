@@ -7,7 +7,8 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-SEED_DATA_DIR="${SEED_DATA_DIR:-$PROJECT_ROOT/server/seed_data}"
+# Seed data is now at the repo root: ./seed_data
+SEED_DATA_DIR="${SEED_DATA_DIR:-$PROJECT_ROOT/seed_data}"
 INFRASTRUCTURE_DIR="${INFRASTRUCTURE_DIR:-$PROJECT_ROOT/infrastructure}"
 
 # Convert JSON object to DynamoDB Item format (omit null). Use with: jq -c 'def dynamo_val: ...; def to_item: ...; .[] | to_item'

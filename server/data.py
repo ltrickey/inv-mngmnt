@@ -7,10 +7,13 @@ import json
 import logging
 import os
 
+import requests
+
 logger = logging.getLogger(__name__)
 
 USE_DYNAMODB = os.environ.get('USE_DYNAMODB', '').lower() in ('1', 'true', 'yes')
 DYNAMODB_PRODUCTS_TABLE = os.environ.get('DYNAMODB_PRODUCTS_TABLE', '').strip()
+INVENTORY_API_BASE_URL = os.environ.get('INVENTORY_API_BASE_URL', '').rstrip('/') or ''
 
 def _dynamodb_table_suffix(suffix):
     """Derive table name from products table (e.g. product-catalogue-test-products -> product-catalogue-test-stores)."""
@@ -22,7 +25,8 @@ DYNAMODB_STORES_TABLE = _dynamodb_table_suffix('-stores')
 DYNAMODB_PRODUCTS_BY_STORE_TABLE = _dynamodb_table_suffix('-products_by_store')
 DYNAMODB_CATEGORIES_TABLE = 'categories'  # fixed name, not prefixed
 
-_SEED_DIR = os.path.join(os.path.dirname(__file__), 'seed_data')
+# Seed data is now at the repo root: ../seed_data
+_SEED_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'seed_data')
 STORES_FILE = os.path.join(_SEED_DIR, 'stores.json')
 PRODUCTS_BY_STORE_FILE = os.path.join(_SEED_DIR, 'products_by_store.json')
 
@@ -31,6 +35,20 @@ def _get_dynamodb_client():
     import boto3
     region = os.environ.get('AWS_REGION') or os.environ.get('AWS_DEFAULT_REGION')
     return boto3.client('dynamodb', region_name=region) if region else boto3.client('dynamodb')
+
+
+def _inventory_api_get(path: str):
+    """Call external inventory API if configured. Returns JSON on success, None on failure/disabled."""
+    if not INVENTORY_API_BASE_URL:
+        return None
+    url = f"{INVENTORY_API_BASE_URL}{path}"
+    try:
+        resp = requests.get(url, timeout=3)
+        resp.raise_for_status()
+        return resp.json()
+    except Exception as e:
+        logger.exception("Inventory API request failed for %s: %s", url, e)
+        return None
 
 
 def _deserialize_item(item):
@@ -176,12 +194,19 @@ def get_stock_item_from_dynamodb(store_id, barcode):
 
 
 def get_stock_for_store(store_id):
+    # Prefer external inventory API if configured
+    data = _inventory_api_get(f"/inventory/{store_id}")
+    if data is not None:
+        return data
     if USE_DYNAMODB and DYNAMODB_PRODUCTS_BY_STORE_TABLE:
         return get_stock_for_store_from_dynamodb(store_id)
     return get_stock_for_store_from_json(store_id)
 
 
 def get_stock_item(store_id, barcode):
+    data = _inventory_api_get(f"/inventory/{store_id}/{barcode}")
+    if data is not None:
+        return data
     if USE_DYNAMODB and DYNAMODB_PRODUCTS_BY_STORE_TABLE:
         return get_stock_item_from_dynamodb(store_id, barcode)
     return get_stock_item_from_json(store_id, barcode)
@@ -231,12 +256,18 @@ def get_sale_from_dynamodb(store_id, barcode):
 
 
 def get_sales_for_store(store_id):
+    data = _inventory_api_get(f"/inventory/{store_id}")
+    if data is not None:
+        return [r for r in data if (r.get('percent_off') or 0) > 0]
     if USE_DYNAMODB and DYNAMODB_PRODUCTS_BY_STORE_TABLE:
         return get_sales_for_store_from_dynamodb(store_id)
     return get_sales_for_store_from_json(store_id)
 
 
 def get_sale(store_id, barcode):
+    data = _inventory_api_get(f"/inventory/{store_id}/{barcode}")
+    if data is not None:
+        return data if (data.get('percent_off') or 0) > 0 else None
     if USE_DYNAMODB and DYNAMODB_PRODUCTS_BY_STORE_TABLE:
         return get_sale_from_dynamodb(store_id, barcode)
     return get_sale_from_json(store_id, barcode)

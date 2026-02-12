@@ -5,6 +5,13 @@ import logging
 import os
 import time
 
+# Load .env file if it exists (for local development)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # python-dotenv not installed, skip .env loading
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -26,7 +33,8 @@ else:
     app = Flask(__name__)
     CORS(app)  # Enable CORS for all routes
 
-# Register blueprints for stores, stock, sales (products/categories stay here)
+# Register blueprints for stores, stock, sales.
+# Stock and sales endpoints proxy to the FastAPI inventory service when INVENTORY_API_BASE_URL is set.
 from stores import stores_bp
 from stock import stock_bp
 from sales import sales_bp
@@ -48,7 +56,8 @@ def serve_image(filename):
     return send_from_directory(IMAGES_DIR, filename)
 
 # Path to the products JSON file (used when running locally, not using DynamoDB)
-PRODUCTS_FILE = os.path.join(os.path.dirname(__file__), 'seed_data', 'products.json')
+# Seed data has been moved to the repo root: ../seed_data
+PRODUCTS_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'seed_data', 'products.json')
 
 # S3 configuration (optional - if not set, uses local images)
 S3_BUCKET_URL = os.environ.get('S3_BUCKET_URL', None)

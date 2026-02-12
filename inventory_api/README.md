@@ -33,10 +33,35 @@ source .venv/bin/activate  # On Windows: .venv\\Scripts\\activate
 pip install -r requirements.txt
 ```
 
-Export your AWS and table env vars (for the same account/region where Terraform created the tables):
+**Using the `.env` file (recommended for local development):**
+
+A `.env` file is provided in this directory with local development settings. The service automatically loads it if `python-dotenv` is installed (included in `requirements.txt`).
+
+If you're using `uvicorn` directly, the `.env` file will be loaded automatically. If you need to manually load it:
 
 ```bash
+# Load environment variables from .env file
+export $(cat .env | xargs)
+
+# Or source it (if your shell supports it):
+# source .env
+```
+
+The `.env` file contains:
+- `USE_DYNAMODB=0` – Disables DynamoDB, uses local JSON files from `../seed_data/products_by_store.json` instead
+- Optional variables for DynamoDB mode (commented out) if you need to test against real tables
+
+**Manual environment variable setup (alternative):**
+
+If you prefer not to use the `.env` file, export variables manually:
+
+```bash
+# For local JSON mode (no DynamoDB):
+export USE_DYNAMODB=0
+
+# For DynamoDB mode (requires AWS credentials):
 export AWS_REGION=us-east-1
+export USE_DYNAMODB=1
 export NAME_PREFIX=product-catalogue-test
 # or explicitly:
 # export DYNAMODB_PRODUCTS_TABLE=product-catalogue-test-products

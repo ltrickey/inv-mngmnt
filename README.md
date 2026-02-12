@@ -1,11 +1,18 @@
-# Customer Website
+# Grocery Store Inventory Management
 Homework series for CPSC 5910 Cloud Computing Seattle University
 
-Written by Lynn Trickey with assistance from Cursor AI agent
+By Lynn Trickey with assistance from Cursor AI agent
 
-## AWS Credentials Setup
+## Pre-Deployment Setup
+**AWS Credentials and SSH Key are required to run Terraform Deployment**
 
-Before running Terraform, you need to configure your AWS credentials. If you're using temporary credentials (common with AWS Academy/AWS Educate), you'll need to set three environment variables:
+Before running Terraform, you need to configure your AWS credentials and SSH key. If you're using temporary credentials (common with AWS Academy/AWS Educate), you'll need to set three environment variables:
+
+### Getting AWS Credentials
+
+**AWS Academy/AWS Educate:**
+   - Download the credentials CSV file from your AWS Academy account
+   - The file contains: Access Key ID, Secret Access Key, and Session Token
 
 ### Setting AWS Credentials
 
@@ -30,19 +37,6 @@ export AWS_ACCESS_KEY_ID="your-access-key-id"
 export AWS_SECRET_ACCESS_KEY="your-secret-access-key"
 # AWS_SESSION_TOKEN not needed for permanent credentials
 ```
-
-### Getting Credentials
-
-1. **AWS Academy/AWS Educate:**
-   - Download the credentials CSV file from your AWS Academy account
-   - The file contains: Access Key ID, Secret Access Key, and Session Token
-   - Set all three environment variables
-
-2. **AWS CLI Configuration (Alternative):**
-   ```bash
-   aws configure
-   ```
-   This will prompt for credentials and save them to `~/.aws/credentials`
 
 ### Verifying Credentials
 
@@ -82,6 +76,84 @@ To deploy to EC2 instances, you need an SSH key pair. The Terraform configuratio
 - If you get "WARNING: UNPROTECTED PRIVATE KEY FILE!" or "bad permissions", run `chmod 600 ~/.ssh/vockey.pem`
 - If you download a new key file, remember to set permissions again
 - Make sure the key name in Terraform variables matches your actual key name in AWS
+
+## Local Development
+
+For local development, both the Flask WebApp and FastAPI Inventory Service can run without DynamoDB by using JSON seed files from the `seed_data/` directory.
+
+### Environment Variables (.env files)
+
+Both services include `.env` files for local development configuration:
+
+**Flask WebApp (`server/.env`):**
+```bash
+# Disable DynamoDB for local development (use JSON seed files instead)
+USE_DYNAMODB=0
+
+# Point Flask to the FastAPI inventory service for stock/sales data
+INVENTORY_API_BASE_URL=http://127.0.0.1:9000
+```
+
+**FastAPI Inventory Service (`inventory_api/.env`):**
+```bash
+# Disable DynamoDB for local development (use JSON seed files from ../seed_data instead)
+USE_DYNAMODB=0
+```
+
+Both services automatically load their respective `.env` files if `python-dotenv` is installed (included in `requirements.txt`). You don't need to manually export these variables unless you prefer not to use the `.env` files.
+
+### Running Locally
+
+**1. Start the FastAPI Inventory Service:**
+
+```bash
+cd inventory_api
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+pip install -r requirements.txt  # Includes python-dotenv
+
+# The .env file will be loaded automatically
+# Run the service
+uvicorn main:app --reload --port 9000
+```
+
+The inventory API will read from `../seed_data/products_by_store.json` when `USE_DYNAMODB=0`.
+
+**2. Start the Flask WebApp:**
+
+In a separate terminal:
+
+```bash
+cd server
+python -m venv .venv  # If you haven't already
+source .venv/bin/activate
+pip install -r requirements.txt  # Install Flask dependencies (includes python-dotenv)
+
+# The .env file will be loaded automatically by Flask
+# Run Flask (adjust command based on how you start Flask)
+python app.py
+# or: flask run --port 8000
+```
+
+The Flask app will:
+- Read products and stores from `../seed_data/products.json` and `../seed_data/stores.json`
+- Forward stock/sales requests to the FastAPI inventory service at `http://127.0.0.1:9000`
+
+**3. Start the React Frontend (optional for full-stack testing):**
+
+```bash
+cd site
+npm install
+npm run dev
+```
+
+The React app will connect to Flask at `http://localhost:8000`.
+
+### Notes
+
+- **Seed data location:** All seed data files (`products.json`, `stores.json`, `products_by_store.json`, `categories.json`) are located at the repo root in `seed_data/` (moved from `server/seed_data/`).
+- **No AWS credentials needed:** When `USE_DYNAMODB=0`, neither service requires AWS credentials or DynamoDB access.
+- **Service communication:** Flask calls the FastAPI inventory service for all stock/sales data. Make sure the inventory service is running before starting Flask.
 
 ## Deployment Process
 
