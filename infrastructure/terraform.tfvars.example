@@ -35,3 +35,6 @@ allowed_cidr_blocks = ["0.0.0.0/0"]
 # Optional: Create a custom instance profile instead of using existing one
 # Set to true if you want Terraform to create the instance profile
 # create_instance_profile = false
+
+# Note: S3 bucket for images is always created when deploying to AWS
+# For local development, the Flask app automatically serves images from infrastructure/images/

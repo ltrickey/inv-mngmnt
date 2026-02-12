@@ -1,8 +1,40 @@
+# Automatically upload images to S3 after bucket is created
+resource "terraform_data" "upload_images_to_s3" {
+  depends_on = [
+    aws_s3_bucket.product_images,
+    aws_s3_bucket_policy.product_images
+  ]
+
+  triggers_replace = [
+    aws_s3_bucket.product_images.id
+  ]
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      set -e
+      PROJECT_ROOT="${abspath("${path.module}/..")}"
+      INFRA_DIR="${abspath(path.module)}"
+      cd "$PROJECT_ROOT"
+      echo "=========================================="
+      echo "TERRAFORM TRIGGERED S3 IMAGE UPLOAD"
+      echo "=========================================="
+      echo "Making upload script executable..."
+      chmod +x scripts/upload_images_to_s3.sh
+      echo ""
+      echo "Uploading product images to S3..."
+      INFRASTRUCTURE_DIR="$INFRA_DIR" ./scripts/upload_images_to_s3.sh
+    EOT
+  }
+}
+
 # Automatically deploy Product Catalogue after EC2 instance is created
 # This uses local-exec to run the deployment scripts from your local machine
 # terraform_data is the recommended built-in resource (replaces null_resource in Terraform v1.14+)
 resource "terraform_data" "deploy_product_catalogue" {
-  depends_on = [aws_instance.product_catalogue]
+  depends_on = [
+    aws_instance.product_catalogue,
+    terraform_data.upload_images_to_s3
+  ]
 
   triggers_replace = [
     aws_instance.product_catalogue.id,

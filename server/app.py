@@ -60,7 +60,8 @@ def serve_image(filename):
 PRODUCTS_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'seed_data', 'products.json')
 
 # S3 configuration (optional - if not set, uses local images)
-S3_BUCKET_URL = os.environ.get('S3_BUCKET_URL', None)
+S3_BUCKET_NAME = os.environ.get('S3_BUCKET_NAME', None)
+S3_BUCKET_REGION = os.environ.get('S3_BUCKET_REGION', None)
 
 
 def get_image_url(image_path):
@@ -69,7 +70,7 @@ def get_image_url(image_path):
     If the image file does not exist on disk, returns the placeholder image URL
     so the API never points to a missing file (avoids 404s after re-seeds or renames).
     
-    If S3_BUCKET_URL is set, prepends it to the image path for S3 storage.
+    If S3_BUCKET_NAME is set, generates a signed URL with 1-hour expiration.
     Otherwise, returns a Flask-served URL for local testing.
     
     Args:
@@ -78,23 +79,43 @@ def get_image_url(image_path):
     Returns:
         Full URL string for the image
     """
-    if S3_BUCKET_URL:
-        # TODO: IMPLEMENT PUlling images from S3Production: Use S3 bucket URL
+    if S3_BUCKET_NAME:
+        # Production: Generate signed S3 URL (expires in 1 hour)
         # Remove 'infrastructure/' prefix if present, S3 should have direct paths
         s3_path = image_path.replace('infrastructure/', '') if image_path.startswith('infrastructure/') else image_path
-        return f"{S3_BUCKET_URL.rstrip('/')}/{s3_path}"
+        
+        try:
+            import boto3
+            from botocore.exceptions import ClientError
+            
+            # Create S3 client
+            if S3_BUCKET_REGION:
+                s3_client = boto3.client('s3', region_name=S3_BUCKET_REGION)
+            else:
+                s3_client = boto3.client('s3')
+            
+            # Generate signed URL (valid for 1 hour)
+            signed_url = s3_client.generate_presigned_url(
+                'get_object',
+                Params={
+                    'Bucket': S3_BUCKET_NAME,
+                    'Key': s3_path
+                },
+                ExpiresIn=3600  # 1 hour
+            )
+            return signed_url
+        except Exception as e:
+            logger.error(f"Failed to generate signed URL for {s3_path}: {e}")
+            # Fallback to placeholder served by Flask
+            return "/images/placeholder.png"
     else:
         # Local development: Use Flask static file serving
         if image_path.startswith(('http://', 'https://')):
             return image_path
-        if image_path.startswith('/images/'):
-            filename = image_path.replace('/images/', '')
-        elif image_path.startswith('infrastructure/images/'):
-            filename = image_path.replace('infrastructure/images/', '')
-        elif image_path.startswith('infrastructure/'):
-            filename = image_path.replace('infrastructure/', '')
-        else:
-            filename = image_path.lstrip('/')
+        
+        # Extract just the filename from any path format
+        filename = os.path.basename(image_path)
+        
         # If the file does not exist (e.g. old DynamoDB image_url, renamed file), use placeholder
         if filename and not os.path.isfile(os.path.join(IMAGES_DIR, filename)):
             filename = PLACEHOLDER_IMAGE

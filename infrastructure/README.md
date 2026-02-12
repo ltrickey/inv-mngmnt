@@ -91,6 +91,16 @@ The infrastructure creates:
 - `{name_prefix}-products_by_store`: Per-store inventory
 - `categories`: Product categories (fixed name)
 
+### S3 Storage (Always created for AWS deployments)
+- **S3 Bucket**: `{name_prefix}-product-images`
+  - Stores product images
+  - **Private bucket** - not publicly accessible
+  - Images accessed via time-limited signed URLs (1-hour expiration)
+  - Versioning enabled
+  - CORS configured for web access
+  - Automatically populated from `infrastructure/images/`
+- **Local Development**: Images served from `infrastructure/images/` directory (no S3)
+
 ### IAM (Identity and Access Management)
 
 **Understanding IAM Role vs Instance Profile:**
@@ -117,15 +127,17 @@ IAM Role                    Instance Profile              EC2 Instance
 ```
 Internet
     |
-    v
-[Product Catalogue EC2] :8000 (public)
-    |
-    | (private network)
-    v
-[Inventory API EC2] :9000 (private)
-    |
-    v
-[DynamoDB Tables]
+    +------------------+------------------+
+    |                  |                  |
+    v                  v                  v
+[Users]      [S3 Product Images]  [Product Catalogue EC2] :8000
+              (public read)              |
+                                        | (private network)
+                                        v
+                             [Inventory API EC2] :9000 (private)
+                                        |
+                                        v
+                                  [DynamoDB Tables]
 ```
 
 ### Security Notes
@@ -149,6 +161,7 @@ terraform output service_url              # Product catalogue URL
 terraform output inventory_api_url        # Internal inventory API URL
 terraform output ec2_instance_public_dns  # Product catalogue DNS
 terraform output iam_instance_profile     # IAM profile being used
+terraform output s3_bucket_url            # S3 bucket URL for images
 ```
 
 ## Deployment
@@ -261,8 +274,37 @@ terraform destroy
 
 **Warning**: This will delete all EC2 instances, security groups, and DynamoDB tables. Data in DynamoDB will be lost.
 
+## Image Hosting
+
+### Two Deployment Modes
+
+**1. Local Development**
+- Images served from `infrastructure/images/` directory
+- Flask serves images at `/images/` endpoint
+- No S3 needed
+
+**2. AWS Deployment (via Terraform)**
+- Images automatically uploaded to S3 bucket
+- S3 bucket URL configured in Flask environment
+- Better performance and scalability
+
+**Quick commands:**
+```bash
+# Upload images to S3 (after terraform apply)
+./scripts/upload_images_to_s3.sh
+
+# View S3 bucket name
+terraform output s3_bucket_name
+
+# Note: Images are private and accessible only via signed URLs from Flask
+```
+
+See [S3_CONFIGURATION.md](S3_CONFIGURATION.md) for details.
+
 ## Additional Resources
 
+- [IAM Configuration Guide](IAM_CONFIGURATION.md)
+- [S3 Configuration Guide](S3_CONFIGURATION.md)
 - [AWS Academy Documentation](https://awsacademy.instructure.com/)
 - [Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
 - [Project Root README](../README.md)

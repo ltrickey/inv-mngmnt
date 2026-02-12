@@ -79,14 +79,14 @@ class InventoryDAO(InventoryItem):
     def get_by_store_id_and_barcode(self, store_id: str, barcode: str) -> InventoryItem:
         pass
 
-    @abstractmethod
-    def deduct_quantity(self, store_id: str, barcode: str, quantity: int) -> bool:
-        pass
+    # @abstractmethod
+    # def deduct_quantity(self, store_id: str, barcode: str, quantity: int) -> bool:
+    #     pass
 
-    # Deduct quantities of multiple products from a given store's inventory.  Return true if successfulf
-    @abstractmethod
-    def deduct_quantities(self, store_id: str, items: List[InventoryItem])-> bool:
-        pass
+    # # Deduct quantities of multiple products from a given store's inventory.  Return true if successfulf
+    # @abstractmethod
+    # def deduct_quantities(self, store_id: str, items: List[InventoryItem])-> bool:
+    #     pass
 
 
   

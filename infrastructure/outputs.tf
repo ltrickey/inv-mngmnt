@@ -78,3 +78,13 @@ output "iam_instance_profile" {
   description = "IAM instance profile used by EC2 instances"
   value       = local.instance_profile_name
 }
+
+output "s3_bucket_name" {
+  description = "Name of the S3 bucket for product images (private - requires signed URLs)"
+  value       = aws_s3_bucket.product_images.id
+}
+
+output "s3_bucket_region" {
+  description = "AWS region of the S3 bucket"
+  value       = var.aws_region
+}

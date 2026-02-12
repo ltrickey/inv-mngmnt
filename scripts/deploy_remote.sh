@@ -140,12 +140,32 @@ for i in {1..30}; do
     sleep 2
 done
 
-# Get DynamoDB table name, region, and inventory API URL for Flask
+# Get DynamoDB table name, region, inventory API URL, and S3 bucket name for Flask
 NAME_PREFIX=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw name_prefix 2>/dev/null || echo "")
 AWS_REGION=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw aws_region 2>/dev/null || echo "us-east-1")
 INVENTORY_API_URL=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw inventory_api_url 2>/dev/null || echo "")
+S3_BUCKET_NAME=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw s3_bucket_name 2>/dev/null || echo "")
 DYNAMODB_PRODUCTS_TABLE=""
 [ -n "$NAME_PREFIX" ] && DYNAMODB_PRODUCTS_TABLE="${NAME_PREFIX}-products"
+
+# ============================================
+# STEP 1.5: UPLOAD IMAGES TO S3
+# ============================================
+if [ -n "$S3_BUCKET_NAME" ]; then
+    echo ""
+    echo "=========================================="
+    echo "UPLOADING IMAGES TO S3"
+    echo "=========================================="
+    echo "S3 Bucket: $S3_BUCKET_NAME (private)"
+    echo ""
+    
+    INFRASTRUCTURE_DIR="$INFRASTRUCTURE_DIR" "$SCRIPT_DIR/upload_images_to_s3.sh"
+    
+    if [ $? -ne 0 ]; then
+        echo "⚠ Warning: Failed to upload images to S3, but continuing with deployment"
+        echo "  Images will be served from EC2 instance instead"
+    fi
+fi
 
 # ============================================
 # STEP 2: DEPLOY ON EC2 INSTANCE VIA SSH
@@ -165,6 +185,7 @@ ssh -i "$SSH_KEY" \
     export DYNAMODB_PRODUCTS_TABLE="$DYNAMODB_PRODUCTS_TABLE"
     export AWS_REGION="$AWS_REGION"
     export INVENTORY_API_URL="$INVENTORY_API_URL"
+    export S3_BUCKET_NAME="$S3_BUCKET_NAME"
 
     PACKAGE_NAME="product_catalogue.zip"
     DEPLOY_DIR="/opt/product_catalogue"
