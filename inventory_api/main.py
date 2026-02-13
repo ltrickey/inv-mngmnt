@@ -2,7 +2,8 @@ from typing import List
 
 from fastapi import FastAPI
 
-from inventory import get_inventory_DAO, InventoryItem, getMode
+from inventory import get_inventory_DAO, getMode
+from dao import InventoryItem
 
 
 

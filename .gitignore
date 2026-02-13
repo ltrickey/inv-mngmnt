@@ -30,3 +30,14 @@ logs/
 *.tmp
 *.temp
 .cache/
+
+# Pytest files
+*/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.DS_Store
+*.log
+.env
