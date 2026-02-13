@@ -1,13 +1,15 @@
 from abc import abstractmethod
-from typing import List
+from typing import List, Optional
+
 from pydantic import BaseModel
+from fastapi import HTTPException
 import json
 import os
 from pathlib import Path
+import boto3
 from boto3.dynamodb.types import TypeDeserializer
 
-
-# Data Transfer Object (DTO)
+# TODO: Move this to a separate file?
 class InventoryItem(BaseModel):
     store_id: str
     barcode: str
@@ -16,10 +18,56 @@ class InventoryItem(BaseModel):
     price: float
 
 
+class InventoryDAO(InventoryItem):
+    @abstractmethod
+    def get_all_by_store_id(self, store_id: str) -> List[InventoryItem]:
+        pass
+
+    @abstractmethod
+    def get_by_store_id_and_barcode(self, store_id: str, barcode: str) -> InventoryItem:
+        pass
+
+    # @abstractmethod
+    # def deduct_quantity(self, store_id: str, barcode: str, quantity: int) -> bool:
+    #     pass
+
+    # # Deduct quantities of multiple products from a given store's inventory.  Return true if successfulf
+    # @abstractmethod
+    # def deduct_quantities(self, store_id: str, items: List[InventoryItem])-> bool:
+    #     pass
+
+
+
+
+
+USE_DYNAMODB = os.environ.get("USE_DYNAMODB", "").lower() in ("1", "true", "yes")
+DYNAMODB_PRODUCTS_TABLE = os.environ.get("DYNAMODB_PRODUCTS_TABLE", "").strip()
+NAME_PREFIX = os.environ.get("NAME_PREFIX", "").strip()
+
+if not DYNAMODB_PRODUCTS_TABLE and NAME_PREFIX:
+    DYNAMODB_PRODUCTS_TABLE = f"{NAME_PREFIX}-products"
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PRODUCTS_BY_STORE_FILE = PROJECT_ROOT / "seed_data" / "products_by_store.json"
+
+
+# Load .env file if it exists (for local development)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # python-dotenv not installed, skip .env loading
+
+
 def _get_dynamodb_client():
     region = os.environ.get("AWS_REGION") or os.environ.get("AWS_DEFAULT_REGION")
     return boto3.client("dynamodb", region_name=region) if region else boto3.client("dynamodb")
 
+deserializer = TypeDeserializer()
+
+def getMode():
+    return "dynamodb" if USE_DYNAMODB else "json"
 
 def _dynamodb_table_suffix(products_table: str, suffix: str) -> str:
     """
@@ -30,20 +78,15 @@ def _dynamodb_table_suffix(products_table: str, suffix: str) -> str:
         return ""
     return products_table[: -len("-products")] + suffix
 
-
-USE_DYNAMODB = os.environ.get("USE_DYNAMODB", "").lower() in ("1", "true", "yes")
-DYNAMODB_PRODUCTS_TABLE = os.environ.get("DYNAMODB_PRODUCTS_TABLE", "").strip()
-NAME_PREFIX = os.environ.get("NAME_PREFIX", "").strip()
-
-if not DYNAMODB_PRODUCTS_TABLE and NAME_PREFIX:
-    DYNAMODB_PRODUCTS_TABLE = f"{NAME_PREFIX}-products"
-
 PRODUCTS_BY_STORE_TABLE = _dynamodb_table_suffix(DYNAMODB_PRODUCTS_TABLE, "-products_by_store")
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-PRODUCTS_BY_STORE_FILE = PROJECT_ROOT / "seed_data" / "products_by_store.json"
+DYNAMODB_CLIENT = _get_dynamodb_client()
 
-deserializer = TypeDeserializer()
+def get_inventory_DAO() -> InventoryDAO:
+    if USE_DYNAMODB and PRODUCTS_BY_STORE_TABLE and DYNAMODB_CLIENT:
+        return InventoryDAODynamoDB(PRODUCTS_BY_STORE_TABLE, DYNAMODB_CLIENT)
+    else:
+        return InventoryDAOJson(PRODUCTS_BY_STORE_FILE)
 
 
 def _deserialize_item(item: dict) -> dict:
@@ -70,39 +113,17 @@ def _deserialize_item(item: dict) -> dict:
 
 #deduct quantities of multiple products from a given store's inventory in one batch operation
 
-class InventoryDAO(InventoryItem):
-    @abstractmethod
-    def get_all_by_store_id(self, store_id: str) -> List[InventoryItem]:
-        pass
-
-    @abstractmethod
-    def get_by_store_id_and_barcode(self, store_id: str, barcode: str) -> InventoryItem:
-        pass
-
-    # @abstractmethod
-    # def deduct_quantity(self, store_id: str, barcode: str, quantity: int) -> bool:
-    #     pass
-
-    # # Deduct quantities of multiple products from a given store's inventory.  Return true if successfulf
-    # @abstractmethod
-    # def deduct_quantities(self, store_id: str, items: List[InventoryItem])-> bool:
-    #     pass
-
-
-  
-
-
 
 # Concrete DAO for accessing inventory Data from DynamoDB
 class InventoryDAODynamoDB(InventoryDAO):
-    def __init__(self, table_name: str):
+    def __init__(self, table_name: str, client: boto3.client):
         self.table_name = table_name
+        self.client = client
 
     def get_all_by_store_id(self, store_id: str) -> List[InventoryItem]:
         # DynamoDB mode
         try:
-            client = _get_dynamodb_client()
-            paginator = client.get_paginator("query")
+            paginator = self.client.get_paginator("query")
             items: List[dict] = []
             for page in paginator.paginate(
                 TableName=PRODUCTS_BY_STORE_TABLE,
@@ -113,12 +134,12 @@ class InventoryDAODynamoDB(InventoryDAO):
                     items.append(_deserialize_item(item))
             return [InventoryItem(**item) for item in items]       
         except Exception as e:  # pragma: no cover - defensive
-            raise HTTPException(status_code=500, detail=f"DynamoDB query failed: {e}") from e  # pyright: ignore[reportUndefinedVariable]
+            raise HTTPException(status_code=500, detail=f"DynamoDB query failed: {e}") from e
 
     def get_by_store_id_and_barcode(self, store_id: str, barcode: str) -> InventoryItem:
         try:
-            client = _get_dynamodb_client()
-            resp = client.get_item(
+            
+            resp = self.client.get_item(
                 TableName=PRODUCTS_BY_STORE_TABLE,
                 Key={"store_id": {"S": store_id}, "barcode": {"S": barcode}},
             )
@@ -156,4 +177,4 @@ class InventoryDAOJson(InventoryDAO):
         for r in rows:
             if r.get("store_id") == store_id and r.get("barcode") == barcode:
                 return InventoryItem(**r)
-        raise HTTPException(status_code=404, detail="Inventory item not found")  # pyright: ignore[reportUndefinedVariable]
+        raise HTTPException(status_code=404, detail="Inventory item not found")

@@ -5,6 +5,10 @@
 
 resource "aws_s3_bucket" "product_images" {
   bucket = "${local.name_prefix}-product-images"
+  
+  # Allow Terraform to destroy the bucket even if it contains objects
+  # This will delete all objects and versions when running terraform destroy
+  force_destroy = true
 
   tags = merge(local.common_tags, {
     Name = "${local.name_prefix}-product-images"
