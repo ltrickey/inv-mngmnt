@@ -51,6 +51,32 @@ Where:
   - Test coverage details
   - Quick start guide
 
+- **CHANGELOG_INVENTORY_API_EXTERNAL_ENDPOINTS.md** - External API endpoints
+  - 4 new endpoints for API Gateway
+  - Check stock availability
+  - Get price with sales
+  - Deduct single/batch operations
+  - 18 new tests (59 total, all passing)
+  - API documentation and usage examples
+
+- **CHANGELOG_INVENTORY_API_RESTFUL_IMPROVEMENTS.md** - RESTful design improvements
+  - Changed POST to PATCH for update operations
+  - Moved quantity to query parameter for stock checks
+  - Removed "/batch" suffix for cleaner URLs
+  - Removed action verbs from URLs
+  - All tests updated (59/59 passing)
+  - Improved REST maturity level
+
+### API Gateway Component
+- **CHANGELOG_API_GATEWAY_SETUP.md** - API Gateway with EC2 integration
+  - Complete Terraform configuration
+  - VPC Link for private EC2 access
+  - Network Load Balancer setup
+  - API key authentication
+  - Rate limiting and usage plans
+  - Mock API Gateway for local testing
+  - Comprehensive testing and deployment guide
+
 ## How to Use
 
 1. **For Quick Overview**: Start with `CHANGELOG_<COMPONENT>_OVERVIEW.md`

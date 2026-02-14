@@ -47,3 +47,31 @@ variable "project_name" {
   default     = "product-catalogue"
 }
 
+# ============================================================================
+# API Gateway Variables
+# ============================================================================
+
+variable "api_quota_limit" {
+  description = "Maximum number of requests per day per API key"
+  type        = number
+  default     = 10000
+}
+
+variable "api_rate_limit" {
+  description = "Steady-state request rate limit (requests per second)"
+  type        = number
+  default     = 100
+}
+
+variable "api_burst_limit" {
+  description = "Maximum concurrent requests (burst)"
+  type        = number
+  default     = 200
+}
+
+variable "log_retention_days" {
+  description = "Number of days to retain API Gateway logs"
+  type        = number
+  default     = 7
+}
+

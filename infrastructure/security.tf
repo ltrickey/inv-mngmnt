@@ -75,6 +75,15 @@ resource "aws_security_group" "inventory_api" {
     security_groups = [aws_security_group.product_catalogue.id]
   }
 
+  # Allow incoming traffic from VPC for API Gateway (via NLB)
+  ingress {
+    description = "FastAPI from API Gateway via VPC Link"
+    from_port   = 9000
+    to_port     = 9000
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.default.cidr_block]
+  }
+
   # Allow SSH access for management
   ingress {
     description = "SSH"
