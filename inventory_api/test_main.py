@@ -269,3 +269,236 @@ class TestDAOIntegration:
         assert response1.status_code == 200
         assert response2.status_code == 200
         assert response1.json() == response2.json()
+
+
+# ============================================================================
+# External API Endpoint Tests
+# ============================================================================
+
+class TestCheckStockEndpoint:
+    """Tests for GET /api/inventory/{store_id}/{barcode}?quantity=N endpoint."""
+
+    def test_check_stock_sufficient(self, client, mock_json_mode):
+        """Test checking stock when sufficient quantity is available."""
+        response = client.get("/api/inventory/store1/12345?quantity=50")
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert data["store_id"] == "store1"
+        assert data["barcode"] == "12345"
+        assert data["available"] is True
+        assert data["current_quantity"] == 100
+        assert data["requested_quantity"] == 50
+
+    def test_check_stock_insufficient(self, client, mock_json_mode):
+        """Test checking stock when insufficient quantity is available."""
+        response = client.get("/api/inventory/store1/12345?quantity=150")
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert data["available"] is False
+        assert data["current_quantity"] == 100
+        assert data["requested_quantity"] == 150
+
+    def test_check_stock_exact_amount(self, client, mock_json_mode):
+        """Test checking stock when exact quantity is available."""
+        response = client.get("/api/inventory/store1/12345?quantity=100")
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert data["available"] is True
+        assert data["current_quantity"] == 100
+        assert data["requested_quantity"] == 100
+
+    def test_check_stock_product_not_found(self, client, mock_json_mode):
+        """Test checking stock for non-existent product."""
+        response = client.get("/api/inventory/store1/99999?quantity=10")
+        
+        assert response.status_code == 404
+
+    def test_check_stock_invalid_quantity(self, client, mock_json_mode):
+        """Test checking stock with invalid quantity parameter."""
+        response = client.get("/api/inventory/store1/12345?quantity=0")
+        
+        assert response.status_code == 422  # Validation error
+
+
+class TestGetPriceEndpoint:
+    """Tests for GET /api/inventory/{store_id}/{barcode}/price endpoint."""
+
+    def test_get_price_no_discount(self, client, mock_json_mode):
+        """Test getting price for product with no discount."""
+        response = client.get("/api/inventory/store1/12345/price")
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert data["store_id"] == "store1"
+        assert data["barcode"] == "12345"
+        assert data["original_price"] == 9.99
+        assert data["percent_off"] == 0
+        assert data["final_price"] == 9.99
+
+    def test_get_price_with_discount(self, client, mock_json_mode):
+        """Test getting price for product with discount."""
+        response = client.get("/api/inventory/store1/67890/price")
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert data["store_id"] == "store1"
+        assert data["barcode"] == "67890"
+        assert data["original_price"] == 19.99
+        assert data["percent_off"] == 10
+        # 10% off: 19.99 * 0.9 = 17.991 -> rounds to 17.99
+        assert data["final_price"] == 17.99
+
+    def test_get_price_product_not_found(self, client, mock_json_mode):
+        """Test getting price for non-existent product."""
+        response = client.get("/api/inventory/store1/99999/price")
+        
+        assert response.status_code == 404
+
+
+class TestDeductQuantityEndpoint:
+    """Tests for PATCH /api/inventory/{store_id}/{barcode} endpoint."""
+
+    def test_deduct_quantity_success(self, client, mock_json_mode):
+        """Test successfully deducting quantity."""
+        response = client.patch(
+            "/api/inventory/store1/12345",
+            json={"quantity": 30}
+        )
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert data["success"] is True
+        assert data["store_id"] == "store1"
+        assert data["barcode"] == "12345"
+        assert data["deducted_quantity"] == 30
+        assert data["new_quantity"] == 70
+
+    def test_deduct_quantity_insufficient_stock(self, client, mock_json_mode):
+        """Test deducting more quantity than available."""
+        response = client.patch(
+            "/api/inventory/store1/12345",
+            json={"quantity": 150}
+        )
+        
+        assert response.status_code == 400
+        assert "insufficient quantity" in response.json()["detail"].lower()
+
+    def test_deduct_quantity_product_not_found(self, client, mock_json_mode):
+        """Test deducting from non-existent product."""
+        response = client.patch(
+            "/api/inventory/store1/99999",
+            json={"quantity": 10}
+        )
+        
+        assert response.status_code == 404
+
+    def test_deduct_quantity_invalid_quantity(self, client, mock_json_mode):
+        """Test deducting with invalid quantity."""
+        response = client.patch(
+            "/api/inventory/store1/12345",
+            json={"quantity": 0}
+        )
+        
+        assert response.status_code == 422  # Validation error
+
+    def test_deduct_quantity_negative_quantity(self, client, mock_json_mode):
+        """Test deducting with negative quantity."""
+        response = client.patch(
+            "/api/inventory/store1/12345",
+            json={"quantity": -10}
+        )
+        
+        assert response.status_code == 422  # Validation error
+
+
+class TestBatchDeductEndpoint:
+    """Tests for PATCH /api/inventory/{store_id} endpoint (batch deduction)."""
+
+    def test_batch_deduct_success(self, client, mock_json_mode):
+        """Test successfully deducting multiple items."""
+        response = client.patch(
+            "/api/inventory/store1",
+            json={
+                "items": [
+                    {"barcode": "12345", "quantity": 20},
+                    {"barcode": "67890", "quantity": 10}
+                ]
+            }
+        )
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert data["success"] is True
+        assert data["store_id"] == "store1"
+        assert data["items_updated"] == 2
+        assert len(data["items"]) == 2
+        
+        # Verify individual items
+        item1 = next(i for i in data["items"] if i["barcode"] == "12345")
+        assert item1["deducted_quantity"] == 20
+        assert item1["new_quantity"] == 80
+        
+        item2 = next(i for i in data["items"] if i["barcode"] == "67890")
+        assert item2["deducted_quantity"] == 10
+        assert item2["new_quantity"] == 40
+
+    def test_batch_deduct_insufficient_stock(self, client, mock_json_mode):
+        """Test batch deduction with insufficient stock (should be atomic)."""
+        response = client.patch(
+            "/api/inventory/store1",
+            json={
+                "items": [
+                    {"barcode": "12345", "quantity": 20},
+                    {"barcode": "67890", "quantity": 100}  # Only 50 available
+                ]
+            }
+        )
+        
+        assert response.status_code == 400
+        
+        # Verify first item was not deducted (atomic operation)
+        check_response = client.get("/inventory/store1/12345")
+        assert check_response.json()["quantity"] == 100  # Unchanged
+
+    def test_batch_deduct_item_not_found(self, client, mock_json_mode):
+        """Test batch deduction with non-existent item (should be atomic)."""
+        response = client.patch(
+            "/api/inventory/store1",
+            json={
+                "items": [
+                    {"barcode": "12345", "quantity": 20},
+                    {"barcode": "99999", "quantity": 10}  # Doesn't exist
+                ]
+            }
+        )
+        
+        assert response.status_code == 404
+        
+        # Verify first item was not deducted (atomic operation)
+        check_response = client.get("/inventory/store1/12345")
+        assert check_response.json()["quantity"] == 100  # Unchanged
+
+    def test_batch_deduct_empty_list(self, client, mock_json_mode):
+        """Test batch deduction with empty items list."""
+        response = client.patch(
+            "/api/inventory/store1",
+            json={"items": []}
+        )
+        
+        assert response.status_code == 422  # Validation error
+
+    def test_batch_deduct_invalid_quantity(self, client, mock_json_mode):
+        """Test batch deduction with invalid quantity."""
+        response = client.patch(
+            "/api/inventory/store1",
+            json={
+                "items": [
+                    {"barcode": "12345", "quantity": 0}
+                ]
+            }
+        )
+        
+        assert response.status_code == 422  # Validation error

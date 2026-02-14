@@ -1,0 +1,341 @@
+# Inventory API Reference
+
+Quick reference guide for the Inventory Service external API endpoints.
+
+## Base URL
+
+```
+Local Development: http://localhost:8000
+Production: https://your-api-gateway-url.amazonaws.com
+```
+
+## Authentication
+
+_Not yet implemented - Add API Gateway authentication when deploying_
+
+---
+
+## Endpoints
+
+### 1. Check Stock Availability
+
+Check if a store has sufficient quantity of a product.
+
+```http
+GET /api/inventory/{store_id}/{barcode}?quantity={min_quantity}
+```
+
+**Parameters:**
+- `store_id` (path) - Store identifier
+- `barcode` (path) - Product barcode
+- `quantity` (query, required) - Minimum quantity required (integer > 0)
+
+**Response 200 OK:**
+```json
+{
+  "store_id": "store1",
+  "barcode": "12345",
+  "available": true,
+  "current_quantity": 100,
+  "requested_quantity": 50
+}
+```
+
+**Example:**
+```bash
+curl "http://localhost:8000/api/inventory/store1/12345?quantity=10"
+```
+
+---
+
+### 2. Get Product Price
+
+Get product price with any applicable sales/discounts.
+
+```http
+GET /api/inventory/{store_id}/{barcode}/price
+```
+
+**Parameters:**
+- `store_id` (path) - Store identifier
+- `barcode` (path) - Product barcode
+
+**Response 200 OK:**
+```json
+{
+  "store_id": "store1",
+  "barcode": "67890",
+  "original_price": 19.99,
+  "percent_off": 10,
+  "final_price": 17.99
+}
+```
+
+**Example:**
+```bash
+curl "http://localhost:8000/api/inventory/store1/67890/price"
+```
+
+---
+
+### 3. Deduct Single Product Quantity
+
+Deduct quantity from a single product's inventory (partial update).
+
+```http
+PATCH /api/inventory/{store_id}/{barcode}
+Content-Type: application/json
+```
+
+**Parameters:**
+- `store_id` (path) - Store identifier
+- `barcode` (path) - Product barcode
+
+**Request Body:**
+```json
+{
+  "quantity": 30
+}
+```
+
+**Response 200 OK:**
+```json
+{
+  "success": true,
+  "store_id": "store1",
+  "barcode": "12345",
+  "deducted_quantity": 30,
+  "new_quantity": 70
+}
+```
+
+**Example:**
+```bash
+curl -X PATCH "http://localhost:8000/api/inventory/store1/12345" \
+  -H "Content-Type: application/json" \
+  -d '{"quantity": 30}'
+```
+
+---
+
+### 4. Batch Deduct (Atomic)
+
+Deduct quantities from multiple products in one atomic operation.
+
+```http
+PATCH /api/inventory/{store_id}
+Content-Type: application/json
+```
+
+**Parameters:**
+- `store_id` (path) - Store identifier
+
+**Request Body:**
+```json
+{
+  "items": [
+    {"barcode": "12345", "quantity": 20},
+    {"barcode": "67890", "quantity": 10}
+  ]
+}
+```
+
+**Response 200 OK:**
+```json
+{
+  "success": true,
+  "store_id": "store1",
+  "items_updated": 2,
+  "items": [
+    {
+      "barcode": "12345",
+      "deducted_quantity": 20,
+      "new_quantity": 80
+    },
+    {
+      "barcode": "67890",
+      "deducted_quantity": 10,
+      "new_quantity": 40
+    }
+  ]
+}
+```
+
+**Example:**
+```bash
+curl -X PATCH "http://localhost:8000/api/inventory/store1" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "items": [
+      {"barcode": "12345", "quantity": 20},
+      {"barcode": "67890", "quantity": 10}
+    ]
+  }'
+```
+
+**Important:** This operation is atomic - either ALL items are deducted or NONE are.
+
+**Note:** The array of items in the request body indicates this is a batch operation.
+
+---
+
+## HTTP Status Codes
+
+| Code | Description |
+|------|-------------|
+| 200 | Success |
+| 400 | Bad Request (e.g., insufficient quantity) |
+| 404 | Not Found (product doesn't exist in store) |
+| 422 | Validation Error (invalid request parameters) |
+| 500 | Internal Server Error |
+
+---
+
+## Error Response Format
+
+```json
+{
+  "detail": "Error description here"
+}
+```
+
+**Common Errors:**
+
+```json
+// Insufficient Quantity
+{
+  "detail": "Insufficient quantity. Available: 50, Requested: 100"
+}
+
+// Not Found
+{
+  "detail": "Inventory item not found"
+}
+
+// Validation Error
+{
+  "detail": [
+    {
+      "loc": ["body", "quantity"],
+      "msg": "ensure this value is greater than 0",
+      "type": "value_error.number.not_gt"
+    }
+  ]
+}
+```
+
+---
+
+## Running the API
+
+### Local Development
+
+```bash
+cd inventory_api
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the server
+uvicorn main:app --reload --port 8000
+```
+
+### Access Documentation
+
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
+- OpenAPI JSON: http://localhost:8000/openapi.json
+
+### Run Tests
+
+```bash
+./run_tests.sh
+```
+
+---
+
+## Price Calculation
+
+Prices are calculated with discounts applied:
+
+```
+final_price = original_price × (100 - percent_off) / 100
+```
+
+Result is rounded to 2 decimal places.
+
+**Example:**
+- Original Price: $19.99
+- Discount: 10%
+- Final Price: $19.99 × 0.90 = $17.991 → $17.99
+
+---
+
+## Atomicity Guarantee (Batch Deduct)
+
+The batch deduct operation guarantees atomicity:
+
+- **DynamoDB Mode:** Uses `transact_write_items` for true ACID transactions
+- **JSON Mode:** Two-pass validation ensures all-or-nothing behavior
+
+If any item fails validation (insufficient quantity, not found), **no items will be deducted**.
+
+---
+
+## Best Practices
+
+### 1. Always Check Stock First
+
+```bash
+# Step 1: Check stock
+GET /api/inventory/store1/12345?quantity=5
+
+# Step 2: Only deduct if available
+PATCH /api/inventory/store1/12345
+```
+
+### 2. Use Batch for Multiple Items
+
+Instead of multiple single deduct calls, use batch:
+
+```bash
+# ❌ Don't do this
+PATCH /api/inventory/store1/12345
+PATCH /api/inventory/store1/67890
+
+# ✅ Do this
+PATCH /api/inventory/store1
+{
+  "items": [
+    {"barcode": "12345", "quantity": 1},
+    {"barcode": "67890", "quantity": 1}
+  ]
+}
+```
+
+### 3. Handle Errors Gracefully
+
+Always handle 400 (insufficient stock) and 404 (not found) errors:
+
+```python
+try:
+    response = deduct_quantity(store_id, barcode, quantity)
+except HTTPException as e:
+    if e.status_code == 400:
+        print("Insufficient stock")
+    elif e.status_code == 404:
+        print("Product not found")
+```
+
+---
+
+## Support
+
+- **API Documentation:** http://localhost:8000/docs
+- **Test Suite:** Run `./run_tests.sh`
+- **Changelog:** See `/changelog/CHANGELOG_INVENTORY_API_EXTERNAL_ENDPOINTS.md`
+
+---
+
+**Version:** 1.1.0  
+**Last Updated:** February 13, 2026

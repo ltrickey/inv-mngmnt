@@ -19,6 +19,11 @@ class InventoryItem(BaseModel):
     percent_off: int
     price: float
 
+# TODO: Move this to a separate file?
+class InventoryDeductionItem(BaseModel):
+    store_id: str
+    barcode: str
+    quantity: int
 
 # Abstract DAO Interface to decouple data access from business logic
 class InventoryDAO(ABC):
@@ -36,7 +41,7 @@ class InventoryDAO(ABC):
 
     # Deduct quantities of multiple products from a given store's inventory.  Return true if successfulf
     @abstractmethod
-    def deduct_quantities(self, store_id: str, items: List[InventoryItem])-> bool:
+    def deduct_quantities(self, store_id: str, items: List[InventoryDeductionItem])-> bool:
         pass
 
 
