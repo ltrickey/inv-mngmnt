@@ -83,6 +83,9 @@ resource "terraform_data" "deploy_inventory_api" {
       echo "Making scripts executable..."
       chmod +x scripts/package_inventory_api.sh scripts/deploy_inventory_api_remote.sh scripts/deploy_inventory_api.sh
       echo ""
+      echo "Ensuring deploy directory exists..."
+      mkdir -p deploy/inventory_api
+      echo ""
       echo "Packaging Inventory API..."
       ./scripts/package_inventory_api.sh
       echo ""
