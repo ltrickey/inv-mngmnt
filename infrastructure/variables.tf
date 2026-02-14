@@ -47,6 +47,12 @@ variable "project_name" {
   default     = "product-catalogue"
 }
 
+variable "short_name" {
+  description = "Short project name for resources with strict name length limits (e.g., Load Balancers)"
+  type        = string
+  default     = "pcat"
+}
+
 # ============================================================================
 # API Gateway Variables
 # ============================================================================

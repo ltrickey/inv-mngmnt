@@ -2,6 +2,7 @@ fastapi==0.115.0
 uvicorn[standard]==0.30.6
 boto3==1.35.0
 python-dotenv>=1.0.0
+mangum>=0.17.0
 
 # Testing dependencies
 pytest>=8.0.0

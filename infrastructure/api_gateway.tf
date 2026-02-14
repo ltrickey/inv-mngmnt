@@ -12,7 +12,7 @@ data "aws_caller_identity" "current" {}
 # ============================================================================
 
 resource "aws_api_gateway_rest_api" "inventory_api" {
-  name        = "${var.name_prefix}-inventory-api"
+  name        = "${local.name_prefix}-inventory-api"
   description = "Inventory Service API with API Key authentication"
 
   endpoint_configuration {
@@ -20,7 +20,7 @@ resource "aws_api_gateway_rest_api" "inventory_api" {
   }
 
   tags = {
-    Name        = "${var.name_prefix}-inventory-api"
+    Name        = "${local.name_prefix}-inventory-api"
     Environment = var.environment
     ManagedBy   = "Terraform"
   }
@@ -71,22 +71,21 @@ resource "aws_api_gateway_resource" "price" {
 
 # Network Load Balancer for EC2 instance
 resource "aws_lb" "inventory_api" {
-  name               = "${var.name_prefix}-inv-api-nlb"
+  name               = "${local.short_name_prefix}-inv-nlb"
   internal           = true
   load_balancer_type = "network"
   subnets            = [data.aws_subnet.default.id]
 
   enable_deletion_protection = false
 
-  tags = {
-    Name        = "${var.name_prefix}-inventory-api-nlb"
-    Environment = var.environment
-  }
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-inventory-api-nlb"
+  })
 }
 
 # Target group for the inventory API EC2 instance
 resource "aws_lb_target_group" "inventory_api" {
-  name     = "${var.name_prefix}-inv-api-tg"
+  name     = "${local.short_name_prefix}-inv-tg"
   port     = 9000
   protocol = "TCP"
   vpc_id   = data.aws_vpc.default.id
@@ -101,10 +100,9 @@ resource "aws_lb_target_group" "inventory_api" {
     port                = 9000
   }
 
-  tags = {
-    Name        = "${var.name_prefix}-inventory-api-tg"
-    Environment = var.environment
-  }
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-inventory-api-tg"
+  })
 }
 
 # Attach EC2 instance to target group
@@ -128,12 +126,12 @@ resource "aws_lb_listener" "inventory_api" {
 
 # VPC Link to connect API Gateway to private NLB
 resource "aws_api_gateway_vpc_link" "inventory_api" {
-  name        = "${var.name_prefix}-inventory-api-vpc-link"
+  name        = "${local.name_prefix}-inventory-api-vpc-link"
   description = "VPC Link for Inventory API"
   target_arns = [aws_lb.inventory_api.arn]
 
   tags = {
-    Name        = "${var.name_prefix}-inventory-api-vpc-link"
+    Name        = "${local.name_prefix}-inventory-api-vpc-link"
     Environment = var.environment
   }
 }
@@ -311,18 +309,18 @@ module "cors_store" {
 # ============================================================================
 
 resource "aws_api_gateway_api_key" "inventory_api_key" {
-  name        = "${var.name_prefix}-inventory-api-key"
+  name        = "${local.name_prefix}-inventory-api-key"
   description = "API Key for Inventory Service"
   enabled     = true
 
   tags = {
-    Name        = "${var.name_prefix}-inventory-api-key"
+    Name        = "${local.name_prefix}-inventory-api-key"
     Environment = var.environment
   }
 }
 
 resource "aws_api_gateway_usage_plan" "inventory_api_plan" {
-  name        = "${var.name_prefix}-inventory-usage-plan"
+  name        = "${local.name_prefix}-inventory-usage-plan"
   description = "Usage plan for Inventory API"
 
   api_stages {
@@ -341,7 +339,7 @@ resource "aws_api_gateway_usage_plan" "inventory_api_plan" {
   }
 
   tags = {
-    Name        = "${var.name_prefix}-inventory-usage-plan"
+    Name        = "${local.name_prefix}-inventory-usage-plan"
     Environment = var.environment
   }
 }
@@ -396,38 +394,39 @@ resource "aws_api_gateway_stage" "prod" {
   rest_api_id   = aws_api_gateway_rest_api.inventory_api.id
   stage_name    = "prod"
 
-  access_log_settings {
-    destination_arn = aws_cloudwatch_log_group.api_gateway.arn
-    format = jsonencode({
-      requestId      = "$context.requestId"
-      ip             = "$context.identity.sourceIp"
-      caller         = "$context.identity.caller"
-      user           = "$context.identity.user"
-      requestTime    = "$context.requestTime"
-      httpMethod     = "$context.httpMethod"
-      resourcePath   = "$context.resourcePath"
-      status         = "$context.status"
-      protocol       = "$context.protocol"
-      responseLength = "$context.responseLength"
-      error          = "$context.error.message"
-    })
-  }
+  # Commented out - requires CloudWatch Logs role ARN set at account level
+  # AWS Academy accounts don't have this configured
+  # access_log_settings {
+  #   destination_arn = aws_cloudwatch_log_group.api_gateway.arn
+  #   format = jsonencode({
+  #     requestId      = "$context.requestId"
+  #     ip             = "$context.identity.sourceIp"
+  #     caller         = "$context.identity.caller"
+  #     user           = "$context.identity.user"
+  #     requestTime    = "$context.requestTime"
+  #     httpMethod     = "$context.httpMethod"
+  #     resourcePath   = "$context.resourcePath"
+  #     status         = "$context.status"
+  #     protocol       = "$context.protocol"
+  #     responseLength = "$context.responseLength"
+  #     error          = "$context.error.message"
+  #   })
+  # }
 
   xray_tracing_enabled = true
 
-  tags = {
-    Name        = "${var.name_prefix}-inventory-api-prod"
-    Environment = var.environment
-  }
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-inventory-api-prod"
+  })
 }
 
 # CloudWatch Log Group for API Gateway
 resource "aws_cloudwatch_log_group" "api_gateway" {
-  name              = "/aws/apigateway/${var.name_prefix}-inventory-api"
+  name              = "/aws/apigateway/${local.name_prefix}-inventory-api"
   retention_in_days = var.log_retention_days
 
   tags = {
-    Name        = "${var.name_prefix}-inventory-api-logs"
+    Name        = "${local.name_prefix}-inventory-api-logs"
     Environment = var.environment
   }
 }

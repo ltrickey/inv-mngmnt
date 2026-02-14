@@ -3,6 +3,32 @@ Homework series for CPSC 5910 Cloud Computing Seattle University
 
 By Lynn Trickey with assistance from Cursor AI agent
 
+## Testing for Point of Sale API homework
+**Changed since last homework submission**
+* Updated data model
+* Added FastAPI inventory API hosted on Ec2 instance
+* Wired Flask WebServer to fetch stock information from FastAPI instead of DynamoDB table directly. _Note: the website still does access other DynamoDB tables directly - to be addressed in future_
+* Added API Gateway endpoints 
+
+### How to test
+1. Follow pre-deployment setup instructions to set SSH key and AWS credentials (if not already set)
+2. Deploy app to AWS: 
+```bash
+cd /infrastructure
+terraform init
+terraform apply
+```
+(See [Deployment Process](#deployment-process) for more detailed instructions)
+
+3. Test new API gateway endpoints by running test_api_gateway.sh locally in terminal.  Script runs locally in terminal and fetches API endpoint and API key from Terraform outputs.
+
+```bash
+cd /
+./scripts/test_api_gateway.sh
+```
+
+4. Hit updated Website endpoint at service_url in outputs, functionality should be unchanged - search for products or products in a given store.
+
 ## Pre-Deployment Setup
 **AWS Credentials and SSH Key are required to run Terraform Deployment**
 
@@ -169,140 +195,75 @@ terraform apply
 
 You will need to input `yes` to allow `terraform apply` to make the required changes.
 
-### What Happens When You Run `terraform apply`
+### Deployment Process
 
-1. **Terraform Creates Infrastructure:**
-   - Creates EC2 instance
-   - Sets up security groups
-   - Configures networking
-
-2. **Automatic Build and Deployment:**
-
-   After the EC2 instance is created, Terraform automatically triggers the deployment process.  
-
-   **Step 1: Builds React Application**
-   - Runs `npm install` (if `node_modules` doesn't exist)
-   - Runs `npm run build` to create production build in `site/dist/`
-   - Build happens on your **local machine** (where Terraform runs)
-   - Requires Node.js installed locally
-
-   **Step 2: Packages Everything**
-   - Packages Flask server files (`server/`)
-   - Packages React production build (`site/dist/`)
-   - Packages product images (`infrastructure/images/`)
-   - Creates deployment archive (`product_catalogue.zip`)
-
-   **Step 3: Deploys to EC2**
-   - Copies package to EC2 instance via SCP
-   - Extracts files to `/opt/product_catalogue/`
-   - Sets up Python virtual environment
-   - Installs Python dependencies (Flask, Gunicorn, etc.)
-   - Seeds DynamoDB tables from `server/seed_data` (on EC2, using instance profile)
-   - Creates and enables systemd service
-   - Starts the Flask application
-
-### Deployment Commands
-
-**Full automated deployment:**
+**Quick Start:**
 ```bash
 cd infrastructure
-terraform apply
+terraform apply  # Automatically builds, packages, and deploys everything
 ```
 
-**Manual deployment (if needed):**
+**What Terraform Does:**
+1. Creates AWS infrastructure (EC2, security groups, DynamoDB, S3, API Gateway, etc.)
+2. Builds React app locally (requires Node.js)
+3. Packages applications into deployment archives
+4. Deploys Product Catalogue and Inventory API to EC2 via SCP
+5. Uploads product images to S3
+6. **Seeds DynamoDB tables automatically** (no manual steps required)
+
+**Manual Deployment (for updates without Terraform):**
 ```bash
-# Build and package locally
-./scripts/package.sh
-
-# Deploy to EC2
-./scripts/deploy_remote.sh
+./scripts/package.sh        # Build & package locally
+./scripts/deploy_remote.sh  # Deploy to existing EC2
 ```
 
-### Deployment Scripts Overview
+### Deployment Scripts
 
-The deployment process uses three scripts, each with a specific role:
+| Script | Runs On | Purpose |
+|--------|---------|---------|
+| `package.sh` | Local | Builds React (`npm run build`), packages Flask + images into ZIP |
+| `deploy_remote.sh` | Local | Copies ZIP to EC2, triggers installation |
+| `deploy.sh` | EC2 | Extracts files, installs dependencies, starts service |
+| `seed_dynamodb.sh` | Local (via Terraform) | Seeds DynamoDB tables with product data |
+| `package_inventory_api.sh` | Local | Packages Inventory API into ZIP |
+| `deploy_inventory_api_remote.sh` | Local | Copies Inventory API ZIP to EC2, triggers installation |
 
-**1. `package.sh` (Local only - no EC2 interaction)**
-- **Purpose:** Builds and packages the application locally
-- **Responsibilities:**
-  - Builds React application (`npm install`, `npm run build`)
-  - Packages Flask server files
-  - Packages React production build
-  - Packages product images
-  - Creates ZIP archive (`deploy/product_catalogue.zip`)
-- **Output:** Creates `deploy/product_catalogue.zip` ready for deployment
+### Requirements
 
-**2. `deploy_remote.sh` (Handles all EC2 interaction)**
-- **Purpose:** Orchestrates deployment to EC2 instance
-- **Responsibilities:**
-  - Gets EC2 instance details from Terraform outputs
-  - Finds SSH key for EC2 access
-  - Copies package to EC2 via SCP (`/tmp/product_catalogue.zip`)
-  - Waits for SSH availability
-  - Connects to EC2 and extracts package
-  - Runs `deploy.sh` on EC2 instance
+- **Local:** Node.js (for React build), AWS credentials, SSH key
+- **EC2:** Python 3, AWS CLI, IAM role (automatically configured by Terraform)
 
-**3. `deploy.sh` (Runs on EC2 instance)**
-- **Purpose:** Sets up the application on the EC2 instance
-- **Responsibilities:**
-  - Extracts package to `/opt/product_catalogue/`
-  - Creates Python virtual environment
-  - Installs Python dependencies
-  - Seeds DynamoDB from `server/seed_data` (when using DynamoDB; installs `jq` if needed)
-  - Creates systemd service file
-  - Starts and enables Flask service
-- **Runs on:** EC2 instance (executed via SSH from `deploy_remote.sh`)
+### Post-Deployment
 
-
-### What Gets Built
-
-- **React App:** Production build created locally (`site/dist/`)
-- **Flask App:** Python files packaged (no compilation needed)
-- **Images:** Product images copied to deployment package
-- **Everything:** Packaged into `product_catalogue.zip` and deployed to EC2
-
-### Important Notes
-
-- **Build Location:** React app is built on your **local machine**, not on EC2
-- **Requirements:** You need Node.js installed locally for the build process
-- **EC2 Requirements:** EC2 only needs Python (for Flask) - no Node.js required
-- **Auto-restart:** The application automatically restarts on EC2 reboot and on failure
-
-### Accessing Your Application
-
-After deployment, access your application at:
-```
-http://<EC2_PUBLIC_DNS>:8000
-```
-
-Get the URL from Terraform output:
+**Access the application:**
 ```bash
-cd infrastructure
-terraform output service_url
+terraform output service_url  # Get http://<EC2_PUBLIC_DNS>:8000
 ```
 
-### Checking Deployment Status
-
-Check if the service is running on EC2:
+**Check service status:**
 ```bash
 ssh -i ~/.ssh/vockey.pem ec2-user@<EC2_HOST> "sudo systemctl status product_catalogue_flask"
 ```
 
-View logs:
+**View logs:**
 ```bash
 ssh -i ~/.ssh/vockey.pem ec2-user@<EC2_HOST> "sudo journalctl -u product_catalogue_flask -f"
 ```
 
-### Seeding DynamoDB
+### DynamoDB Seeding
 
-DynamoDB tables are seeded **on the EC2 instance** during `deploy.sh`, using the instance's IAM role (no local AWS credentials needed for seeding). The seed script runs after the package is extracted and loads `products.json`, `stores.json`, `products_by_store.json`, and `categories.json` from `server/seed_data` into the tables (`name_prefix-products`, `-stores`, `-products-by-store`, and `categories`). EC2 needs `jq` and the AWS CLI; `deploy.sh` will install `jq` via `yum`/`dnf` if missing. In `products.json`, each product has a **category_path** field: `"<secondary>#<tertiary>#<barcode>"` (e.g. `"Cheese#NONE#0123456789017"`). Missing secondary or tertiary categories are stored as the literal `"NONE"`.
+**Fully Automated:** Tables are automatically seeded during `terraform apply` from `seed_data/` directory on your local machine. No manual steps required.
 
-**To seed manually from your machine** (e.g. after changing seed data without re-deploying):
+**What Gets Seeded:**
+- 100 products
+- 5 stores
+- 85 inventory items (products by store)
+- 64 categories
+
+**Manual Re-seeding (optional, only if you need to reset data):**
 ```bash
+cd /
 INFRASTRUCTURE_DIR=./infrastructure ./scripts/seed_dynamodb.sh
 ```
-Or on EC2 (with `DYNAMODB_PRODUCTS_TABLE` set in the environment or in the Flask env file):
-```bash
-SEED_DATA_DIR=/opt/product_catalogue/server/seed_data DYNAMODB_PRODUCTS_TABLE=your-prefix-products /opt/product_catalogue/scripts/seed_dynamodb.sh
-```
-Optional env vars: `NAME_PREFIX` or `DYNAMODB_PRODUCTS_TABLE`, `SEED_DATA_DIR`, `INFRASTRUCTURE_DIR` (for local Terraform output), `AWS_REGION`.
+
+**Note:** Seeding runs automatically whenever DynamoDB tables are created or recreated by Terraform.

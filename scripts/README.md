@@ -144,9 +144,7 @@ Before running deployment scripts, ensure:
 
 ### DynamoDB Integration
 
-Both services automatically detect and use DynamoDB when deployed to EC2:
-
-- **Products Table:** `{NAME_PREFIX}-products`
+Both services automatically detect and use DynamoDB when deployed to EC2- **Products Table:** `{NAME_PREFIX}-products`
 - **Products by Store Table:** `{NAME_PREFIX}-products_by_store`
 
 Where `{NAME_PREFIX}` is derived from Terraform outputs (e.g., `product-catalogue-test`).

@@ -91,3 +91,43 @@ resource "terraform_data" "deploy_inventory_api" {
     EOT
   }
 }
+
+# Automatically seed DynamoDB tables after they are created and deployments are complete
+resource "terraform_data" "seed_dynamodb" {
+  depends_on = [
+    aws_dynamodb_table.products,
+    aws_dynamodb_table.stores,
+    aws_dynamodb_table.products_by_store,
+    aws_dynamodb_table.categories,
+    terraform_data.deploy_product_catalogue,
+    terraform_data.deploy_inventory_api
+  ]
+
+  triggers_replace = [
+    aws_dynamodb_table.products.id,
+    aws_dynamodb_table.stores.id,
+    aws_dynamodb_table.products_by_store.id,
+    aws_dynamodb_table.categories.id
+  ]
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      set -e
+      PROJECT_ROOT="${abspath("${path.module}/..")}"
+      INFRA_DIR="${abspath(path.module)}"
+      cd "$PROJECT_ROOT"
+      echo ""
+      echo "=========================================="
+      echo "TERRAFORM TRIGGERED DATABASE SEEDING"
+      echo "=========================================="
+      echo "Making seed script executable..."
+      chmod +x scripts/seed_dynamodb.sh
+      echo ""
+      echo "Seeding DynamoDB tables with product data..."
+      INFRASTRUCTURE_DIR="$INFRA_DIR" ./scripts/seed_dynamodb.sh
+      echo ""
+      echo "✓ Database seeding complete"
+      echo "=========================================="
+    EOT
+  }
+}
