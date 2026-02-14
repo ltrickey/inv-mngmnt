@@ -23,7 +23,7 @@ terraform apply
 3. Test new API gateway endpoints by running test_api_gateway.sh locally in terminal.  Script runs locally in terminal and fetches API endpoint and API key from Terraform outputs.
 
 ```bash
-cd /
+cd .. # go to root directory
 ./scripts/test_api_gateway.sh
 ```
 
