@@ -3,11 +3,11 @@ import Login from './components/Login'
 import StoreSelector from './components/StoreSelector'
 import StockTable from './components/StockTable'
 import AddProductModal from './components/AddProductModal'
-import { getCurrentUser, logout } from './auth'
+import { getCurrentUser, logout, isConfigured } from './auth'
 import { fetchStores, fetchProducts, fetchInventory } from './api'
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(!!getCurrentUser())
+  const [loggedIn, setLoggedIn] = useState(!isConfigured() || !!getCurrentUser())
   const [stores, setStores] = useState([])
   const [storesLoading, setStoresLoading] = useState(false)
   const [selectedStoreId, setSelectedStoreId] = useState(null)

@@ -41,8 +41,10 @@ cd inventory_api && uvicorn main:app --port 9000
 
 ```bash
 cd employee_site/server
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
-python app.py          # runs on port 5000, SKIP_AUTH=1 by default in .env
+python app.py          # runs on port 5001, SKIP_AUTH=1 by default in .env
 ```
 
 ### 3. Start the React Dev Server
@@ -50,7 +52,7 @@ python app.py          # runs on port 5000, SKIP_AUTH=1 by default in .env
 ```bash
 cd employee_site/site
 npm install
-npm run dev            # runs on port 3001, proxies /api/* to port 5000
+npm run dev            # runs on port 3001, proxies /api/* to port 5001
 ```
 
 Open http://localhost:3001. With `SKIP_AUTH=1`, the login screen still appears
@@ -82,7 +84,7 @@ but you can enter any credentials (they are not validated).
 ```bash
 cd employee_site/server
 docker build -t employee-bff .
-docker run -p 5000:5000 \
+docker run -p 5001:5001 \
   -e COGNITO_USER_POOL_ID=us-east-1_XXXXX \
   -e COGNITO_APP_CLIENT_ID=abc123 \
   -e AWS_REGION=us-east-1 \
@@ -90,6 +92,47 @@ docker run -p 5000:5000 \
   -e INVENTORY_API_URL=http://inventory-host:9000 \
   employee-bff
 ```
+
+## Deployment to AWS
+
+### Prerequisites
+
+- **Docker Desktop** — must be running locally. The deploy script builds the BFF Docker image and pushes it to ECR during `terraform apply`.
+- **AWS CLI** — configured with valid credentials (`~/.aws/credentials`). For Learner Lab, re-copy credentials each session.
+- **Node.js 18+** — used to build the React frontend before uploading to S3.
+- **Terraform** — the infrastructure is defined in `infrastructure/`.
+
+### How it works
+
+Running `terraform apply` from the `infrastructure/` directory will:
+
+1. Provision all AWS resources (ECR, ECS Fargate, ALB, S3, Cognito, etc.)
+2. Automatically trigger `scripts/deploy_employee_site.sh`, which:
+   - Builds the BFF Docker image and pushes it to ECR
+   - Builds the React frontend with production env vars and uploads to S3
+   - Forces the ECS service to pull the latest image
+
+### Re-deploying after code changes
+
+```bash
+cd infrastructure
+terraform apply
+```
+
+Terraform detects changes and re-runs the deploy script. If only the employee site code changed (no infrastructure changes), you can also run the deploy script directly:
+
+```bash
+ECR_REPOSITORY_URL=<ecr_url> \
+COGNITO_USER_POOL_ID=<pool_id> \
+COGNITO_APP_CLIENT_ID=<client_id> \
+EMPLOYEE_BFF_ALB_URL=<alb_url> \
+EMPLOYEE_SITE_BUCKET=<bucket> \
+ECS_CLUSTER=<cluster_name> \
+ECS_SERVICE=<service_name> \
+./scripts/deploy_employee_site.sh
+```
+
+All values are available from `terraform output`.
 
 ## Creating Employee Users
 

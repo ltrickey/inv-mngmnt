@@ -134,3 +134,42 @@ resource "terraform_data" "seed_dynamodb" {
     EOT
   }
 }
+
+# Automatically deploy the Employee Site after all its infrastructure is ready
+resource "terraform_data" "deploy_employee_site" {
+  depends_on = [
+    aws_ecr_repository.employee_bff,
+    aws_ecs_cluster.employee,
+    aws_ecs_service.employee_bff,
+    aws_s3_bucket_policy.employee_site,
+    aws_cognito_user_pool.employees,
+    aws_cognito_user_pool_client.employee_site,
+  ]
+
+  triggers_replace = [
+    aws_ecr_repository.employee_bff.repository_url,
+    aws_ecs_service.employee_bff.id,
+    aws_s3_bucket.employee_site.id,
+    aws_cognito_user_pool.employees.id,
+  ]
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      set -e
+      PROJECT_ROOT="${abspath("${path.module}/..")}"
+      cd "$PROJECT_ROOT"
+      echo "Making deploy script executable..."
+      chmod +x scripts/deploy_employee_site.sh
+      echo ""
+      ECR_REPOSITORY_URL="${aws_ecr_repository.employee_bff.repository_url}" \
+      AWS_REGION="${var.aws_region}" \
+      COGNITO_USER_POOL_ID="${aws_cognito_user_pool.employees.id}" \
+      COGNITO_APP_CLIENT_ID="${aws_cognito_user_pool_client.employee_site.id}" \
+      EMPLOYEE_BFF_ALB_URL="http://${aws_lb.employee.dns_name}" \
+      EMPLOYEE_SITE_BUCKET="${aws_s3_bucket.employee_site.id}" \
+      ECS_CLUSTER="${aws_ecs_cluster.employee.name}" \
+      ECS_SERVICE="${aws_ecs_service.employee_bff.name}" \
+      ./scripts/deploy_employee_site.sh
+    EOT
+  }
+}

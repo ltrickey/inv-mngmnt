@@ -4,7 +4,7 @@
 # For local development, the Flask app serves images from infrastructure/images/
 
 resource "aws_s3_bucket" "product_images" {
-  bucket = "${local.name_prefix}-product-images"
+  bucket = "${local.name_prefix}-product-images-${local.account_id}"
   
   # Allow Terraform to destroy the bucket even if it contains objects
   # This will delete all objects and versions when running terraform destroy

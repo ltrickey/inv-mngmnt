@@ -4,6 +4,8 @@ import { createStockItem } from '../api'
 export default function AddProductModal({ products, inventory, storeId, onClose, onRefresh }) {
   const [selectedBarcode, setSelectedBarcode] = useState('')
   const [quantity, setQuantity] = useState(1)
+  const [price, setPrice] = useState('')
+  const [percentOff, setPercentOff] = useState(0)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
 
@@ -21,14 +23,14 @@ export default function AddProductModal({ products, inventory, storeId, onClose,
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!selectedBarcode || !selectedProduct) return
+    if (!selectedBarcode || !selectedProduct || !price) return
     setBusy(true)
     setError('')
     try {
       await createStockItem(storeId, selectedBarcode, {
         quantity,
-        price: selectedProduct.price,
-        percent_off: 0,
+        price: parseFloat(price),
+        percent_off: percentOff,
       })
       onRefresh()
       onClose()
@@ -62,9 +64,27 @@ export default function AddProductModal({ products, inventory, storeId, onClose,
               ))}
             </select>
 
-            {selectedProduct && (
-              <p className="product-price">Catalog price: ${Number(selectedProduct.price).toFixed(2)}</p>
-            )}
+            <label htmlFor="price-input">Store Price:</label>
+            <input
+              id="price-input"
+              type="number"
+              min="0.01"
+              step="0.01"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              placeholder={selectedProduct ? `Catalog: $${Number(selectedProduct.price).toFixed(2)}` : '0.00'}
+              required
+            />
+
+            <label htmlFor="pct-off-input">% Off:</label>
+            <input
+              id="pct-off-input"
+              type="number"
+              min="0"
+              max="100"
+              value={percentOff}
+              onChange={(e) => setPercentOff(parseInt(e.target.value, 10) || 0)}
+            />
 
             <label htmlFor="qty-input">Initial Quantity:</label>
             <input

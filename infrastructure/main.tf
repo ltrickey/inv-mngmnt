@@ -25,9 +25,12 @@ data "aws_ami" "amazon_linux" {
     }
 }
 
+data "aws_caller_identity" "current" {}
+
 locals {
   name_prefix       = "${var.project_name}-${var.environment}"
   short_name_prefix = "${var.short_name}-${var.environment}"
+  account_id        = data.aws_caller_identity.current.account_id
   common_tags = {
     Project     = var.project_name
     Environment = var.environment

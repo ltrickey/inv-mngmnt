@@ -3,6 +3,7 @@ from flask_cors import CORS
 import json
 import logging
 import os
+import threading
 import time
 
 # Load .env file if it exists (for local development)
@@ -67,60 +68,60 @@ PRODUCTS_FILE = os.path.join(_PROJECT_ROOT, 'seed_data', 'products.json')
 S3_BUCKET_NAME = os.environ.get('S3_BUCKET_NAME', None)
 S3_BUCKET_REGION = os.environ.get('S3_BUCKET_REGION', None)
 
+# ---------------------------------------------------------------------------
+# Simple TTL cache – avoids repeated DynamoDB scans + presigned URL generation
+# ---------------------------------------------------------------------------
+CACHE_TTL_SECONDS = 120  # products rarely change; 2 minutes is safe
+
+_cache = {}
+_cache_lock = threading.Lock()
+
+
+def _cache_get(key):
+    with _cache_lock:
+        entry = _cache.get(key)
+        if entry and (time.time() - entry['ts']) < CACHE_TTL_SECONDS:
+            return entry['data']
+    return None
+
+
+def _cache_set(key, data):
+    with _cache_lock:
+        _cache[key] = {'data': data, 'ts': time.time()}
+
+# Reusable S3 client – created once on first use to avoid per-request overhead
+_s3_client = None
+
+def _get_s3_client():
+    global _s3_client
+    if _s3_client is None:
+        import boto3
+        _s3_client = boto3.client('s3', region_name=S3_BUCKET_REGION) if S3_BUCKET_REGION else boto3.client('s3')
+    return _s3_client
+
 
 def get_image_url(image_path):
     """
     Get the full image URL based on environment configuration.
-    If the image file does not exist on disk, returns the placeholder image URL
-    so the API never points to a missing file (avoids 404s after re-seeds or renames).
-    
     If S3_BUCKET_NAME is set, generates a signed URL with 1-hour expiration.
     Otherwise, returns a Flask-served URL for local testing.
-    
-    Args:
-        image_path: Relative path to the image (e.g., 'infrastructure/images/product.jpg')
-    
-    Returns:
-        Full URL string for the image
     """
     if S3_BUCKET_NAME:
-        # Production: Generate signed S3 URL (expires in 1 hour)
-        # Remove 'infrastructure/' prefix if present, S3 should have direct paths
         s3_path = image_path.replace('infrastructure/', '') if image_path.startswith('infrastructure/') else image_path
-        
         try:
-            import boto3
-            from botocore.exceptions import ClientError
-            
-            # Create S3 client
-            if S3_BUCKET_REGION:
-                s3_client = boto3.client('s3', region_name=S3_BUCKET_REGION)
-            else:
-                s3_client = boto3.client('s3')
-            
-            # Generate signed URL (valid for 1 hour)
-            signed_url = s3_client.generate_presigned_url(
+            signed_url = _get_s3_client().generate_presigned_url(
                 'get_object',
-                Params={
-                    'Bucket': S3_BUCKET_NAME,
-                    'Key': s3_path
-                },
-                ExpiresIn=3600  # 1 hour
+                Params={'Bucket': S3_BUCKET_NAME, 'Key': s3_path},
+                ExpiresIn=3600,
             )
             return signed_url
         except Exception as e:
             logger.error(f"Failed to generate signed URL for {s3_path}: {e}")
-            # Fallback to placeholder served by Flask
             return "/images/placeholder.png"
     else:
-        # Local development: Use Flask static file serving
         if image_path.startswith(('http://', 'https://')):
             return image_path
-        
-        # Extract just the filename from any path format
         filename = os.path.basename(image_path)
-        
-        # If the file does not exist (e.g. old DynamoDB image_url, renamed file), use placeholder
         if filename and not os.path.isfile(os.path.join(IMAGES_DIR, filename)):
             filename = PLACEHOLDER_IMAGE
         return f"/images/{filename}"
@@ -151,10 +152,15 @@ def _normalize_product_for_json(product):
     return result
 
 
+_dynamodb_products_client = None
+
 def _get_dynamodb_products_client():
-    import boto3
-    region = os.environ.get('AWS_REGION') or os.environ.get('AWS_DEFAULT_REGION')
-    return boto3.client('dynamodb', region_name=region) if region else boto3.client('dynamodb')
+    global _dynamodb_products_client
+    if _dynamodb_products_client is None:
+        import boto3
+        region = os.environ.get('AWS_REGION') or os.environ.get('AWS_DEFAULT_REGION')
+        _dynamodb_products_client = boto3.client('dynamodb', region_name=region) if region else boto3.client('dynamodb')
+    return _dynamodb_products_client
 
 
 def get_products_by_category_filters_dynamodb(p_category=None, s_category=None, t_category=None):
@@ -169,6 +175,10 @@ def get_products_by_category_filters_dynamodb(p_category=None, s_category=None, 
     t_val = str(t_category).strip() if t_category else None
     if not p_val and not s_val and not t_val:
         return []
+    cache_key = f'cat_filter:{p_val}:{s_val}:{t_val}'
+    cached = _cache_get(cache_key)
+    if cached is not None:
+        return cached
     try:
         from boto3.dynamodb.types import TypeDeserializer
         client = _get_dynamodb_products_client()
@@ -226,6 +236,7 @@ def get_products_by_category_filters_dynamodb(p_category=None, s_category=None, 
                     raw = {k: deserializer.deserialize(v) for k, v in item.items()}
                     items.append(_normalize_product_for_json(raw))
 
+        _cache_set(cache_key, items)
         return items
     except Exception as e:
         logger.exception("DynamoDB get_products_by_category_filters failed: %s", e)
@@ -236,6 +247,9 @@ def load_products_from_dynamodb():
     """Load products from the DynamoDB products table (used when running on EC2)."""
     if not DYNAMODB_PRODUCTS_TABLE:
         return []
+    cached = _cache_get('all_products_dynamo')
+    if cached is not None:
+        return cached
     try:
         from boto3.dynamodb.types import TypeDeserializer
         deserializer = TypeDeserializer()
@@ -246,6 +260,7 @@ def load_products_from_dynamodb():
             for item in page.get('Items', []):
                 raw = {k: deserializer.deserialize(v) for k, v in item.items()}
                 products.append(_normalize_product_for_json(raw))
+        _cache_set('all_products_dynamo', products)
         return products
     except Exception as e:
         logger.exception("DynamoDB load_products failed: %s", e)
@@ -255,10 +270,11 @@ def load_products_from_dynamodb():
 def load_products():
     """
     Load products from DynamoDB (on EC2) or from the JSON file (locally), then resolve image URLs.
-    Image URLs are resolved based on S3_BUCKET_URL environment variable.
-    If S3_BUCKET_URL is set, images are fetched from S3.
-    Otherwise, images are served from local infrastructure/images directory.
+    Results are cached to avoid repeated DynamoDB scans and presigned URL generation.
     """
+    cached = _cache_get('products_with_urls')
+    if cached is not None:
+        return cached
     if USE_DYNAMODB and DYNAMODB_PRODUCTS_TABLE:
         products = load_products_from_dynamodb()
     else:
@@ -266,6 +282,7 @@ def load_products():
     for product in products:
         if product.get('image_url'):
             product['image_url'] = get_image_url(product['image_url'])
+    _cache_set('products_with_urls', products)
     return products
 
 

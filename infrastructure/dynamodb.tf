@@ -8,12 +8,9 @@
 
 ## Products table which includes Product details
 resource "aws_dynamodb_table" "products" {
-  name           = "${local.name_prefix}-products"
-  billing_mode   = "PROVISIONED"
-  read_capacity  = 2
-  write_capacity = 2
-  hash_key       = "barcode"
-  # TODO: range_key of name?
+  name         = "${local.name_prefix}-products"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "barcode"
 
   attribute {
     name = "barcode"
@@ -34,21 +31,15 @@ resource "aws_dynamodb_table" "products" {
     name            = "GSI_Category"
     hash_key        = "primary_category"
     range_key       = "category_path"
-    read_capacity   = 2
-    write_capacity  = 2
     projection_type = "ALL"
   }
-
- 
 }
 
 # Stores table - one item per store (store_id, store_name, store_address)
 resource "aws_dynamodb_table" "stores" {
-  name           = "${local.name_prefix}-stores"
-  billing_mode   = "PROVISIONED"
-  read_capacity  = 2
-  write_capacity = 2
-  hash_key       = "store_id"
+  name         = "${local.name_prefix}-stores"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "store_id"
 
   attribute {
     name = "store_id"
@@ -56,14 +47,12 @@ resource "aws_dynamodb_table" "stores" {
   }
 }
 
-# Stock Table - TODO: May need to up capacity here.
+# Stock Table - inventory per store (store_id PK, barcode SK)
 resource "aws_dynamodb_table" "products_by_store" {
-  name           = "${local.name_prefix}-products_by_store"
-  billing_mode   = "PROVISIONED"
-  read_capacity  = 2
-  write_capacity = 2
-  hash_key       = "store_id"
-  range_key      = "barcode"
+  name         = "${local.name_prefix}-products_by_store"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "store_id"
+  range_key    = "barcode"
 
   attribute {
     name = "barcode"
@@ -74,7 +63,6 @@ resource "aws_dynamodb_table" "products_by_store" {
     name = "store_id"
     type = "S"
   }
-  
 }
 
 resource "aws_dynamodb_table" "categories" {

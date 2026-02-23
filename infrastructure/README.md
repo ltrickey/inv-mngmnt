@@ -157,7 +157,7 @@ After `terraform apply`, you'll get:
 terraform output
 
 # Specific outputs
-terraform output service_url              # Product catalogue URL
+terraform output customer_website         # Product catalogue URL
 terraform output inventory_api_url        # Internal inventory API URL
 terraform output ec2_instance_public_dns  # Product catalogue DNS
 terraform output iam_instance_profile     # IAM profile being used

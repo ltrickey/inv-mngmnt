@@ -72,3 +72,7 @@ export function getCurrentUser() {
   const pool = getPool()
   return pool ? pool.getCurrentUser() : null
 }
+
+export function isConfigured() {
+  return !!(POOL_DATA.UserPoolId && POOL_DATA.ClientId)
+}

@@ -27,7 +27,7 @@ cd .. # go to root directory
 ./scripts/test_api_gateway.sh
 ```
 
-4. Hit updated Website endpoint at service_url in outputs, functionality should be unchanged - search for products or products in a given store.
+4. Hit updated Website endpoint at customer_website in outputs, functionality should be unchanged - search for products or products in a given store.
 
 ## Pre-Deployment Setup
 **AWS Credentials and SSH Key are required to run Terraform Deployment**
@@ -237,7 +237,7 @@ terraform apply  # Automatically builds, packages, and deploys everything
 
 **Access the application:**
 ```bash
-terraform output service_url  # Get http://<EC2_PUBLIC_DNS>:8000
+terraform output customer_website  # Get http://<EC2_PUBLIC_DNS>:8000
 ```
 
 **Check service status:**

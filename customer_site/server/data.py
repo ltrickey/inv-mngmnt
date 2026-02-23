@@ -34,10 +34,15 @@ STORES_FILE = os.path.join(_SEED_DIR, 'stores.json')
 PRODUCTS_BY_STORE_FILE = os.path.join(_SEED_DIR, 'products_by_store.json')
 
 
+_dynamodb_client = None
+
 def _get_dynamodb_client():
-    import boto3
-    region = os.environ.get('AWS_REGION') or os.environ.get('AWS_DEFAULT_REGION')
-    return boto3.client('dynamodb', region_name=region) if region else boto3.client('dynamodb')
+    global _dynamodb_client
+    if _dynamodb_client is None:
+        import boto3
+        region = os.environ.get('AWS_REGION') or os.environ.get('AWS_DEFAULT_REGION')
+        _dynamodb_client = boto3.client('dynamodb', region_name=region) if region else boto3.client('dynamodb')
+    return _dynamodb_client
 
 
 def _inventory_api_get(path: str):
