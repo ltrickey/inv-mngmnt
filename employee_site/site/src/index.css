@@ -1,0 +1,269 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, sans-serif;
+  background: #f5f7fa;
+  color: #1a1a2e;
+  line-height: 1.5;
+}
+
+.app {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+/* Header */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+/* Login */
+.login-container {
+  max-width: 380px;
+  margin: 8vh auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.login-container h2 {
+  margin-top: 0;
+}
+
+.login-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.login-container input {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+/* Store Selector */
+.store-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.store-selector select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  min-width: 240px;
+}
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Buttons */
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  background: #e9ecef;
+  color: #333;
+  transition: background 0.15s;
+}
+
+.btn:hover:not(:disabled) {
+  background: #dee2e6;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-save {
+  background: #2563eb;
+  color: #fff;
+}
+
+.btn-save:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.btn-edit {
+  background: #f59e0b;
+  color: #fff;
+}
+
+.btn-edit:hover:not(:disabled) {
+  background: #d97706;
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: #fff;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #dc2626;
+}
+
+.btn-add {
+  background: #16a34a;
+  color: #fff;
+}
+
+.btn-add:hover:not(:disabled) {
+  background: #15803d;
+}
+
+.btn-cancel {
+  background: #6b7280;
+  color: #fff;
+}
+
+.btn-cancel:hover:not(:disabled) {
+  background: #4b5563;
+}
+
+.btn-logout {
+  background: transparent;
+  border: 1px solid #d0d5dd;
+  color: #333;
+}
+
+.btn-logout:hover {
+  background: #f3f4f6;
+}
+
+/* Stock Table */
+.stock-table-wrapper {
+  overflow-x: auto;
+}
+
+.stock-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+}
+
+.stock-table th,
+.stock-table td {
+  padding: 0.65rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.stock-table th {
+  background: #f9fafb;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #555;
+}
+
+.stock-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.qty-input {
+  width: 80px;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid #d0d5dd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1.5rem 2rem;
+  max-width: 480px;
+  width: 90%;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+}
+
+.modal h3 {
+  margin-top: 0;
+}
+
+.modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.modal select,
+.modal input[type='number'] {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  width: 100%;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.product-price {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* Error */
+.error {
+  color: #dc2626;
+  font-size: 0.9rem;
+}
+
+.empty-state {
+  text-align: center;
+  color: #888;
+  padding: 2rem;
+}

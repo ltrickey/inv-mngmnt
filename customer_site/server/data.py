@@ -25,8 +25,11 @@ DYNAMODB_STORES_TABLE = _dynamodb_table_suffix('-stores')
 DYNAMODB_PRODUCTS_BY_STORE_TABLE = _dynamodb_table_suffix('-products_by_store')
 DYNAMODB_CATEGORIES_TABLE = 'categories'  # fixed name, not prefixed
 
-# Seed data is now at the repo root: ../seed_data
-_SEED_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'seed_data')
+# Resolve repo root: works both on EC2 (/opt/product_catalogue/server/ -> parent has seed_data)
+# and locally (customer_site/server/ -> grandparent has seed_data)
+_PARENT = os.path.dirname(os.path.dirname(__file__))
+_REPO_ROOT = _PARENT if os.path.isdir(os.path.join(_PARENT, 'seed_data')) else os.path.dirname(_PARENT)
+_SEED_DIR = os.path.join(_REPO_ROOT, 'seed_data')
 STORES_FILE = os.path.join(_SEED_DIR, 'stores.json')
 PRODUCTS_BY_STORE_FILE = os.path.join(_SEED_DIR, 'products_by_store.json')
 

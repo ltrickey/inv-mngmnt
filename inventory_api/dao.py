@@ -44,6 +44,21 @@ class InventoryDAO(ABC):
     def deduct_quantities(self, store_id: str, items: List[InventoryDeductionItem])-> bool:
         pass
 
+    @abstractmethod
+    def create_item(self, item: InventoryItem) -> InventoryItem:
+        """Add a new product to a store's stock. Raises 409 if already exists."""
+        pass
+
+    @abstractmethod
+    def update_quantity(self, store_id: str, barcode: str, quantity: int) -> InventoryItem:
+        """Set the quantity of an existing stock record. Raises 404 if not found."""
+        pass
+
+    @abstractmethod
+    def delete_item(self, store_id: str, barcode: str) -> bool:
+        """Remove a product from a store's stock. Raises 404 if not found."""
+        pass
+
 
 # Concrete DAO for accessing inventory Data from DynamoDB
 class InventoryDAODynamoDB(InventoryDAO):
@@ -175,6 +190,55 @@ class InventoryDAODynamoDB(InventoryDAO):
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"DynamoDB transaction failed: {e}") from e
 
+    def create_item(self, item: InventoryItem) -> InventoryItem:
+        try:
+            self.client.put_item(
+                TableName=PRODUCTS_BY_STORE_TABLE,
+                Item={
+                    "store_id": {"S": item.store_id},
+                    "barcode": {"S": item.barcode},
+                    "quantity": {"N": str(item.quantity)},
+                    "price": {"N": str(item.price)},
+                    "percent_off": {"N": str(item.percent_off)},
+                },
+                ConditionExpression="attribute_not_exists(store_id) AND attribute_not_exists(barcode)",
+            )
+            return item
+        except self.client.exceptions.ConditionalCheckFailedException:
+            raise HTTPException(status_code=409, detail="Item already exists in store inventory")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"DynamoDB put_item failed: {e}") from e
+
+    def update_quantity(self, store_id: str, barcode: str, quantity: int) -> InventoryItem:
+        try:
+            resp = self.client.update_item(
+                TableName=PRODUCTS_BY_STORE_TABLE,
+                Key={"store_id": {"S": store_id}, "barcode": {"S": barcode}},
+                UpdateExpression="SET quantity = :qty",
+                ConditionExpression="attribute_exists(store_id) AND attribute_exists(barcode)",
+                ExpressionAttributeValues={":qty": {"N": str(quantity)}},
+                ReturnValues="ALL_NEW",
+            )
+            return InventoryItem(**self._deserialize_item(resp["Attributes"]))
+        except self.client.exceptions.ConditionalCheckFailedException:
+            raise HTTPException(status_code=404, detail="Inventory item not found")
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"DynamoDB update failed: {e}") from e
+
+    def delete_item(self, store_id: str, barcode: str) -> bool:
+        try:
+            self.client.delete_item(
+                TableName=PRODUCTS_BY_STORE_TABLE,
+                Key={"store_id": {"S": store_id}, "barcode": {"S": barcode}},
+                ConditionExpression="attribute_exists(store_id) AND attribute_exists(barcode)",
+            )
+            return True
+        except self.client.exceptions.ConditionalCheckFailedException:
+            raise HTTPException(status_code=404, detail="Inventory item not found")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"DynamoDB delete_item failed: {e}") from e
 
 
 # Concrete DAO for accessing inventory Data from JSON file for local testing
@@ -290,3 +354,52 @@ class InventoryDAOJson(InventoryDAO):
             return True
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to write to inventory file: {e}") from e
+
+    def create_item(self, item: InventoryItem) -> InventoryItem:
+        try:
+            with open(self.file_path, "r", encoding="utf-8") as f:
+                rows = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            rows = []
+
+        for r in rows:
+            if r.get("store_id") == item.store_id and r.get("barcode") == item.barcode:
+                raise HTTPException(status_code=409, detail="Item already exists in store inventory")
+
+        rows.append(item.model_dump())
+        with open(self.file_path, "w", encoding="utf-8") as f:
+            json.dump(rows, f, indent=2)
+        return item
+
+    def update_quantity(self, store_id: str, barcode: str, quantity: int) -> InventoryItem:
+        try:
+            with open(self.file_path, "r", encoding="utf-8") as f:
+                rows = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            rows = []
+
+        for r in rows:
+            if r.get("store_id") == store_id and r.get("barcode") == barcode:
+                r["quantity"] = quantity
+                with open(self.file_path, "w", encoding="utf-8") as f:
+                    json.dump(rows, f, indent=2)
+                return InventoryItem(**r)
+
+        raise HTTPException(status_code=404, detail="Inventory item not found")
+
+    def delete_item(self, store_id: str, barcode: str) -> bool:
+        try:
+            with open(self.file_path, "r", encoding="utf-8") as f:
+                rows = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            rows = []
+
+        original_len = len(rows)
+        rows = [r for r in rows if not (r.get("store_id") == store_id and r.get("barcode") == barcode)]
+
+        if len(rows) == original_len:
+            raise HTTPException(status_code=404, detail="Inventory item not found")
+
+        with open(self.file_path, "w", encoding="utf-8") as f:
+            json.dump(rows, f, indent=2)
+        return True

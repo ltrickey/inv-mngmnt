@@ -53,6 +53,45 @@ def get_inventory_item(store_id: str, barcode: str) -> InventoryItem:
 
 
 # ============================================================================
+# Internal CRUD Endpoints (called by employee site backend)
+# ============================================================================
+
+class CreateInventoryItemRequest(BaseModel):
+    quantity: int = Field(..., ge=0)
+    price: float = Field(..., gt=0)
+    percent_off: int = Field(0, ge=0, le=100)
+
+
+class UpdateQuantityRequest(BaseModel):
+    quantity: int = Field(..., ge=0)
+
+
+@app.post("/inventory/{store_id}/{barcode}", response_model=InventoryItem, status_code=201)
+def create_inventory_item(store_id: str, barcode: str, request: CreateInventoryItemRequest):
+    """Add a product to a store's inventory. Returns 409 if it already exists."""
+    item = InventoryItem(
+        store_id=store_id,
+        barcode=barcode,
+        quantity=request.quantity,
+        price=request.price,
+        percent_off=request.percent_off,
+    )
+    return get_inventory_DAO().create_item(item)
+
+
+@app.put("/inventory/{store_id}/{barcode}", response_model=InventoryItem)
+def update_inventory_quantity(store_id: str, barcode: str, request: UpdateQuantityRequest):
+    """Set the quantity of an existing stock record. Returns 404 if not found."""
+    return get_inventory_DAO().update_quantity(store_id, barcode, request.quantity)
+
+
+@app.delete("/inventory/{store_id}/{barcode}", status_code=204)
+def delete_inventory_item(store_id: str, barcode: str):
+    """Remove a product from a store's inventory. Returns 404 if not found."""
+    get_inventory_DAO().delete_item(store_id, barcode)
+
+
+# ============================================================================
 # Request/Response Models for External API
 # ============================================================================
 

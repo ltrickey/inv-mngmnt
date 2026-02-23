@@ -16,7 +16,7 @@ echo "=========================================="
 
 # Build React application
 echo "Building React application..."
-cd "$PROJECT_ROOT/site"
+cd "$PROJECT_ROOT/customer_site/site"
 if [ ! -d "node_modules" ]; then
     echo "Installing npm dependencies..."
     npm install
@@ -51,7 +51,7 @@ mkdir -p "$OUTPUT_DIR"
 # These will be deployed to: /opt/product_catalogue/server/
 echo "Packaging Flask server files..."
 mkdir -p "$OUTPUT_DIR/server"
-cp -r "$PROJECT_ROOT/server"/* "$OUTPUT_DIR/server/"
+cp -r "$PROJECT_ROOT/customer_site/server"/* "$OUTPUT_DIR/server/"
 # Remove any virtual environment if it exists (will be created on EC2)
 rm -rf "$OUTPUT_DIR/server/.venv"
 rm -rf "$OUTPUT_DIR/server/__pycache__"
@@ -61,7 +61,7 @@ echo "  → Flask files packaged (will be at /opt/product_catalogue/server/ on E
 # Copy React build
 # These will be deployed to: /opt/product_catalogue/site-dist/
 echo "Packaging React build..."
-cp -r "$PROJECT_ROOT/site/dist" "$OUTPUT_DIR/site-dist"
+cp -r "$PROJECT_ROOT/customer_site/site/dist" "$OUTPUT_DIR/site-dist"
 echo "  → React build packaged (will be at /opt/product_catalogue/site-dist/ on EC2)"
 
 # Copy product images (if needed locally, otherwise they'll be in S3)

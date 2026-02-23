@@ -19,7 +19,7 @@ except ImportError:
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent
-SEED_DATA = PROJECT_ROOT / "server" / "seed_data" / "products.json"
+SEED_DATA = PROJECT_ROOT / "seed_data" / "products.json"
 IMAGES_DIR = PROJECT_ROOT / "infrastructure" / "images"
 
 # Barcode range for the 79 new products (--force only overwrites these)

@@ -19,9 +19,14 @@ logger = logging.getLogger(__name__)
 USE_DYNAMODB = os.environ.get('USE_DYNAMODB', '').lower() in ('1', 'true', 'yes')
 DYNAMODB_PRODUCTS_TABLE = os.environ.get('DYNAMODB_PRODUCTS_TABLE', '').strip()
 
+# Resolve the parent that contains peer directories (site-dist, infrastructure, seed_data).
+# On EC2 that's one level up (/opt/product_catalogue/); locally it's two (customer_site/ -> repo root).
+_PARENT = os.path.dirname(os.path.dirname(__file__))
+_PROJECT_ROOT = _PARENT if os.path.isdir(os.path.join(_PARENT, 'seed_data')) else os.path.dirname(_PARENT)
+
 # Determine if we're in production (serving React static files)
-# In production, React build is in ../site-dist relative to server directory
-REACT_BUILD_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'site-dist')
+# In production, React build is in site-dist/ next to server/ inside the deploy dir
+REACT_BUILD_DIR = os.path.join(_PARENT, 'site-dist')
 IS_PRODUCTION = os.path.exists(REACT_BUILD_DIR) and os.path.isdir(REACT_BUILD_DIR)
 
 if IS_PRODUCTION:
@@ -44,7 +49,7 @@ app.register_blueprint(stock_bp)
 app.register_blueprint(sales_bp)
 
 # Serve static images from infrastructure/images directory
-IMAGES_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'infrastructure', 'images')
+IMAGES_DIR = os.path.join(_PROJECT_ROOT, 'infrastructure', 'images')
 PLACEHOLDER_IMAGE = 'placeholder.png'
 
 @app.route('/images/<path:filename>')
@@ -56,8 +61,7 @@ def serve_image(filename):
     return send_from_directory(IMAGES_DIR, filename)
 
 # Path to the products JSON file (used when running locally, not using DynamoDB)
-# Seed data has been moved to the repo root: ../seed_data
-PRODUCTS_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'seed_data', 'products.json')
+PRODUCTS_FILE = os.path.join(_PROJECT_ROOT, 'seed_data', 'products.json')
 
 # S3 configuration (optional - if not set, uses local images)
 S3_BUCKET_NAME = os.environ.get('S3_BUCKET_NAME', None)

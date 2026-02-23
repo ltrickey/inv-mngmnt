@@ -88,3 +88,14 @@ output "s3_bucket_region" {
   description = "AWS region of the S3 bucket"
   value       = var.aws_region
 }
+
+# Cognito outputs for employee site
+output "cognito_user_pool_id" {
+  description = "Cognito User Pool ID for the employee site"
+  value       = aws_cognito_user_pool.employees.id
+}
+
+output "cognito_app_client_id" {
+  description = "Cognito App Client ID for the employee site SPA"
+  value       = aws_cognito_user_pool_client.employee_site.id
+}
