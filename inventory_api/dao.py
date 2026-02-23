@@ -50,8 +50,9 @@ class InventoryDAO(ABC):
         pass
 
     @abstractmethod
-    def update_quantity(self, store_id: str, barcode: str, quantity: int) -> InventoryItem:
-        """Set the quantity of an existing stock record. Raises 404 if not found."""
+    def update_item(self, store_id: str, barcode: str, quantity: int,
+                    price: float | None = None, percent_off: int | None = None) -> InventoryItem:
+        """Update an existing stock record. quantity is required; price and percent_off are optional."""
         pass
 
     @abstractmethod
@@ -209,14 +210,24 @@ class InventoryDAODynamoDB(InventoryDAO):
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"DynamoDB put_item failed: {e}") from e
 
-    def update_quantity(self, store_id: str, barcode: str, quantity: int) -> InventoryItem:
+    def update_item(self, store_id: str, barcode: str, quantity: int,
+                    price: float | None = None, percent_off: int | None = None) -> InventoryItem:
         try:
+            set_parts = ["quantity = :qty"]
+            expr_vals = {":qty": {"N": str(quantity)}}
+            if price is not None:
+                set_parts.append("price = :p")
+                expr_vals[":p"] = {"N": str(price)}
+            if percent_off is not None:
+                set_parts.append("percent_off = :po")
+                expr_vals[":po"] = {"N": str(percent_off)}
+
             resp = self.client.update_item(
                 TableName=PRODUCTS_BY_STORE_TABLE,
                 Key={"store_id": {"S": store_id}, "barcode": {"S": barcode}},
-                UpdateExpression="SET quantity = :qty",
+                UpdateExpression="SET " + ", ".join(set_parts),
                 ConditionExpression="attribute_exists(store_id) AND attribute_exists(barcode)",
-                ExpressionAttributeValues={":qty": {"N": str(quantity)}},
+                ExpressionAttributeValues=expr_vals,
                 ReturnValues="ALL_NEW",
             )
             return InventoryItem(**self._deserialize_item(resp["Attributes"]))
@@ -371,7 +382,8 @@ class InventoryDAOJson(InventoryDAO):
             json.dump(rows, f, indent=2)
         return item
 
-    def update_quantity(self, store_id: str, barcode: str, quantity: int) -> InventoryItem:
+    def update_item(self, store_id: str, barcode: str, quantity: int,
+                    price: float | None = None, percent_off: int | None = None) -> InventoryItem:
         try:
             with open(self.file_path, "r", encoding="utf-8") as f:
                 rows = json.load(f)
@@ -381,6 +393,10 @@ class InventoryDAOJson(InventoryDAO):
         for r in rows:
             if r.get("store_id") == store_id and r.get("barcode") == barcode:
                 r["quantity"] = quantity
+                if price is not None:
+                    r["price"] = price
+                if percent_off is not None:
+                    r["percent_off"] = percent_off
                 with open(self.file_path, "w", encoding="utf-8") as f:
                     json.dump(rows, f, indent=2)
                 return InventoryItem(**r)

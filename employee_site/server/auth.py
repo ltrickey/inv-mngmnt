@@ -14,6 +14,21 @@ COGNITO_USER_POOL_ID = os.environ.get("COGNITO_USER_POOL_ID", "")
 COGNITO_APP_CLIENT_ID = os.environ.get("COGNITO_APP_CLIENT_ID", "")
 SKIP_AUTH = os.environ.get("SKIP_AUTH", "").lower() in ("1", "true", "yes")
 
+_auth_configured = bool(COGNITO_USER_POOL_ID and COGNITO_APP_CLIENT_ID)
+
+if not SKIP_AUTH and not _auth_configured:
+    raise RuntimeError(
+        "Cognito is not configured (COGNITO_USER_POOL_ID and COGNITO_APP_CLIENT_ID are required). "
+        "Set SKIP_AUTH=1 for local development only."
+    )
+
+if SKIP_AUTH and _auth_configured:
+    import logging as _log
+    _log.getLogger(__name__).warning(
+        "SKIP_AUTH is enabled but Cognito IS configured -- "
+        "auth will be SKIPPED. Do NOT deploy like this."
+    )
+
 _jwks_cache = {"keys": None, "fetched_at": 0}
 JWKS_CACHE_TTL = 3600  # seconds
 

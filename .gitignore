@@ -47,14 +47,6 @@ logs/
 *.temp
 .cache/
 
-# Pytest files
-*/__pycache__/
-*/inventory_api/__pycache__/*
-*/inventory_api/*.pyc
-*.pyo
-*.pyd
-.Python
-*.so
-.DS_Store
-*.log
-.env
+# Python bytecode
+__pycache__/
+*.pyc

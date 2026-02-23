@@ -62,8 +62,10 @@ class CreateInventoryItemRequest(BaseModel):
     percent_off: int = Field(0, ge=0, le=100)
 
 
-class UpdateQuantityRequest(BaseModel):
+class UpdateInventoryItemRequest(BaseModel):
     quantity: int = Field(..., ge=0)
+    price: float | None = Field(None, gt=0)
+    percent_off: int | None = Field(None, ge=0, le=100)
 
 
 @app.post("/inventory/{store_id}/{barcode}", response_model=InventoryItem, status_code=201)
@@ -80,9 +82,14 @@ def create_inventory_item(store_id: str, barcode: str, request: CreateInventoryI
 
 
 @app.put("/inventory/{store_id}/{barcode}", response_model=InventoryItem)
-def update_inventory_quantity(store_id: str, barcode: str, request: UpdateQuantityRequest):
-    """Set the quantity of an existing stock record. Returns 404 if not found."""
-    return get_inventory_DAO().update_quantity(store_id, barcode, request.quantity)
+def update_inventory_item(store_id: str, barcode: str, request: UpdateInventoryItemRequest):
+    """Update an existing stock record. quantity is required; price and percent_off are optional."""
+    return get_inventory_DAO().update_item(
+        store_id, barcode,
+        quantity=request.quantity,
+        price=request.price,
+        percent_off=request.percent_off,
+    )
 
 
 @app.delete("/inventory/{store_id}/{barcode}", status_code=204)

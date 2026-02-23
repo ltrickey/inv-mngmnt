@@ -41,8 +41,10 @@ cd inventory_api && uvicorn main:app --port 9000
 
 ```bash
 cd employee_site/server
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
-python app.py          # runs on port 5000, SKIP_AUTH=1 by default in .env
+python app.py          # runs on port 5001, SKIP_AUTH=1 by default in .env
 ```
 
 ### 3. Start the React Dev Server
@@ -50,7 +52,7 @@ python app.py          # runs on port 5000, SKIP_AUTH=1 by default in .env
 ```bash
 cd employee_site/site
 npm install
-npm run dev            # runs on port 3001, proxies /api/* to port 5000
+npm run dev            # runs on port 3001, proxies /api/* to port 5001
 ```
 
 Open http://localhost:3001. With `SKIP_AUTH=1`, the login screen still appears
@@ -82,7 +84,7 @@ but you can enter any credentials (they are not validated).
 ```bash
 cd employee_site/server
 docker build -t employee-bff .
-docker run -p 5000:5000 \
+docker run -p 5001:5001 \
   -e COGNITO_USER_POOL_ID=us-east-1_XXXXX \
   -e COGNITO_APP_CLIENT_ID=abc123 \
   -e AWS_REGION=us-east-1 \
