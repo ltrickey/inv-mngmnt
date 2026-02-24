@@ -145,6 +145,7 @@ NAME_PREFIX=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw name_prefix 2>/
 AWS_REGION=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw aws_region 2>/dev/null || echo "us-east-1")
 INVENTORY_API_URL=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw inventory_api_url 2>/dev/null || echo "")
 S3_BUCKET_NAME=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw s3_bucket_name 2>/dev/null || echo "")
+S3_BUCKET_URL="https://${S3_BUCKET_NAME}.s3.amazonaws.com"
 DYNAMODB_PRODUCTS_TABLE=""
 [ -n "$NAME_PREFIX" ] && DYNAMODB_PRODUCTS_TABLE="${NAME_PREFIX}-products"
 
@@ -186,6 +187,7 @@ ssh -i "$SSH_KEY" \
     export AWS_REGION="$AWS_REGION"
     export INVENTORY_API_URL="$INVENTORY_API_URL"
     export S3_BUCKET_NAME="$S3_BUCKET_NAME"
+    export S3_BUCKET_URL="$S3_BUCKET_URL"
 
     PACKAGE_NAME="product_catalogue.zip"
     DEPLOY_DIR="/opt/product_catalogue"

@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi import FastAPI, Query
 from pydantic import BaseModel, Field
@@ -64,8 +64,13 @@ class CreateInventoryItemRequest(BaseModel):
 
 class UpdateInventoryItemRequest(BaseModel):
     quantity: int = Field(..., ge=0)
+<<<<<<< HEAD
     price: float | None = Field(None, gt=0)
     percent_off: int | None = Field(None, ge=0, le=100)
+=======
+    price: Optional[float] = Field(None, gt=0)
+    percent_off: Optional[int] = Field(None, ge=0, le=100)
+>>>>>>> move-to-docker
 
 
 @app.post("/inventory/{store_id}/{barcode}", response_model=InventoryItem, status_code=201)

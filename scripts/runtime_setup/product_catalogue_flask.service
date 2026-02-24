@@ -11,7 +11,7 @@ WorkingDirectory=/opt/product_catalogue/server
 Environment="PATH=/opt/product_catalogue/server/.venv/bin"
 # Load DynamoDB table name and region (created by deploy.sh when deploying to EC2)
 EnvironmentFile=/etc/product_catalogue_flask.env
-ExecStart=/opt/product_catalogue/server/.venv/bin/gunicorn -w 4 -b 0.0.0.0:8000 app:app
+ExecStart=/opt/product_catalogue/server/.venv/bin/gunicorn --preload --workers 2 --threads 4 -b 0.0.0.0:8000 --timeout 120 app:app
 Restart=always
 RestartSec=10
 StartLimitInterval=300

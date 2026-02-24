@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 from decimal import Decimal
 from fastapi import HTTPException
@@ -51,7 +51,11 @@ class InventoryDAO(ABC):
 
     @abstractmethod
     def update_item(self, store_id: str, barcode: str, quantity: int,
+<<<<<<< HEAD
                     price: float | None = None, percent_off: int | None = None) -> InventoryItem:
+=======
+                    price: Optional[float] = None, percent_off: Optional[int] = None) -> InventoryItem:
+>>>>>>> move-to-docker
         """Update an existing stock record. quantity is required; price and percent_off are optional."""
         pass
 
@@ -211,7 +215,11 @@ class InventoryDAODynamoDB(InventoryDAO):
             raise HTTPException(status_code=500, detail=f"DynamoDB put_item failed: {e}") from e
 
     def update_item(self, store_id: str, barcode: str, quantity: int,
+<<<<<<< HEAD
                     price: float | None = None, percent_off: int | None = None) -> InventoryItem:
+=======
+                    price: Optional[float] = None, percent_off: Optional[int] = None) -> InventoryItem:
+>>>>>>> move-to-docker
         try:
             set_parts = ["quantity = :qty"]
             expr_vals = {":qty": {"N": str(quantity)}}
@@ -383,7 +391,11 @@ class InventoryDAOJson(InventoryDAO):
         return item
 
     def update_item(self, store_id: str, barcode: str, quantity: int,
+<<<<<<< HEAD
                     price: float | None = None, percent_off: int | None = None) -> InventoryItem:
+=======
+                    price: Optional[float] = None, percent_off: Optional[int] = None) -> InventoryItem:
+>>>>>>> move-to-docker
         try:
             with open(self.file_path, "r", encoding="utf-8") as f:
                 rows = json.load(f)

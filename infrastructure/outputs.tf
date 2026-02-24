@@ -39,8 +39,8 @@ output "inventory_api_private_ip" {
 } */
 
 
-output "service_url" {
-  description = "URL to access the product catalogue via the flask app hosting react's index.html"
+output "customer_website" {
+  description = "URL to access the customer-facing product catalogue website"
   value       = "http://${aws_instance.product_catalogue.public_dns}:8000"
 }
 
