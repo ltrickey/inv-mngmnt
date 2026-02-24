@@ -65,8 +65,13 @@ class CreateInventoryItemRequest(BaseModel):
 class UpdateInventoryItemRequest(BaseModel):
     quantity: int = Field(..., ge=0)
 <<<<<<< HEAD
+<<<<<<< HEAD
     price: float | None = Field(None, gt=0)
     percent_off: int | None = Field(None, ge=0, le=100)
+=======
+    price: Optional[float] = Field(None, gt=0)
+    percent_off: Optional[int] = Field(None, ge=0, le=100)
+>>>>>>> move-to-docker
 =======
     price: Optional[float] = Field(None, gt=0)
     percent_off: Optional[int] = Field(None, ge=0, le=100)
