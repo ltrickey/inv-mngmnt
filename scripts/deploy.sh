@@ -71,15 +71,15 @@ if [ -n "$DYNAMODB_PRODUCTS_TABLE" ]; then
   echo "Configuring Flask for production mode:"
   echo "  DynamoDB: $DYNAMODB_PRODUCTS_TABLE"
   [ -n "$INVENTORY_API_URL" ] && echo "  Inventory API: $INVENTORY_API_URL"
-  [ -n "$S3_BUCKET_NAME" ] && echo "  S3 Images: $S3_BUCKET_NAME (private bucket)"
+  [ -n "$S3_BUCKET_URL" ] && echo "  S3 Images: $S3_BUCKET_URL (public)"
   
   {
     echo "USE_DYNAMODB=1"
     echo "DYNAMODB_PRODUCTS_TABLE=$DYNAMODB_PRODUCTS_TABLE"
     [ -n "$AWS_REGION" ] && echo "AWS_REGION=$AWS_REGION"
     [ -n "$INVENTORY_API_URL" ] && echo "INVENTORY_API_BASE_URL=$INVENTORY_API_URL"
+    [ -n "$S3_BUCKET_URL" ] && echo "S3_BUCKET_URL=$S3_BUCKET_URL"
     [ -n "$S3_BUCKET_NAME" ] && echo "S3_BUCKET_NAME=$S3_BUCKET_NAME"
-    [ -n "$AWS_REGION" ] && echo "S3_BUCKET_REGION=$AWS_REGION"
   } | sudo tee "$FLASK_ENV_FILE" > /dev/null
 else
   echo "USE_DYNAMODB=0" | sudo tee "$FLASK_ENV_FILE" > /dev/null

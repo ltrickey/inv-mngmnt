@@ -65,11 +65,12 @@ def serve_image(filename):
 PRODUCTS_FILE = os.path.join(_PROJECT_ROOT, 'seed_data', 'products.json')
 
 # S3 configuration (optional - if not set, uses local images)
+# S3_BUCKET_URL is the public base URL (e.g. https://bucket.s3.amazonaws.com)
+S3_BUCKET_URL = os.environ.get('S3_BUCKET_URL', '').rstrip('/')
 S3_BUCKET_NAME = os.environ.get('S3_BUCKET_NAME', None)
-S3_BUCKET_REGION = os.environ.get('S3_BUCKET_REGION', None)
 
 # ---------------------------------------------------------------------------
-# Simple TTL cache – avoids repeated DynamoDB scans + presigned URL generation
+# Simple TTL cache – avoids repeated DynamoDB scans
 # ---------------------------------------------------------------------------
 CACHE_TTL_SECONDS = 120  # products rarely change; 2 minutes is safe
 
@@ -89,35 +90,16 @@ def _cache_set(key, data):
     with _cache_lock:
         _cache[key] = {'data': data, 'ts': time.time()}
 
-# Reusable S3 client – created once on first use to avoid per-request overhead
-_s3_client = None
-
-def _get_s3_client():
-    global _s3_client
-    if _s3_client is None:
-        import boto3
-        _s3_client = boto3.client('s3', region_name=S3_BUCKET_REGION) if S3_BUCKET_REGION else boto3.client('s3')
-    return _s3_client
-
 
 def get_image_url(image_path):
     """
     Get the full image URL based on environment configuration.
-    If S3_BUCKET_NAME is set, generates a signed URL with 1-hour expiration.
+    If S3_BUCKET_URL is set, returns a direct public S3 URL (no signing needed).
     Otherwise, returns a Flask-served URL for local testing.
     """
-    if S3_BUCKET_NAME:
+    if S3_BUCKET_URL:
         s3_path = image_path.replace('infrastructure/', '') if image_path.startswith('infrastructure/') else image_path
-        try:
-            signed_url = _get_s3_client().generate_presigned_url(
-                'get_object',
-                Params={'Bucket': S3_BUCKET_NAME, 'Key': s3_path},
-                ExpiresIn=3600,
-            )
-            return signed_url
-        except Exception as e:
-            logger.error(f"Failed to generate signed URL for {s3_path}: {e}")
-            return "/images/placeholder.png"
+        return f"{S3_BUCKET_URL}/{s3_path}"
     else:
         if image_path.startswith(('http://', 'https://')):
             return image_path
@@ -448,10 +430,17 @@ else:
         return '', 204
 
 
+# Eagerly initialize boto3 clients and warm the product cache at import time.
+# With gunicorn --preload this runs once in the master process before forking,
+# so every worker starts ready to serve instantly.
+if USE_DYNAMODB and DYNAMODB_PRODUCTS_TABLE:
+    try:
+        _get_dynamodb_products_client()
+        load_products()
+        logger.info("Warm-up complete: DynamoDB client initialized, products cached")
+    except Exception as e:
+        logger.warning("Warm-up failed (will retry on first request): %s", e)
+
+
 if __name__ == '__main__':
-    # Development server only - NOT for production
-    # For production, use a WSGI server like Gunicorn:
-    #   gunicorn -w 4 -b 0.0.0.0:8000 app:app
-    # host='0.0.0.0' makes the server accessible from other machines on the network
-    # This is useful for testing from other devices during development
     app.run(debug=True, host='0.0.0.0', port=8000)
