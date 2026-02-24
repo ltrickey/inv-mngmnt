@@ -5,8 +5,9 @@ import ProductsGrid from './components/ProductsGrid'
 import Loading from './components/Loading'
 import Error from './components/Error'
 
-// Use relative URLs to go through Vite proxy
-const API_BASE_URL = ''
+// In production, VITE_API_BASE_URL is set at build time to the ALB URL.
+// In local dev, it's empty so relative URLs go through the Vite proxy.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 
 /** Build { primary: { secondary: [tertiary, ...] } } from product list. Supports both flat (primary_category) and nested (category.primary) shapes. */
 function buildCategoryHierarchy(products) {

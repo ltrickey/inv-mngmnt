@@ -16,28 +16,16 @@ except ImportError:
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Use DynamoDB for products when on EC2 (USE_DYNAMODB=1 and DYNAMODB_PRODUCTS_TABLE set); otherwise JSON files
 USE_DYNAMODB = os.environ.get('USE_DYNAMODB', '').lower() in ('1', 'true', 'yes')
 DYNAMODB_PRODUCTS_TABLE = os.environ.get('DYNAMODB_PRODUCTS_TABLE', '').strip()
 
-# Resolve the parent that contains peer directories (site-dist, infrastructure, seed_data).
-# On EC2 that's one level up (/opt/product_catalogue/); locally it's two (customer_site/ -> repo root).
+# Resolve repo root for local dev paths (seed_data, infrastructure/images).
+# In Docker these aren't used since USE_DYNAMODB=1 and images come from S3.
 _PARENT = os.path.dirname(os.path.dirname(__file__))
 _PROJECT_ROOT = _PARENT if os.path.isdir(os.path.join(_PARENT, 'seed_data')) else os.path.dirname(_PARENT)
 
-# Determine if we're in production (serving React static files)
-# In production, React build is in site-dist/ next to server/ inside the deploy dir
-REACT_BUILD_DIR = os.path.join(_PARENT, 'site-dist')
-IS_PRODUCTION = os.path.exists(REACT_BUILD_DIR) and os.path.isdir(REACT_BUILD_DIR)
-
-if IS_PRODUCTION:
-    # Production: Serve React static files
-    app = Flask(__name__, static_folder=REACT_BUILD_DIR, static_url_path='')
-    CORS(app)  # Enable CORS for all routes
-else:
-    # Development: Don't serve static files (Vite dev server handles it)
-    app = Flask(__name__)
-    CORS(app)  # Enable CORS for all routes
+app = Flask(__name__)
+CORS(app)
 
 # Register blueprints for stores, stock, sales.
 # Stock and sales endpoints proxy to the FastAPI inventory service when INVENTORY_API_BASE_URL is set.
@@ -401,33 +389,9 @@ def get_products():
     return jsonify(products)
 
 
-# In production, serve React app for all non-API routes
-# This must be defined AFTER all API routes to avoid intercepting them
-if IS_PRODUCTION:
-    @app.route('/', defaults={'path': ''})
-    @app.route('/<path:path>')
-    def serve_react_app(path):
-        """Serve React app for all non-API routes."""
-        # API routes are already handled above, so this only catches non-API routes
-        # Serve index.html for all routes (React Router handles client-side routing)
-        return send_from_directory(REACT_BUILD_DIR, 'index.html')
-else:
-    # Development: no React build; avoid 404 when someone hits Flask root or favicon
-    @app.route('/')
-    def dev_root():
-        """In dev, frontend is served by Vite (e.g. port 3000). Use http:// (not https://)."""
-        return (
-            '<!DOCTYPE html><html><head><meta charset="utf-8"><title>API</title></head><body>'
-            '<p>Backend API only. In development, open the <strong>frontend</strong> at '
-            '<a href="http://localhost:3000">http://localhost:3000</a>.</p>'
-            '<p>Use <strong>http://</strong> (not https://) when connecting to this server.</p>'
-            '</body></html>'
-        ), 200, {'Content-Type': 'text/html; charset=utf-8'}
-
-    @app.route('/favicon.ico')
-    def favicon():
-        """Avoid 404 for browser favicon requests."""
-        return '', 204
+@app.route('/health')
+def health():
+    return jsonify({"status": "ok", "service": "customer-api"})
 
 
 # Eagerly initialize boto3 clients and warm the product cache at import time.

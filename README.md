@@ -3,16 +3,21 @@ Homework series for CPSC 5910 Cloud Computing Seattle University
 
 By Lynn Trickey with assistance from Cursor AI agent
 
-## Testing for Point of Sale API homework
+## Testing for Employee Website Homework
 **Changed since last homework submission**
-* Updated data model
-* Added FastAPI inventory API hosted on Ec2 instance
-* Wired Flask WebServer to fetch stock information from FastAPI instead of DynamoDB table directly. _Note: the website still does access other DynamoDB tables directly - to be addressed in future_
-* Added API Gateway endpoints 
+* Moved customer site backend from EC2 to docker image with ECR & ECS
+* Moved front end to S3 bucket
+* Changed S3 bucket hosting images to public to increase load time - extra security not needed.
+
+### Prereqesites
+- AWS credentials set
+- Install jq 
+- Install Docker Desktop
 
 ### How to test
 1. Follow pre-deployment setup instructions to set SSH key and AWS credentials (if not already set)
-2. Deploy app to AWS: 
+2. Make sure Docker Desktop is running
+3. Deploy app to AWS: 
 ```bash
 cd /infrastructure
 terraform init
@@ -27,7 +32,7 @@ cd .. # go to root directory
 ./scripts/test_api_gateway.sh
 ```
 
-4. Hit updated Website endpoint at customer_website in outputs, functionality should be unchanged - search for products or products in a given store.
+4. Hit updated Website endpoint at customer_site_url in outputs, functionality should be unchanged - search for products or products in a given store.
 
 ## Pre-Deployment Setup
 **AWS Credentials and SSH Key are required to run Terraform Deployment**
@@ -181,73 +186,79 @@ The React app will connect to Flask at `http://localhost:8000`.
 - **No AWS credentials needed:** When `USE_DYNAMODB=0`, neither service requires AWS credentials or DynamoDB access.
 - **Service communication:** Flask calls the FastAPI inventory service for all stock/sales data. Make sure the inventory service is running before starting Flask.
 
+## Architecture
+
+```
+Customer Site:
+  React SPA (S3)  →  Flask API (ECS Fargate / Docker)  →  DynamoDB
+                                                        →  Inventory API (EC2)
+                                                        →  S3 Product Images
+
+Employee Site:
+  React SPA (S3)  →  Flask BFF (ECS Fargate / Docker)  →  Customer API (ECS Fargate)
+                                                        →  Inventory API (EC2)
+
+Inventory API:
+  FastAPI (EC2)  →  DynamoDB
+
+Public API:
+  API Gateway  →  Inventory API (EC2)
+```
+
 ## Deployment Process
 
-Before running deployment, you must have the correct aws credentials and ssh key set as described above.  Otherwise the deployment will fail.
+### Prerequisites
 
-The deployment is fully automated through Terraform. To deploy:
+The following must be installed and available on the machine running `terraform apply`:
+
+- **Docker Desktop** — must be running. Docker is used to build and push container images to ECR for both the customer and employee sites.
+- **Node.js 18+** — used to build the React frontends before uploading to S3.
+- **AWS CLI** — configured with valid credentials (`~/.aws/credentials`). For Learner Lab, re-copy credentials each session.
+- **Terraform** — the infrastructure is defined in `infrastructure/`.
+- **SSH Key** — required for deploying the Inventory API to its EC2 instance (see [SSH Key Setup](#ssh-key-setup)).
+
+### Quick Start
 
 ```bash
-cd /infrastructure
-terraform init
-terraform apply
+cd infrastructure
+terraform init    # first time only
+terraform apply   # builds, packages, and deploys everything
 ```
 
 You will need to input `yes` to allow `terraform apply` to make the required changes.
 
-### Deployment Process
+### What Terraform Does
 
-**Quick Start:**
-```bash
-cd infrastructure
-terraform apply  # Automatically builds, packages, and deploys everything
-```
-
-**What Terraform Does:**
-1. Creates AWS infrastructure (EC2, security groups, DynamoDB, S3, API Gateway, etc.)
-2. Builds React app locally (requires Node.js)
-3. Packages applications into deployment archives
-4. Deploys Product Catalogue and Inventory API to EC2 via SCP
-5. Uploads product images to S3
-6. **Seeds DynamoDB tables automatically** (no manual steps required)
-
-**Manual Deployment (for updates without Terraform):**
-```bash
-./scripts/package.sh        # Build & package locally
-./scripts/deploy_remote.sh  # Deploy to existing EC2
-```
+1. Creates AWS infrastructure (ECS Fargate clusters, ALBs, ECR, S3 buckets, EC2 for Inventory API, DynamoDB, API Gateway, Cognito, etc.)
+2. Uploads product images to S3
+3. Deploys the Inventory API to EC2 via SCP
+4. Seeds DynamoDB tables with product data
+5. Builds the Customer API Docker image locally and pushes to ECR
+6. Builds the Customer React frontend and uploads to S3
+7. Deploys customer ECS service
+8. Builds the Employee BFF Docker image locally and pushes to ECR
+9. Builds the Employee React frontend and uploads to S3
+10. Deploys employee ECS service
 
 ### Deployment Scripts
 
-| Script | Runs On | Purpose |
-|--------|---------|---------|
-| `package.sh` | Local | Builds React (`npm run build`), packages Flask + images into ZIP |
-| `deploy_remote.sh` | Local | Copies ZIP to EC2, triggers installation |
-| `deploy.sh` | EC2 | Extracts files, installs dependencies, starts service |
-| `seed_dynamodb.sh` | Local (via Terraform) | Seeds DynamoDB tables with product data |
-| `package_inventory_api.sh` | Local | Packages Inventory API into ZIP |
-| `deploy_inventory_api_remote.sh` | Local | Copies Inventory API ZIP to EC2, triggers installation |
-
-### Requirements
-
-- **Local:** Node.js (for React build), AWS credentials, SSH key
-- **EC2:** Python 3, AWS CLI, IAM role (automatically configured by Terraform)
+| Script | Purpose |
+|--------|---------|
+| `deploy_customer_site.sh` | Builds Customer API Docker image, pushes to ECR, builds React frontend, uploads to S3, redeploys ECS |
+| `deploy_employee_site.sh` | Builds Employee BFF Docker image, pushes to ECR, builds React frontend, uploads to S3, redeploys ECS |
+| `seed_dynamodb.sh` | Seeds DynamoDB tables with product data |
+| `upload_images_to_s3.sh` | Uploads product images to S3 |
+| `package_inventory_api.sh` | Packages Inventory API for EC2 deployment |
+| `deploy_inventory_api_remote.sh` | Deploys Inventory API to EC2 |
 
 ### Post-Deployment
 
-**Access the application:**
+**Access the applications:**
 ```bash
-terraform output customer_website  # Get http://<EC2_PUBLIC_DNS>:8000
-```
-
-**Check service status:**
-```bash
-ssh -i ~/.ssh/vockey.pem ec2-user@<EC2_HOST> "sudo systemctl status product_catalogue_flask"
-```
-
-**View logs:**
-```bash
-ssh -i ~/.ssh/vockey.pem ec2-user@<EC2_HOST> "sudo journalctl -u product_catalogue_flask -f"
+terraform output customer_site_url    # Customer site (S3 static website)
+terraform output customer_api_alb_url  # Customer API (ALB)
+terraform output employee_site_url     # Employee site (S3 static website)
+terraform output employee_bff_alb_url  # Employee BFF API (ALB)
 ```
 
 ### DynamoDB Seeding
@@ -262,7 +273,6 @@ ssh -i ~/.ssh/vockey.pem ec2-user@<EC2_HOST> "sudo journalctl -u product_catalog
 
 **Manual Re-seeding (optional, only if you need to reset data):**
 ```bash
-cd /
 INFRASTRUCTURE_DIR=./infrastructure ./scripts/seed_dynamodb.sh
 ```
 

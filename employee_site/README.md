@@ -5,8 +5,8 @@ Internal employee-only website for managing store inventory. Gated behind AWS Co
 ## Architecture
 
 ```
-React SPA (S3)  →  Flask BFF (Docker)  →  Inventory API (FastAPI / EC2)
-                                       →  Product Catalogue (Flask / EC2)
+React SPA (S3)  →  Flask BFF (ECS Fargate)  →  Inventory API (FastAPI / EC2)
+                                              →  Product Catalogue API (Flask / ECS Fargate)
 ```
 
 ## Directory Layout
@@ -136,15 +136,12 @@ All values are available from `terraform output`.
 
 ## Creating Employee Users
 
-After deploying the Cognito User Pool via Terraform:
+After deploying the Cognito User Pool via Terraform, use the script in the project root (requires AWS CLI):
 
 ```bash
-cd employee_site/scripts
-python create_user.py \
-  --email alice@store.com \
-  --username alice \
-  --user-pool-id us-east-1_XXXXX \
-  --region us-east-1
+./scripts/create_employee_user.sh --email alice@store.com
+./scripts/create_employee_user.sh --email alice@store.com --username alice
+./scripts/create_employee_user.sh --email bob@store.com --user-pool-id us-east-1_XXXXX --region us-east-1
 ```
 
-The user will receive a temporary password and must change it on first login.
+Set `COGNITO_USER_POOL_ID` and optionally `AWS_REGION` if you don’t pass them on the command line. The user will receive a temporary password and must change it on first login.

@@ -157,11 +157,11 @@ After `terraform apply`, you'll get:
 terraform output
 
 # Specific outputs
-terraform output customer_website         # Product catalogue URL
+terraform output customer_site_url        # Customer site URL (S3)
 terraform output inventory_api_url        # Internal inventory API URL
-terraform output ec2_instance_public_dns  # Product catalogue DNS
+terraform output inventory_api_public_dns # Inventory API EC2 DNS
 terraform output iam_instance_profile     # IAM profile being used
-terraform output s3_bucket_url            # S3 bucket URL for images
+terraform output s3_bucket_name           # S3 bucket for product images
 ```
 
 ## Deployment

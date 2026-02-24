@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { updateStockQuantity, deleteStockItem } from '../api'
 
 export default function StockTable({ inventory, products, onRefresh }) {
@@ -6,15 +6,23 @@ export default function StockTable({ inventory, products, onRefresh }) {
   const [editQty, setEditQty] = useState(0)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
 
   const productMap = Object.fromEntries(
     (products || []).map((p) => [String(p.barcode), p])
   )
 
+  useEffect(() => {
+    if (!successMessage) return
+    const id = setTimeout(() => setSuccessMessage(''), 4000)
+    return () => clearTimeout(id)
+  }, [successMessage])
+
   const startEdit = (item) => {
     setEditingKey(`${item.store_id}:${item.barcode}`)
     setEditQty(item.quantity)
     setError('')
+    setSuccessMessage('')
   }
 
   const cancelEdit = () => {
@@ -25,10 +33,14 @@ export default function StockTable({ inventory, products, onRefresh }) {
   const saveEdit = async (item) => {
     setBusy(true)
     setError('')
+    setSuccessMessage('')
     try {
       await updateStockQuantity(item.store_id, item.barcode, editQty)
       setEditingKey(null)
       onRefresh()
+      const product = productMap[String(item.barcode)]
+      const name = product ? product.name : item.barcode
+      setSuccessMessage(`Quantity updated for "${name}".`)
     } catch (e) {
       setError(e.message)
     } finally {
@@ -59,6 +71,7 @@ export default function StockTable({ inventory, products, onRefresh }) {
 
   return (
     <div className="stock-table-wrapper">
+      {successMessage && <p className="success-message">{successMessage}</p>}
       {error && <p className="error">{error}</p>}
       <table className="stock-table">
         <thead>

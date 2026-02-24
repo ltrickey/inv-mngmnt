@@ -1,23 +1,3 @@
-output "ec2_instance_id" {
-  description = "ID of the product catalogue EC2 instance"
-  value       = aws_instance.product_catalogue.id
-}
-
-output "ec2_instance_public_ip" {
-  description = "Public IP address of the product catalogue EC2 instance"
-  value       = aws_instance.product_catalogue.public_ip
-}
-
-output "ec2_instance_public_dns" {
-  description = "Public DNS name of the product catalogue EC2 instance"
-  value       = aws_instance.product_catalogue.public_dns
-}
-
-output "inventory_api_instance_id" {
-  description = "ID of the inventory API EC2 instance"
-  value       = aws_instance.inventory_api.id
-}
-
 output "inventory_api_public_ip" {
   description = "Public IP address of the inventory API EC2 instance"
   value       = aws_instance.inventory_api.public_ip
@@ -38,11 +18,6 @@ output "inventory_api_private_ip" {
   value       = aws_s3_bucket.build_artifacts.id
 } */
 
-
-output "customer_website" {
-  description = "URL to access the customer-facing product catalogue website"
-  value       = "http://${aws_instance.product_catalogue.public_dns}:8000"
-}
 
 output "inventory_api_url" {
   description = "Internal URL for the inventory API (accessible from product catalogue instance)"
@@ -82,11 +57,6 @@ output "iam_instance_profile" {
 output "s3_bucket_name" {
   description = "Name of the S3 bucket for product images (private - requires signed URLs)"
   value       = aws_s3_bucket.product_images.id
-}
-
-output "s3_bucket_region" {
-  description = "AWS region of the S3 bucket"
-  value       = var.aws_region
 }
 
 # Cognito outputs for employee site

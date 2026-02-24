@@ -262,6 +262,13 @@ body {
   font-size: 0.9rem;
 }
 
+/* Success */
+.success-message {
+  color: #059669;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
 .empty-state {
   text-align: center;
   color: #888;

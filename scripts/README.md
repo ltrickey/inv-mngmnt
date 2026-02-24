@@ -70,6 +70,7 @@ This will:
 | Script | Description |
 |--------|-------------|
 | `deploy_all.sh` | Deploys both Product Catalogue and Inventory API |
+| `create_employee_user.sh` | Creates a Cognito user for the employee site (requires AWS CLI) |
 | `seed_dynamodb.sh` | Seeds DynamoDB tables with initial data |
 | `check_status.sh` | Checks the status of running services |
 | `generate_product_images.py` | Generates product images (if needed) |

@@ -1,24 +1,16 @@
 # =============================================================================
-# Employee Internal Site Infrastructure
-# - ECR repository for the BFF Docker image
+# Customer Site Infrastructure
+# - ECR repository for the Customer API Docker image
 # - ECS Fargate cluster + service behind an ALB
 # - S3 static website for the React frontend
 # =============================================================================
-
-# Need at least 2 subnets in different AZs for the ALB
-data "aws_subnets" "all_default" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.default.id]
-  }
-}
 
 # ---------------------------------------------------------------------------
 # ECR Repository
 # ---------------------------------------------------------------------------
 
-resource "aws_ecr_repository" "employee_bff" {
-  name         = "${local.name_prefix}-employee-bff"
+resource "aws_ecr_repository" "customer_api" {
+  name         = "${local.name_prefix}-customer-api"
   force_delete = true
 
   image_scanning_configuration {
@@ -26,7 +18,7 @@ resource "aws_ecr_repository" "employee_bff" {
   }
 
   tags = merge(local.common_tags, {
-    Name = "${local.name_prefix}-employee-bff"
+    Name = "${local.name_prefix}-customer-api"
   })
 }
 
@@ -34,8 +26,8 @@ resource "aws_ecr_repository" "employee_bff" {
 # CloudWatch Log Group (ECS logs)
 # ---------------------------------------------------------------------------
 
-resource "aws_cloudwatch_log_group" "employee_bff" {
-  name              = "/ecs/${local.name_prefix}-employee-bff"
+resource "aws_cloudwatch_log_group" "customer_api" {
+  name              = "/ecs/${local.name_prefix}-customer-api"
   retention_in_days = var.log_retention_days
 
   tags = local.common_tags
@@ -45,8 +37,8 @@ resource "aws_cloudwatch_log_group" "employee_bff" {
 # ECS Cluster
 # ---------------------------------------------------------------------------
 
-resource "aws_ecs_cluster" "employee" {
-  name = "${local.name_prefix}-employee"
+resource "aws_ecs_cluster" "customer" {
+  name = "${local.name_prefix}-customer"
 
   tags = local.common_tags
 }
@@ -55,40 +47,41 @@ resource "aws_ecs_cluster" "employee" {
 # ECS Task Definition
 # ---------------------------------------------------------------------------
 
-resource "aws_ecs_task_definition" "employee_bff" {
-  family                   = "${local.name_prefix}-employee-bff"
+resource "aws_ecs_task_definition" "customer_api" {
+  family                   = "${local.name_prefix}-customer-api"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  cpu                      = "256"
-  memory                   = "512"
+  cpu                      = "512"
+  memory                   = "1024"
   execution_role_arn       = data.aws_iam_role.ec2_role.arn
   task_role_arn            = data.aws_iam_role.ec2_role.arn
 
   container_definitions = jsonencode([
     {
-      name      = "employee-bff"
-      image     = "${aws_ecr_repository.employee_bff.repository_url}:latest"
+      name      = "customer-api"
+      image     = "${aws_ecr_repository.customer_api.repository_url}:latest"
       essential = true
 
       portMappings = [
         {
-          containerPort = 5001
+          containerPort = 8000
           protocol      = "tcp"
         }
       ]
 
       environment = [
-        { name = "COGNITO_USER_POOL_ID", value = aws_cognito_user_pool.employees.id },
-        { name = "COGNITO_APP_CLIENT_ID", value = aws_cognito_user_pool_client.employee_site.id },
+        { name = "USE_DYNAMODB", value = "1" },
+        { name = "DYNAMODB_PRODUCTS_TABLE", value = aws_dynamodb_table.products.name },
         { name = "AWS_REGION", value = var.aws_region },
-        { name = "PRODUCT_CATALOGUE_API_URL", value = "http://${aws_lb.customer.dns_name}" },
-        { name = "INVENTORY_API_URL", value = "http://${aws_instance.inventory_api.private_ip}:9000" },
+        { name = "INVENTORY_API_BASE_URL", value = "http://${aws_instance.inventory_api.private_ip}:9000" },
+        { name = "S3_BUCKET_URL", value = local.s3_bucket_url },
+        { name = "S3_BUCKET_NAME", value = local.s3_bucket_name },
       ]
 
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          "awslogs-group"         = aws_cloudwatch_log_group.employee_bff.name
+          "awslogs-group"         = aws_cloudwatch_log_group.customer_api.name
           "awslogs-region"        = var.aws_region
           "awslogs-stream-prefix" = "ecs"
         }
@@ -103,9 +96,9 @@ resource "aws_ecs_task_definition" "employee_bff" {
 # Security Groups
 # ---------------------------------------------------------------------------
 
-resource "aws_security_group" "employee_alb" {
-  name        = "${local.name_prefix}-employee-alb-sg"
-  description = "ALB for employee BFF"
+resource "aws_security_group" "customer_alb" {
+  name        = "${local.name_prefix}-customer-alb-sg"
+  description = "ALB for customer API"
   vpc_id      = data.aws_vpc.default.id
 
   ingress {
@@ -124,23 +117,23 @@ resource "aws_security_group" "employee_alb" {
   }
 
   tags = merge(local.common_tags, {
-    Name = "${local.name_prefix}-employee-alb-sg"
+    Name = "${local.name_prefix}-customer-alb-sg"
   })
 
   lifecycle { create_before_destroy = true }
 }
 
-resource "aws_security_group" "employee_ecs" {
-  name        = "${local.name_prefix}-employee-ecs-sg"
-  description = "ECS tasks for employee BFF"
+resource "aws_security_group" "customer_ecs" {
+  name        = "${local.name_prefix}-customer-ecs-sg"
+  description = "ECS tasks for customer API"
   vpc_id      = data.aws_vpc.default.id
 
   ingress {
     description     = "From ALB"
-    from_port       = 5001
-    to_port         = 5001
+    from_port       = 8000
+    to_port         = 8000
     protocol        = "tcp"
-    security_groups = [aws_security_group.employee_alb.id]
+    security_groups = [aws_security_group.customer_alb.id]
   }
 
   egress {
@@ -151,7 +144,7 @@ resource "aws_security_group" "employee_ecs" {
   }
 
   tags = merge(local.common_tags, {
-    Name = "${local.name_prefix}-employee-ecs-sg"
+    Name = "${local.name_prefix}-customer-ecs-sg"
   })
 
   lifecycle { create_before_destroy = true }
@@ -161,27 +154,27 @@ resource "aws_security_group" "employee_ecs" {
 # ALB
 # ---------------------------------------------------------------------------
 
-resource "aws_lb" "employee" {
-  name               = "${local.short_name_prefix}-emp-alb"
+resource "aws_lb" "customer" {
+  name               = "${local.short_name_prefix}-cust-alb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.employee_alb.id]
+  security_groups    = [aws_security_group.customer_alb.id]
   subnets            = slice(data.aws_subnets.all_default.ids, 0, min(3, length(data.aws_subnets.all_default.ids)))
 
   tags = merge(local.common_tags, {
-    Name = "${local.name_prefix}-employee-alb"
+    Name = "${local.name_prefix}-customer-alb"
   })
 }
 
-resource "aws_lb_target_group" "employee_bff" {
-  name        = "${local.short_name_prefix}-emp-bff-tg"
-  port        = 5001
+resource "aws_lb_target_group" "customer_api" {
+  name        = "${local.short_name_prefix}-cust-api-tg"
+  port        = 8000
   protocol    = "HTTP"
   vpc_id      = data.aws_vpc.default.id
   target_type = "ip"
 
   health_check {
-    path                = "/health"
+    path                = "/debug"
     interval            = 30
     timeout             = 5
     healthy_threshold   = 2
@@ -192,14 +185,14 @@ resource "aws_lb_target_group" "employee_bff" {
   tags = local.common_tags
 }
 
-resource "aws_lb_listener" "employee_http" {
-  load_balancer_arn = aws_lb.employee.arn
+resource "aws_lb_listener" "customer_http" {
+  load_balancer_arn = aws_lb.customer.arn
   port              = 80
   protocol          = "HTTP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.employee_bff.arn
+    target_group_arn = aws_lb_target_group.customer_api.arn
   }
 }
 
@@ -207,66 +200,52 @@ resource "aws_lb_listener" "employee_http" {
 # ECS Service
 # ---------------------------------------------------------------------------
 
-resource "aws_ecs_service" "employee_bff" {
-  name            = "${local.name_prefix}-employee-bff"
-  cluster         = aws_ecs_cluster.employee.id
-  task_definition = aws_ecs_task_definition.employee_bff.arn
+resource "aws_ecs_service" "customer_api" {
+  name            = "${local.name_prefix}-customer-api"
+  cluster         = aws_ecs_cluster.customer.id
+  task_definition = aws_ecs_task_definition.customer_api.arn
   desired_count   = 1
   launch_type     = "FARGATE"
 
   network_configuration {
     subnets          = slice(data.aws_subnets.all_default.ids, 0, min(3, length(data.aws_subnets.all_default.ids)))
-    security_groups  = [aws_security_group.employee_ecs.id]
+    security_groups  = [aws_security_group.customer_ecs.id]
     assign_public_ip = true
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.employee_bff.arn
-    container_name   = "employee-bff"
-    container_port   = 5001
+    target_group_arn = aws_lb_target_group.customer_api.arn
+    container_name   = "customer-api"
+    container_port   = 8000
   }
 
-  depends_on = [aws_lb_listener.employee_http]
+  depends_on = [aws_lb_listener.customer_http]
 
   tags = local.common_tags
 }
 
 # ---------------------------------------------------------------------------
-# Allow ECS tasks to reach the inventory API and product catalogue
+# S3 Static Website for Customer React Frontend
 # ---------------------------------------------------------------------------
 
-resource "aws_security_group_rule" "inventory_api_from_ecs" {
-  type                     = "ingress"
-  from_port                = 9000
-  to_port                  = 9000
-  protocol                 = "tcp"
-  security_group_id        = aws_security_group.inventory_api.id
-  source_security_group_id = aws_security_group.employee_ecs.id
-  description              = "Inventory API from employee BFF ECS tasks"
-}
-
-# ---------------------------------------------------------------------------
-# S3 Static Website for Employee React Frontend
-# ---------------------------------------------------------------------------
-
-resource "aws_s3_bucket" "employee_site" {
-  bucket        = "${local.name_prefix}-employee-site-${local.account_id}"
+resource "aws_s3_bucket" "customer_site" {
+  bucket        = "${local.name_prefix}-customer-site-${local.account_id}"
   force_destroy = true
 
   tags = merge(local.common_tags, {
-    Name = "${local.name_prefix}-employee-site"
+    Name = "${local.name_prefix}-customer-site"
   })
 }
 
-resource "aws_s3_bucket_website_configuration" "employee_site" {
-  bucket = aws_s3_bucket.employee_site.id
+resource "aws_s3_bucket_website_configuration" "customer_site" {
+  bucket = aws_s3_bucket.customer_site.id
 
   index_document { suffix = "index.html" }
   error_document { key = "index.html" }
 }
 
-resource "aws_s3_bucket_public_access_block" "employee_site" {
-  bucket = aws_s3_bucket.employee_site.id
+resource "aws_s3_bucket_public_access_block" "customer_site" {
+  bucket = aws_s3_bucket.customer_site.id
 
   block_public_acls       = false
   block_public_policy     = false
@@ -274,9 +253,9 @@ resource "aws_s3_bucket_public_access_block" "employee_site" {
   restrict_public_buckets = false
 }
 
-resource "aws_s3_bucket_policy" "employee_site" {
-  bucket     = aws_s3_bucket.employee_site.id
-  depends_on = [aws_s3_bucket_public_access_block.employee_site]
+resource "aws_s3_bucket_policy" "customer_site" {
+  bucket     = aws_s3_bucket.customer_site.id
+  depends_on = [aws_s3_bucket_public_access_block.customer_site]
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -286,14 +265,14 @@ resource "aws_s3_bucket_policy" "employee_site" {
         Effect    = "Allow"
         Principal = "*"
         Action    = "s3:GetObject"
-        Resource  = "${aws_s3_bucket.employee_site.arn}/*"
+        Resource  = "${aws_s3_bucket.customer_site.arn}/*"
       }
     ]
   })
 }
 
-resource "aws_s3_bucket_cors_configuration" "employee_site" {
-  bucket = aws_s3_bucket.employee_site.id
+resource "aws_s3_bucket_cors_configuration" "customer_site" {
+  bucket = aws_s3_bucket.customer_site.id
 
   cors_rule {
     allowed_headers = ["*"]
@@ -307,22 +286,22 @@ resource "aws_s3_bucket_cors_configuration" "employee_site" {
 # Outputs
 # ---------------------------------------------------------------------------
 
-output "ecr_repository_url" {
-  description = "ECR repository URL for the employee BFF Docker image"
-  value       = aws_ecr_repository.employee_bff.repository_url
+output "customer_api_ecr_repository_url" {
+  description = "ECR repository URL for the customer API Docker image"
+  value       = aws_ecr_repository.customer_api.repository_url
 }
 
-output "employee_bff_alb_url" {
-  description = "URL of the employee BFF (ALB)"
-  value       = "http://${aws_lb.employee.dns_name}"
+output "customer_api_alb_url" {
+  description = "URL of the customer API (ALB)"
+  value       = "http://${aws_lb.customer.dns_name}"
 }
 
-output "employee_site_url" {
-  description = "URL of the employee React site (S3)"
-  value       = "http://${aws_s3_bucket_website_configuration.employee_site.website_endpoint}"
+output "customer_site_url" {
+  description = "URL of the customer React site (S3)"
+  value       = "http://${aws_s3_bucket_website_configuration.customer_site.website_endpoint}"
 }
 
-output "employee_site_bucket" {
-  description = "S3 bucket name for the employee React site"
-  value       = aws_s3_bucket.employee_site.id
+output "customer_site_bucket" {
+  description = "S3 bucket name for the customer React site"
+  value       = aws_s3_bucket.customer_site.id
 }

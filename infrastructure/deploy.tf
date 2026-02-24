@@ -27,41 +27,6 @@ resource "terraform_data" "upload_images_to_s3" {
   }
 }
 
-# Automatically deploy Product Catalogue after EC2 instance is created
-# This uses local-exec to run the deployment scripts from your local machine
-# terraform_data is the recommended built-in resource (replaces null_resource in Terraform v1.14+)
-resource "terraform_data" "deploy_product_catalogue" {
-  depends_on = [
-    aws_instance.product_catalogue,
-    terraform_data.upload_images_to_s3
-  ]
-
-  triggers_replace = [
-    aws_instance.product_catalogue.id,
-    aws_instance.product_catalogue.public_ip
-  ]
-
-  provisioner "local-exec" {
-    command = <<-EOT
-      set -e
-      PROJECT_ROOT="${abspath("${path.module}/..")}"
-      INFRA_DIR="${abspath(path.module)}"
-      cd "$PROJECT_ROOT"
-      echo "=========================================="
-      echo "TERRAFORM TRIGGERED DEPLOYMENT - PRODUCT CATALOGUE"
-      echo "=========================================="
-      echo "Making scripts executable..."
-      chmod +x scripts/package.sh scripts/deploy_remote.sh scripts/deploy.sh scripts/seed_dynamodb.sh
-      echo ""
-      echo "Building and packaging application..."
-      ./scripts/package.sh
-      echo ""
-      echo "Deploying to EC2 instance (DynamoDB will be seeded on EC2)..."
-      INFRASTRUCTURE_DIR="$INFRA_DIR" ./scripts/deploy_remote.sh
-    EOT
-  }
-}
-
 # Automatically deploy Inventory API after EC2 instance is created
 resource "terraform_data" "deploy_inventory_api" {
   depends_on = [aws_instance.inventory_api]
@@ -102,7 +67,6 @@ resource "terraform_data" "seed_dynamodb" {
     aws_dynamodb_table.stores,
     aws_dynamodb_table.products_by_store,
     aws_dynamodb_table.categories,
-    terraform_data.deploy_product_catalogue,
     terraform_data.deploy_inventory_api
   ]
 
@@ -170,6 +134,41 @@ resource "terraform_data" "deploy_employee_site" {
       ECS_CLUSTER="${aws_ecs_cluster.employee.name}" \
       ECS_SERVICE="${aws_ecs_service.employee_bff.name}" \
       ./scripts/deploy_employee_site.sh
+    EOT
+  }
+}
+
+# Automatically deploy the Customer Site after all its infrastructure is ready
+resource "terraform_data" "deploy_customer_site" {
+  depends_on = [
+    aws_ecr_repository.customer_api,
+    aws_ecs_cluster.customer,
+    aws_ecs_service.customer_api,
+    aws_s3_bucket_policy.customer_site,
+    terraform_data.seed_dynamodb,
+  ]
+
+  triggers_replace = [
+    aws_ecr_repository.customer_api.repository_url,
+    aws_ecs_service.customer_api.id,
+    aws_s3_bucket.customer_site.id,
+  ]
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      set -e
+      PROJECT_ROOT="${abspath("${path.module}/..")}"
+      cd "$PROJECT_ROOT"
+      echo "Making deploy script executable..."
+      chmod +x scripts/deploy_customer_site.sh
+      echo ""
+      ECR_REPOSITORY_URL="${aws_ecr_repository.customer_api.repository_url}" \
+      AWS_REGION="${var.aws_region}" \
+      CUSTOMER_API_ALB_URL="http://${aws_lb.customer.dns_name}" \
+      CUSTOMER_SITE_BUCKET="${aws_s3_bucket.customer_site.id}" \
+      ECS_CLUSTER="${aws_ecs_cluster.customer.name}" \
+      ECS_SERVICE="${aws_ecs_service.customer_api.name}" \
+      ./scripts/deploy_customer_site.sh
     EOT
   }
 }

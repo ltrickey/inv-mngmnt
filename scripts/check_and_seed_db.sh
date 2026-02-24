@@ -15,7 +15,7 @@ echo "=========================================="
 # Get configuration from Terraform
 NAME_PREFIX=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw name_prefix 2>/dev/null || echo "")
 AWS_REGION=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw aws_region 2>/dev/null || echo "us-east-1")
-EC2_PUBLIC_DNS=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw ec2_instance_public_dns 2>/dev/null || echo "")
+EC2_PUBLIC_DNS=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw inventory_api_public_dns 2>/dev/null || echo "")
 KEY_PAIR=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw ec2_key_pair 2>/dev/null || echo "vockey")
 
 if [ -z "$NAME_PREFIX" ]; then
@@ -98,10 +98,10 @@ else
     echo "✓ All tables have data"
 fi
 
-# Restart Flask service on EC2 to pick up any changes
+# Optionally restart Inventory API on EC2 to pick up any changes
 if [ -n "$EC2_PUBLIC_DNS" ]; then
     echo ""
-    read -p "Restart Flask service on EC2 to reload configuration? (y/n) " -n 1 -r
+    read -p "Restart Inventory API service on EC2? (y/n) " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         # Find SSH key
@@ -117,19 +117,19 @@ if [ -n "$EC2_PUBLIC_DNS" ]; then
             exit 1
         fi
         
-        echo "Restarting Flask service..."
+        echo "Restarting Inventory API service..."
         ssh -i "$SSH_KEY" \
             -o StrictHostKeyChecking=no \
             -o UserKnownHostsFile=/dev/null \
             ec2-user@"$EC2_PUBLIC_DNS" \
-            "sudo systemctl restart product_catalogue_flask"
+            "sudo systemctl restart inventory_api"
         
         if [ $? -eq 0 ]; then
-            echo "✓ Flask service restarted"
+            echo "✓ Inventory API service restarted"
             echo ""
-            echo "Service URL: http://$EC2_PUBLIC_DNS:8000"
+            echo "Inventory API URL: http://$EC2_PUBLIC_DNS:9000"
         else
-            echo "✗ Failed to restart Flask service"
+            echo "✗ Failed to restart Inventory API service"
         fi
     fi
 fi
