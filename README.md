@@ -3,36 +3,124 @@ Homework series for CPSC 5910 Cloud Computing Seattle University
 
 By Lynn Trickey with assistance from Cursor AI agent
 
-## Testing for Employee Website Homework
 **Changed since last homework submission**
 * Moved customer site backend from EC2 to docker image with ECR & ECS
-* Moved front end to S3 bucket
-* Changed S3 bucket hosting images to public to increase load time - extra security not needed.
+* Moved custoer site front end to S3 bucket hosting
+* Changed S3 bucket hosting images to public to decrease load time - extra security not needed.
+* Added employee site with inventory management functionality & cognito auth
 
-### Prereqesites
-- AWS credentials set
-- Install jq 
-- Install Docker Desktop
+## Testing for Inventory Management Tool
 
-### How to test
+### Prerequisites
+
+Everything below must be installed and configured on your local machine for the deployment and scripts to work.
+
+- **AWS credentials** — Set as environment variables or in `~/.aws/credentials`. See [Pre-Deployment Setup](#pre-deployment-setup) and [Getting AWS Credentials](#getting-aws-credentials).
+- **Terraform** — Used by `terraform apply` and by scripts that read Terraform outputs.
+- **AWS CLI** — Used by deploy scripts, `create_employee_user.sh`, `seed_dynamodb.sh`, and others. Configure with the same credentials as above.
+- **Node.js 18+** and **npm** — Used to build the customer and employee React frontends during deploy.
+- **jq** — Required by `seed_dynamodb.sh` (and by Terraform-triggered seeding during `terraform apply`).
+- **Docker Desktop** — Must be installed and running. Used to build and push container images to ECR for the customer and employee sites.
+- **SSH key** — Required for Inventory API EC2 deployment and for `check_status.sh` / `check_and_seed_db.sh`. See [SSH Key Setup](#ssh-key-setup).
+
+Optional for some scripts: **Python 3** (e.g. for `test_api_gateway.sh` and manual Inventory API packaging).
+
+#### Installing jq
+
+**macOS (Homebrew):**
+```bash
+brew install jq
+```
+
+**Windows (PowerShell as Administrator):**
+- Using Chocolatey: `choco install jq`
+- Using winget: `winget install jq.jq`
+- Or download the Windows binary from [jqlang.github.io/jq](https://jqlang.github.io/jq/) and add the folder containing `jq.exe` to your PATH.
+
+**Linux:**
+- Debian/Ubuntu: `sudo apt-get update && sudo apt-get install -y jq`
+- RHEL/CentOS/Fedora: `sudo yum install -y jq` or `sudo dnf install -y jq`
+- Arch: `sudo pacman -S jq`
+
+Verify: `jq --version`
+
+#### Installing Docker Desktop
+
+**macOS:**
+- Download the appropriate installer (Apple Silicon or Intel) from [Docker Desktop for Mac](https://docs.docker.com/desktop/install/mac-install/).
+- Open the `.dmg`, drag Docker to Applications, then open Docker from Applications. Allow privileged helper when prompted.
+- Ensure Docker is running (whale icon in the menu bar) before running `terraform apply` or deploy scripts.
+
+**Windows:**
+- Download the installer from [Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/). You need WSL 2; the installer can enable it.
+- Run the installer, restart if asked, then start “Docker Desktop” from the Start menu.
+- Ensure Docker is running before `terraform apply` or deploy scripts.
+
+**Linux:**
+- Follow [Install Docker Engine](https://docs.docker.com/engine/install/) for your distribution. For the full Desktop experience (GUI), use [Docker Desktop for Linux](https://docs.docker.com/desktop/install/linux-install/).
+- Start the Docker service (e.g. `sudo systemctl start docker` or start Docker Desktop) before running Terraform or deploy scripts.
+
+Verify: `docker run hello-world`
+
+#### Other tools (Terraform, AWS CLI, Node.js)
+
+- **Terraform:** [Install Terraform](https://developer.hashicorp.com/terraform/downloads) — e.g. macOS: `brew install terraform`; Windows: `choco install terraform` or download the binary.
+- **AWS CLI:** [Install or update the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) — e.g. macOS: `brew install awscli`; Windows: `msi` installer or `pip install awscli`.
+- **Node.js:** [Node.js downloads](https://nodejs.org/) (LTS 18+). macOS: `brew install node`; Windows: use the installer or `winget install OpenJS.NodeJS.LTS`.
+
+### TESTING STEPS FOR GRADERS
 1. Follow pre-deployment setup instructions to set SSH key and AWS credentials (if not already set)
-2. Make sure Docker Desktop is running
-3. Deploy app to AWS: 
-```bash
-cd /infrastructure
-terraform init
-terraform apply
-```
-(See [Deployment Process](#deployment-process) for more detailed instructions)
+1. Make sure Docker Desktop is running
+1. Deploy app to AWS: 
+   ```bash
+   cd /infrastructure
+   terraform init
+   terraform apply
+   ```
+   (See [Deployment Process](#deployment-process) for more detailed instructions)
 
-3. Test new API gateway endpoints by running test_api_gateway.sh locally in terminal.  Script runs locally in terminal and fetches API endpoint and API key from Terraform outputs.
+1. Once deployment is complete, Create user in Cognito User pool for new Employee website, submitting an email to create a user with.
 
-```bash
-cd .. # go to root directory
-./scripts/test_api_gateway.sh
-```
+   ```bash
+   cd .. # go to root directory
+   ./scripts/create_employee_user.sh --email <ENTER YOUR EMAIL HERE>
+   ```
 
-4. Hit updated Website endpoint at customer_site_url in outputs, functionality should be unchanged - search for products or products in a given store.
+   Output should look like this:
+   ```bash
+   User created successfully!
+   Username:           your_email
+   Email:              your_email
+   Temporary password: j8@wVFbN0j7T
+   Status:             FORCE_CHANGE_PASSWORD
+   ```
+
+1. Use the temporary password to login at the employee site url (part of terraform outputs).  It should be in this format:
+   ```
+   employee_site_url = "http://product-catalogue-test-employee-site-<aws_account_id>.s3-website-us-east-1.amazonaws.com"
+   ````
+
+1. Once logged in, choose a store and verify that you can:
+   1. List all products in stock by a given store (select store in drop down)
+   1. Edit quantity of what is in stock (Edit Qty button)
+   1. Remove an item from being in stock at a store (Remove button or set Qty to 0)
+   1. Add a product to this store (Select add product, Select product from drop down, enter store price, click add product)
+
+1. Verify that inventory changes made in the employee website are reflected in the customer website. 
+   1. Find customer_site_url from terraform output.  It will look like: 
+      ```
+      customer_site_url = "http://product-catalogue-test-customer-site-<aws-id>.s3-website-us-east-1.amazonaws.com"
+      ```
+   1. Hit the customer site, load the store you updated, and verify that the quantity matches.  Other functionality should be unchanged - search for products by category, etc.
+
+
+1. Verify API Gateway endpoints still work (previous assignment, optional)
+
+   ```bash
+   cd .. # go to root directory
+   ./scripts/test_api_gateway.sh
+   ```
+
 
 ## Pre-Deployment Setup
 **AWS Credentials and SSH Key are required to run Terraform Deployment**
