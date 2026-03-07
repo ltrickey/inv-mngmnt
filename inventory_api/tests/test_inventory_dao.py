@@ -11,7 +11,7 @@ from fastapi import HTTPException
 import boto3
 from moto import mock_aws
 
-from dao import InventoryItem, InventoryDAOJson, InventoryDAODynamoDB
+from inventory_dao import InventoryItem, InventoryDAOJson, InventoryDAODynamoDB
 
 
 # ============================================================================
@@ -307,7 +307,7 @@ class TestInventoryDAODynamoDB:
         table_name, client = mock_dynamodb_table
         
         # Patch the imported variable
-        with patch('dao.PRODUCTS_BY_STORE_TABLE', table_name):
+        with patch('inventory_dao.PRODUCTS_BY_STORE_TABLE', table_name):
             dao = InventoryDAODynamoDB(table_name, client)
             items = dao.get_all_by_store_id("store1")
         
@@ -319,7 +319,7 @@ class TestInventoryDAODynamoDB:
         """Test retrieving inventory for a store with no items."""
         table_name, client = mock_dynamodb_table
         
-        with patch('dao.PRODUCTS_BY_STORE_TABLE', table_name):
+        with patch('inventory_dao.PRODUCTS_BY_STORE_TABLE', table_name):
             dao = InventoryDAODynamoDB(table_name, client)
             items = dao.get_all_by_store_id("store999")
         
@@ -329,7 +329,7 @@ class TestInventoryDAODynamoDB:
         """Test retrieving a specific inventory item from DynamoDB."""
         table_name, client = mock_dynamodb_table
         
-        with patch('dao.PRODUCTS_BY_STORE_TABLE', table_name):
+        with patch('inventory_dao.PRODUCTS_BY_STORE_TABLE', table_name):
             dao = InventoryDAODynamoDB(table_name, client)
             item = dao.get_by_store_id_and_barcode("store1", "12345")
         
@@ -343,7 +343,7 @@ class TestInventoryDAODynamoDB:
         """Test retrieving a non-existent inventory item from DynamoDB."""
         table_name, client = mock_dynamodb_table
         
-        with patch('dao.PRODUCTS_BY_STORE_TABLE', table_name):
+        with patch('inventory_dao.PRODUCTS_BY_STORE_TABLE', table_name):
             dao = InventoryDAODynamoDB(table_name, client)
             
             with pytest.raises(HTTPException) as exc_info:
@@ -355,7 +355,7 @@ class TestInventoryDAODynamoDB:
         """Test successfully deducting quantity from DynamoDB inventory."""
         table_name, client = mock_dynamodb_table
         
-        with patch('dao.PRODUCTS_BY_STORE_TABLE', table_name):
+        with patch('inventory_dao.PRODUCTS_BY_STORE_TABLE', table_name):
             dao = InventoryDAODynamoDB(table_name, client)
             
             result = dao.deduct_quantity("store1", "12345", 30)
@@ -369,7 +369,7 @@ class TestInventoryDAODynamoDB:
         """Test deducting more quantity than available from DynamoDB."""
         table_name, client = mock_dynamodb_table
         
-        with patch('dao.PRODUCTS_BY_STORE_TABLE', table_name):
+        with patch('inventory_dao.PRODUCTS_BY_STORE_TABLE', table_name):
             dao = InventoryDAODynamoDB(table_name, client)
             
             with pytest.raises(HTTPException) as exc_info:
@@ -385,7 +385,7 @@ class TestInventoryDAODynamoDB:
         """Test deducting quantity from non-existent DynamoDB item."""
         table_name, client = mock_dynamodb_table
         
-        with patch('dao.PRODUCTS_BY_STORE_TABLE', table_name):
+        with patch('inventory_dao.PRODUCTS_BY_STORE_TABLE', table_name):
             dao = InventoryDAODynamoDB(table_name, client)
             
             with pytest.raises(HTTPException) as exc_info:
@@ -397,7 +397,7 @@ class TestInventoryDAODynamoDB:
         """Test successfully deducting multiple items in DynamoDB transaction."""
         table_name, client = mock_dynamodb_table
         
-        with patch('dao.PRODUCTS_BY_STORE_TABLE', table_name):
+        with patch('inventory_dao.PRODUCTS_BY_STORE_TABLE', table_name):
             dao = InventoryDAODynamoDB(table_name, client)
             
             items_to_deduct = [
@@ -419,7 +419,7 @@ class TestInventoryDAODynamoDB:
         """Test deducting with empty list in DynamoDB."""
         table_name, client = mock_dynamodb_table
         
-        with patch('dao.PRODUCTS_BY_STORE_TABLE', table_name):
+        with patch('inventory_dao.PRODUCTS_BY_STORE_TABLE', table_name):
             dao = InventoryDAODynamoDB(table_name, client)
             
             result = dao.deduct_quantities("store1", [])
@@ -429,7 +429,7 @@ class TestInventoryDAODynamoDB:
         """Test batch deduction with insufficient stock in DynamoDB (atomic failure)."""
         table_name, client = mock_dynamodb_table
         
-        with patch('dao.PRODUCTS_BY_STORE_TABLE', table_name):
+        with patch('inventory_dao.PRODUCTS_BY_STORE_TABLE', table_name):
             dao = InventoryDAODynamoDB(table_name, client)
             
             items_to_deduct = [

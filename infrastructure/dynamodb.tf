@@ -65,6 +65,48 @@ resource "aws_dynamodb_table" "products_by_store" {
   }
 }
 
+# Sales Events Table - records each inventory deduction (i.e. a sale) for reporting
+# PK: store_id + SK: sale_id (ISO UTC timestamp + "#" + UUID) → time-range queries per store
+# GSI on barcode → time-range queries per product (used for category-level reports)
+resource "aws_dynamodb_table" "sales_events" {
+  name         = "${local.name_prefix}-sales_events"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "store_id"
+  range_key    = "sale_id"
+
+  attribute {
+    name = "store_id"
+    type = "S"
+  }
+
+  # Format: "YYYY-MM-DDTHH:mm:ss.ffffffZ#<uuid4>" — sortable by time, unique per event
+  attribute {
+    name = "sale_id"
+    type = "S"
+  }
+
+  attribute {
+    name = "barcode"
+    type = "S"
+  }
+
+  # Allows querying all sales for a specific product across stores (for category reports)
+  global_secondary_index {
+    name            = "GSI_Barcode"
+    hash_key        = "barcode"
+    range_key       = "sale_id"
+    projection_type = "ALL"
+  }
+
+  # Streams enable future Lambda triggers (e.g. real-time report generation)
+  stream_enabled   = true
+  stream_view_type = "NEW_IMAGE"
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-sales-events"
+  })
+}
+
 resource "aws_dynamodb_table" "categories" {
   # NOTE: App code and seed script use a fixed, unprefixed categories table name.
   # See `server/data.py` (DYNAMODB_CATEGORIES_TABLE = 'categories') and `scripts/seed_dynamodb.sh`.

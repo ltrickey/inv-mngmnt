@@ -41,6 +41,8 @@ rm -rf "$OUTPUT_DIR/__pycache__"
 rm -rf "$OUTPUT_DIR/*.pyc"
 # Remove .env file (will be created on EC2 with production settings)
 rm -f "$OUTPUT_DIR/.env"
+# Remove tests directory — not needed on EC2
+rm -rf "$OUTPUT_DIR/tests"
 echo "  → Inventory API files packaged (will be at /opt/inventory_api/ on EC2)"
 
 # Copy deployment script (standalone script to run on EC2)

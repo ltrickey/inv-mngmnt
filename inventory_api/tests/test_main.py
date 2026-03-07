@@ -9,7 +9,7 @@ from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
 
 from main import app
-from dao import InventoryItem
+from inventory_dao import InventoryItem
 
 
 @pytest.fixture

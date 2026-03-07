@@ -1,10 +1,12 @@
+from datetime import datetime, timezone
 from typing import List, Optional
 
 from fastapi import FastAPI, Query
 from pydantic import BaseModel, Field
 
-from inventory import get_inventory_DAO, getMode
-from dao import InventoryDeductionItem, InventoryItem
+from inventory import get_inventory_DAO, get_sales_dao, getMode
+from inventory_dao import InventoryDeductionItem, InventoryItem
+from sales_dao import SaleEvent
 
 
 
@@ -316,4 +318,117 @@ def deduct_product_quantities_batch(
         store_id=store_id,
         items_updated=len(updated_items),
         items=updated_items
+    )
+
+
+# ============================================================================
+# POS (Point of Sale) Endpoints
+# ============================================================================
+
+class POSSaleItem(BaseModel):
+    """One line item in a POS sale basket."""
+    barcode: str
+    quantity: int = Field(..., gt=0, description="Quantity sold (must be positive)")
+
+
+class POSSaleRequest(BaseModel):
+    """A full basket submitted by a POS terminal at checkout."""
+    transaction_id: str = Field(..., description="Unique transaction ID from the POS terminal")
+    items: List[POSSaleItem] = Field(..., min_length=1, description="Line items in the basket")
+
+
+class POSSaleLineResult(BaseModel):
+    barcode: str
+    quantity: int
+    unit_price: float
+    revenue: float
+    new_inventory_quantity: int
+
+
+class POSSaleResponse(BaseModel):
+    success: bool
+    store_id: str
+    transaction_id: str
+    items: List[POSSaleLineResult]
+    total_revenue: float
+
+
+@app.post("/api/pos/sale/{store_id}", response_model=POSSaleResponse, status_code=201)
+def record_pos_sale(store_id: str, request: POSSaleRequest):
+    """
+    Record a full POS basket sale for a store.
+
+    This endpoint:
+    1. Looks up the current price for each item in the basket
+    2. Atomically deducts all inventory quantities (all-or-nothing)
+    3. Persists a SaleEvent per line item (keyed by transaction_id) for report generation
+
+    Args:
+        store_id: The store submitting the sale
+        request: POSSaleRequest with a POS-supplied transaction_id and list of line items
+
+    Returns:
+        POSSaleResponse with per-item unit prices, revenues, and updated inventory quantities
+
+    Raises:
+        400: If any item has insufficient inventory (nothing is deducted)
+        404: If any barcode is not found in this store's inventory (nothing is deducted)
+        409: If transaction_id has already been recorded (idempotency guard)
+    """
+    dao = get_inventory_DAO()
+    sales_dao = get_sales_dao()
+
+    # Capture a single timestamp for the whole transaction so all line items share it
+    sale_timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+
+    # 1. Fetch current price/percent_off for each item (before deduction)
+    #    This also serves as an early 404 check — raises HTTPException if any barcode is missing.
+    inventory_items = {
+        item.barcode: dao.get_by_store_id_and_barcode(store_id, item.barcode)
+        for item in request.items
+    }
+
+    # 2. Atomically deduct all inventory quantities
+    items_to_deduct = [
+        InventoryDeductionItem(store_id=store_id, barcode=item.barcode, quantity=item.quantity)
+        for item in request.items
+    ]
+    dao.deduct_quantities(store_id, items_to_deduct)
+
+    # 3. Build sale events and response items
+    sale_events = []
+    result_items = []
+    for item in request.items:
+        inv = inventory_items[item.barcode]
+        unit_price = round(inv.price * (100 - inv.percent_off) / 100, 2)
+        revenue = round(unit_price * item.quantity, 2)
+
+        sale_events.append(SaleEvent(
+            store_id=store_id,
+            sale_id=f"{sale_timestamp}#{request.transaction_id}#{item.barcode}",
+            transaction_id=request.transaction_id,
+            barcode=item.barcode,
+            quantity=item.quantity,
+            unit_price=unit_price,
+            revenue=revenue,
+        ))
+
+        updated = dao.get_by_store_id_and_barcode(store_id, item.barcode)
+        result_items.append(POSSaleLineResult(
+            barcode=item.barcode,
+            quantity=item.quantity,
+            unit_price=unit_price,
+            revenue=revenue,
+            new_inventory_quantity=updated.quantity,
+        ))
+
+    # 4. Persist all sale events in one batch write
+    sales_dao.record_sales(sale_events)
+
+    return POSSaleResponse(
+        success=True,
+        store_id=store_id,
+        transaction_id=request.transaction_id,
+        items=result_items,
+        total_revenue=round(sum(i.revenue for i in result_items), 2),
     )

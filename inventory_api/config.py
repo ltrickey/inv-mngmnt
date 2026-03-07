@@ -38,3 +38,4 @@ def _dynamodb_table_suffix(products_table: str, suffix: str) -> str:
 
 
 PRODUCTS_BY_STORE_TABLE = _dynamodb_table_suffix(DYNAMODB_PRODUCTS_TABLE, "-products_by_store")
+SALES_EVENTS_TABLE = _dynamodb_table_suffix(DYNAMODB_PRODUCTS_TABLE, "-sales_events")

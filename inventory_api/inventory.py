@@ -5,8 +5,9 @@ Provides factory function to get the appropriate DAO implementation.
 import os
 import boto3
 
-from config import USE_DYNAMODB, PRODUCTS_BY_STORE_TABLE, PRODUCTS_BY_STORE_FILE
-from dao import InventoryDAO, InventoryDAODynamoDB, InventoryDAOJson
+from config import USE_DYNAMODB, PRODUCTS_BY_STORE_TABLE, PRODUCTS_BY_STORE_FILE, SALES_EVENTS_TABLE
+from inventory_dao import InventoryDAO, InventoryDAODynamoDB, InventoryDAOJson
+from sales_dao import SalesEventDAO, SalesEventDAODynamoDB, SalesEventDAONoop
 
 
 def _get_dynamodb_client():
@@ -21,6 +22,14 @@ DYNAMODB_CLIENT = _get_dynamodb_client()
 def getMode():
     """Return the current mode (dynamodb or json)."""
     return "dynamodb" if USE_DYNAMODB else "json"
+
+
+def get_sales_dao() -> SalesEventDAO:
+    """Factory function to get the appropriate SalesEventDAO based on configuration."""
+    if USE_DYNAMODB and SALES_EVENTS_TABLE and DYNAMODB_CLIENT:
+        return SalesEventDAODynamoDB(SALES_EVENTS_TABLE, DYNAMODB_CLIENT)
+    else:
+        return SalesEventDAONoop()
 
 
 def get_inventory_DAO() -> InventoryDAO:
