@@ -69,3 +69,18 @@ output "cognito_app_client_id" {
   description = "Cognito App Client ID for the employee site SPA"
   value       = aws_cognito_user_pool_client.employee_site.id
 }
+
+output "report_lambda_arn" {
+  description = "ARN of the report generator Lambda function"
+  value       = aws_lambda_function.report_generator.arn
+}
+
+output "report_schedule_group_name" {
+  description = "EventBridge Scheduler group name for report schedules"
+  value       = aws_scheduler_schedule_group.reports.name
+}
+
+output "reports_bucket_name" {
+  description = "S3 bucket name for generated report CSV files"
+  value       = aws_s3_bucket.reports.id
+}

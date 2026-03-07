@@ -83,6 +83,12 @@ resource "aws_ecs_task_definition" "employee_bff" {
         { name = "AWS_REGION", value = var.aws_region },
         { name = "PRODUCT_CATALOGUE_API_URL", value = "http://${aws_lb.customer.dns_name}" },
         { name = "INVENTORY_API_URL", value = "http://${aws_instance.inventory_api.private_ip}:9000" },
+        { name = "REPORT_SCHEDULES_TABLE", value = aws_dynamodb_table.report_schedules.name },
+        { name = "REPORT_RESULTS_TABLE", value = aws_dynamodb_table.report_results.name },
+        { name = "REPORTS_BUCKET", value = aws_s3_bucket.reports.id },
+        { name = "REPORT_LAMBDA_ARN", value = aws_lambda_function.report_generator.arn },
+        { name = "REPORT_SCHEDULE_GROUP", value = aws_scheduler_schedule_group.reports.name },
+        { name = "LAB_ROLE_ARN", value = data.aws_iam_role.ec2_role.arn },
       ]
 
       logConfiguration = {

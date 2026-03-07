@@ -3,11 +3,13 @@ import Login from './components/Login'
 import StoreSelector from './components/StoreSelector'
 import StockTable from './components/StockTable'
 import AddProductModal from './components/AddProductModal'
+import ReportsPage from './pages/ReportsPage'
 import { getCurrentUser, logout, isConfigured } from './auth'
 import { fetchStores, fetchProducts, fetchInventory } from './api'
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(!isConfigured() || !!getCurrentUser())
+  const [activeTab, setActiveTab] = useState('inventory')
   const [stores, setStores] = useState([])
   const [storesLoading, setStoresLoading] = useState(false)
   const [selectedStoreId, setSelectedStoreId] = useState(null)
@@ -81,49 +83,69 @@ function App() {
     <div className="app">
       <header className="app-header">
         <h1>Inventory Manager</h1>
+        <nav className="tab-nav">
+          <button
+            className={`btn ${activeTab === 'inventory' ? 'btn-add' : ''}`}
+            onClick={() => setActiveTab('inventory')}
+          >
+            Inventory
+          </button>
+          <button
+            className={`btn ${activeTab === 'reports' ? 'btn-add' : ''}`}
+            onClick={() => setActiveTab('reports')}
+          >
+            Reports
+          </button>
+        </nav>
         <button onClick={handleLogout} className="btn btn-logout">Sign Out</button>
       </header>
 
-      <StoreSelector
-        stores={stores}
-        selectedStoreId={selectedStoreId}
-        onChange={setSelectedStoreId}
-        loading={storesLoading}
-      />
-
-      {error && <p className="error">{error}</p>}
-
-      {selectedStoreId && (
+      {activeTab === 'reports' ? (
+        <ReportsPage />
+      ) : (
         <>
-          <div className="toolbar">
-            <button onClick={() => setShowAdd(true)} className="btn btn-add">
-              + Add Product
-            </button>
-            <button onClick={loadInventory} className="btn" disabled={invLoading}>
-              Refresh
-            </button>
-          </div>
+          <StoreSelector
+            stores={stores}
+            selectedStoreId={selectedStoreId}
+            onChange={setSelectedStoreId}
+            loading={storesLoading}
+          />
 
-          {invLoading ? (
-            <p>Loading inventory...</p>
-          ) : (
-            <StockTable
-              inventory={inventory}
+          {error && <p className="error">{error}</p>}
+
+          {selectedStoreId && (
+            <>
+              <div className="toolbar">
+                <button onClick={() => setShowAdd(true)} className="btn btn-add">
+                  + Add Product
+                </button>
+                <button onClick={loadInventory} className="btn" disabled={invLoading}>
+                  Refresh
+                </button>
+              </div>
+
+              {invLoading ? (
+                <p>Loading inventory...</p>
+              ) : (
+                <StockTable
+                  inventory={inventory}
+                  products={products}
+                  onRefresh={loadInventory}
+                />
+              )}
+            </>
+          )}
+
+          {showAdd && (
+            <AddProductModal
               products={products}
+              inventory={inventory}
+              storeId={selectedStoreId}
+              onClose={() => setShowAdd(false)}
               onRefresh={loadInventory}
             />
           )}
         </>
-      )}
-
-      {showAdd && (
-        <AddProductModal
-          products={products}
-          inventory={inventory}
-          storeId={selectedStoreId}
-          onClose={() => setShowAdd(false)}
-          onRefresh={loadInventory}
-        />
       )}
     </div>
   )

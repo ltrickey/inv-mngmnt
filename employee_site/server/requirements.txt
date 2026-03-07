@@ -4,3 +4,4 @@ requests
 PyJWT[crypto]
 gunicorn
 python-dotenv
+boto3

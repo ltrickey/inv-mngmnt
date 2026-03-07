@@ -13,22 +13,33 @@ from sales_dao import SaleEvent
 app = FastAPI(
     title="Inventory Service",
     description="""
-    Inventory API backed by DynamoDB products_by_store table.
-    
-    ## External API Endpoints
-    
-    This service provides externally-facing API endpoints for:
-    - Checking stock availability
-    - Getting product prices with sales applied
-    - Deducting inventory quantities (single and batch)
-    
-    All external endpoints are prefixed with `/api/inventory/`.
+Manages per-store inventory and records point-of-sale transactions.
+
+## Endpoint Groups
+
+- **Health** — liveness check
+- **Inventory (Internal)** — CRUD used by the employee site backend
+- **Inventory (External)** — read-only + deduct endpoints for external vendors (fronted by API Gateway)
+- **POS** — basket checkout: atomically deducts inventory and writes sale events for reporting
+
+## Design Notes
+
+Sales recording is co-located with inventory management so that inventory deduction and
+sale event creation can be executed in a single atomic DynamoDB transaction. This is
+intentional — the sales data is used for financial reporting and must be consistent with
+the inventory state at the moment of sale.
     """,
-    version="1.0.0",
+    version="1.1.0",
+    openapi_tags=[
+        {"name": "Health"},
+        {"name": "Inventory (Internal)", "description": "Used by the employee site BFF"},
+        {"name": "Inventory (External)", "description": "Vendor-facing endpoints, fronted by API Gateway"},
+        {"name": "POS", "description": "Point-of-sale checkout — atomic deduction + sale recording"},
+    ],
 )
 
 
-@app.get("/health")
+@app.get("/health", tags=["Health"])
 def health():
     return {
         "status": "ok",
@@ -36,7 +47,7 @@ def health():
     }
 
 
-@app.get("/inventory/{store_id}")
+@app.get("/inventory/{store_id}", tags=["Inventory (Internal)"])
 def list_inventory_for_store(store_id: str) -> List[InventoryItem]:
     """
     Return all inventory rows for a given store_id.
@@ -46,7 +57,7 @@ def list_inventory_for_store(store_id: str) -> List[InventoryItem]:
     return get_inventory_DAO().get_all_by_store_id(store_id)
 
 
-@app.get("/inventory/{store_id}/{barcode}")
+@app.get("/inventory/{store_id}/{barcode}", tags=["Inventory (Internal)"])
 def get_inventory_item(store_id: str, barcode: str) -> InventoryItem:
     """
     Return a single inventory row for (store_id, barcode) or 404 if not found.
@@ -70,7 +81,7 @@ class UpdateInventoryItemRequest(BaseModel):
     percent_off: Optional[int] = Field(None, ge=0, le=100)
 
 
-@app.post("/inventory/{store_id}/{barcode}", response_model=InventoryItem, status_code=201)
+@app.post("/inventory/{store_id}/{barcode}", response_model=InventoryItem, status_code=201, tags=["Inventory (Internal)"])
 def create_inventory_item(store_id: str, barcode: str, request: CreateInventoryItemRequest):
     """Add a product to a store's inventory. Returns 409 if it already exists."""
     item = InventoryItem(
@@ -83,7 +94,7 @@ def create_inventory_item(store_id: str, barcode: str, request: CreateInventoryI
     return get_inventory_DAO().create_item(item)
 
 
-@app.put("/inventory/{store_id}/{barcode}", response_model=InventoryItem)
+@app.put("/inventory/{store_id}/{barcode}", response_model=InventoryItem, tags=["Inventory (Internal)"])
 def update_inventory_item(store_id: str, barcode: str, request: UpdateInventoryItemRequest):
     """Update an existing stock record. quantity is required; price and percent_off are optional."""
     return get_inventory_DAO().update_item(
@@ -94,7 +105,7 @@ def update_inventory_item(store_id: str, barcode: str, request: UpdateInventoryI
     )
 
 
-@app.delete("/inventory/{store_id}/{barcode}", status_code=204)
+@app.delete("/inventory/{store_id}/{barcode}", status_code=204, tags=["Inventory (Internal)"])
 def delete_inventory_item(store_id: str, barcode: str):
     """Remove a product from a store's inventory. Returns 404 if not found."""
     get_inventory_DAO().delete_item(store_id, barcode)
@@ -159,7 +170,7 @@ class BatchDeductResponse(BaseModel):
 # External API Endpoints
 # ============================================================================
 
-@app.get("/api/inventory/{store_id}/{barcode}", response_model=StockCheckResponse)
+@app.get("/api/inventory/{store_id}/{barcode}", response_model=StockCheckResponse, tags=["Inventory (External)"])
 def check_stock_availability(
     store_id: str,
     barcode: str,
@@ -193,7 +204,7 @@ def check_stock_availability(
     )
 
 
-@app.get("/api/inventory/{store_id}/{barcode}/price", response_model=PriceResponse)
+@app.get("/api/inventory/{store_id}/{barcode}/price", response_model=PriceResponse, tags=["Inventory (External)"])
 def get_product_price(store_id: str, barcode: str):
     """
     Get the price of a given product at a given store, applying any relevant sales.
@@ -225,7 +236,7 @@ def get_product_price(store_id: str, barcode: str):
 
 
 #Using patch as it is updating the quantity of an item in the inventory.
-@app.patch("/api/inventory/{store_id}/{barcode}", response_model=DeductQuantityResponse)
+@app.patch("/api/inventory/{store_id}/{barcode}", response_model=DeductQuantityResponse, tags=["Inventory (External)"])
 def deduct_product_quantity(
     store_id: str,
     barcode: str,
@@ -266,7 +277,7 @@ def deduct_product_quantity(
     )
 
 
-@app.patch("/api/inventory/{store_id}", response_model=BatchDeductResponse)
+@app.patch("/api/inventory/{store_id}", response_model=BatchDeductResponse, tags=["Inventory (External)"])
 def deduct_product_quantities_batch(
     store_id: str,
     request: BatchDeductRequest
@@ -353,7 +364,7 @@ class POSSaleResponse(BaseModel):
     total_revenue: float
 
 
-@app.post("/api/pos/sale/{store_id}", response_model=POSSaleResponse, status_code=201)
+@app.post("/api/pos/sale/{store_id}", response_model=POSSaleResponse, status_code=201, tags=["POS"])
 def record_pos_sale(store_id: str, request: POSSaleRequest):
     """
     Record a full POS basket sale for a store.

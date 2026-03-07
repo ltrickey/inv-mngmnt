@@ -27,6 +27,7 @@ echo ""
 echo "Step 1: Building and pushing BFF Docker image..."
 echo "  ECR: $ECR_REPOSITORY_URL"
 
+docker logout "${ECR_REPOSITORY_URL%%/*}" 2>/dev/null || true
 aws ecr get-login-password --region "$AWS_REGION" \
   | docker login --username AWS --password-stdin "${ECR_REPOSITORY_URL%%/*}"
 

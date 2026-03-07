@@ -30,3 +30,25 @@ export const updateStockQuantity = (storeId, barcode, quantity) =>
 
 export const deleteStockItem = (storeId, barcode) =>
   authFetch(`/api/inventory/${storeId}/${barcode}`, { method: 'DELETE' })
+
+export const fetchCategories = () => authFetch('/api/categories')
+
+// Report scheduling
+export const fetchSchedules = () => authFetch('/api/reports/schedules')
+
+export const createSchedule = (body) =>
+  authFetch('/api/reports/schedules', { method: 'POST', body })
+
+export const deleteSchedule = (scheduleId) =>
+  authFetch(`/api/reports/schedules/${scheduleId}`, { method: 'DELETE' })
+
+export const fetchScheduleResults = (scheduleId) =>
+  authFetch(`/api/reports/schedules/${scheduleId}/results`)
+
+export const downloadReport = async (s3Key) => {
+  const { url } = await authFetch(`/api/reports/results/download?s3_key=${encodeURIComponent(s3Key)}`)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = s3Key.split('/').pop()
+  a.click()
+}

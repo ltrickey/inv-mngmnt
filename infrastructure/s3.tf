@@ -97,7 +97,39 @@ resource "aws_s3_bucket_lifecycle_configuration" "product_images" {
   }
 }
 
+# S3 bucket for storing generated report CSV files (private — accessed via presigned URLs)
+resource "aws_s3_bucket" "reports" {
+  bucket        = "${local.name_prefix}-reports-${local.account_id}"
+  force_destroy = true
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-reports"
+  })
+}
+
+resource "aws_s3_bucket_public_access_block" "reports" {
+  bucket = aws_s3_bucket.reports.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# CORS needed for presigned URL downloads initiated by the browser
+resource "aws_s3_bucket_cors_configuration" "reports" {
+  bucket = aws_s3_bucket.reports.id
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET"]
+    allowed_origins = ["*"]
+    max_age_seconds = 3000
+  }
+}
+
 locals {
   s3_bucket_name = aws_s3_bucket.product_images.id
   s3_bucket_url  = "https://${aws_s3_bucket.product_images.bucket}.s3.amazonaws.com"
+  reports_bucket = aws_s3_bucket.reports.id
 }

@@ -1,23 +1,33 @@
 ## Inventory API (FastAPI)
 
-This service exposes inventory data (per–store stock and sale price) backed by the DynamoDB `products_by_store` table.
+This service manages per-store inventory and records point-of-sale transactions. It is backed by two DynamoDB tables:
+
+- `products_by_store` — current inventory state (mutable)
+- `sales_events` — append-only log of sale transactions (used for reporting)
 
 It is designed to be fronted by API Gateway for external vendors, but can also be run directly on an EC2 instance or locally for development.
 
-### Table naming and configuration
+### Design Decisions
 
-The service follows the same convention as the Flask app:
+**Sales API is co-located with the Inventory API (not a separate service)**
 
-- `DYNAMODB_PRODUCTS_TABLE` – full products table name, e.g. `product-catalogue-test-products`
-- From that, the service derives:
-  - `products_by_store` table name as `<prefix>-products_by_store`
+The POS endpoint (`POST /api/pos/sale/{store_id}`) atomically deducts inventory and records the sale event in a single request using DynamoDB `transact_write_items`. Splitting these into separate services would require distributed transactions or an eventual-consistency saga pattern, which is inappropriate for data used in financial reporting.
 
-Environment variables:
+**Sales events are an append-only log (event sourcing)**
+
+Each sale records `unit_price` (the discounted price at time of sale). This ensures that historical revenue calculations remain accurate even if prices change later. The `sales_events` table is never mutated — only appended to.
+
+**One event record per basket line item**
+
+A POS basket with N distinct products generates N `SaleEvent` records, all sharing a `transaction_id` from the POS terminal. This allows efficient DynamoDB queries by product (via `GSI_Barcode`) during report generation.
+
+### Environment variables
 
 - **Required (one of):**
   - `DYNAMODB_PRODUCTS_TABLE` – e.g. `product-catalogue-test-products`, or
-  - `NAME_PREFIX` – e.g. `product-catalogue-test` (then `DYNAMODB_PRODUCTS_TABLE` is inferred as `<NAME_PREFIX>-products`)
+  - `NAME_PREFIX` – e.g. `product-catalogue-test` (tables are inferred as `<NAME_PREFIX>-products`, `<NAME_PREFIX>-products_by_store`, `<NAME_PREFIX>-sales_events`)
 - **Optional:**
+  - `SALES_EVENTS_TABLE` – overrides the inferred sales events table name
   - `AWS_REGION` or `AWS_DEFAULT_REGION` – if not set, boto3 will fall back to its default resolution
 
 ### Local development

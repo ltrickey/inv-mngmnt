@@ -107,6 +107,46 @@ resource "aws_dynamodb_table" "sales_events" {
   })
 }
 
+# Report Schedules Table - stores recurring report configurations created by employees
+# PK: schedule_id (UUID) — single-item lookups when Lambda runs or employee deletes
+resource "aws_dynamodb_table" "report_schedules" {
+  name         = "${local.name_prefix}-report_schedules"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "schedule_id"
+
+  attribute {
+    name = "schedule_id"
+    type = "S"
+  }
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-report-schedules"
+  })
+}
+
+# Report Results Table - one record per generated report CSV
+# PK: schedule_id + SK: generated_at — efficient listing of results per schedule (newest first)
+resource "aws_dynamodb_table" "report_results" {
+  name         = "${local.name_prefix}-report_results"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "schedule_id"
+  range_key    = "generated_at"
+
+  attribute {
+    name = "schedule_id"
+    type = "S"
+  }
+
+  attribute {
+    name = "generated_at"
+    type = "S"
+  }
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-report-results"
+  })
+}
+
 resource "aws_dynamodb_table" "categories" {
   # NOTE: App code and seed script use a fixed, unprefixed categories table name.
   # See `server/data.py` (DYNAMODB_CATEGORIES_TABLE = 'categories') and `scripts/seed_dynamodb.sh`.

@@ -4,10 +4,12 @@ Homework series for CPSC 5910 Cloud Computing Seattle University
 By Lynn Trickey with assistance from Cursor AI agent
 
 **Changed since last homework submission**
-* Moved customer site backend from EC2 to docker image with ECR & ECS
-* Moved custoer site front end to S3 bucket hosting
-* Changed S3 bucket hosting images to public to decrease load time - extra security not needed.
-* Added employee site with inventory management functionality & cognito auth
+* Added DynamoDB tables for sales records
+* Added API in inventory_api to record sales from store POS systems
+* Added view in employee_site to set up reports to run
+* Added Lambda to generate repts under report_lambda
+* Added EventBridge to schedule runing reports lambda
+* Added S3 Config to save & load past reports
 
 ## Testing for Inventory Management Tool
 
