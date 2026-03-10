@@ -11,7 +11,7 @@ By Lynn Trickey with assistance from Cursor AI agent
 * Added EventBridge to schedule runing reports lambda
 * Added S3 Config to save & load past reports
 
-## Testing for Inventory Management Tool
+## Testing for Report Manager
 
 1. Follow pre-deployment setup instructions to set SSH key and AWS credentials (if not already set)
 1. Make sure Docker Desktop is running
