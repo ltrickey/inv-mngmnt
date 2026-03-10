@@ -69,6 +69,13 @@ Resets inventory quantities after the traffic generator depletes stock.
 ./scripts/restock.sh --low-only --threshold 10
 ```
 
+1. Verify API Gateway endpoints still work (previous assignment, optional)
+
+   ```bash
+   cd .. # go to root directory
+   ./scripts/test_api_gateway.sh
+   ```
+
 ### Prerequisites
 
 Everything below must be installed and configured on your local machine for the deployment and scripts to work.
@@ -125,59 +132,6 @@ Verify: `docker run hello-world`
 - **Terraform:** [Install Terraform](https://developer.hashicorp.com/terraform/downloads) — e.g. macOS: `brew install terraform`; Windows: `choco install terraform` or download the binary.
 - **AWS CLI:** [Install or update the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) — e.g. macOS: `brew install awscli`; Windows: `msi` installer or `pip install awscli`.
 - **Node.js:** [Node.js downloads](https://nodejs.org/) (LTS 18+). macOS: `brew install node`; Windows: use the installer or `winget install OpenJS.NodeJS.LTS`.
-
-### TESTING STEPS FOR GRADERS
-1. Follow pre-deployment setup instructions to set SSH key and AWS credentials (if not already set)
-1. Make sure Docker Desktop is running
-1. Deploy app to AWS: 
-   ```bash
-   cd /infrastructure
-   terraform init
-   terraform apply
-   ```
-   (See [Deployment Process](#deployment-process) for more detailed instructions)
-
-1. Once deployment is complete, Create user in Cognito User pool for new Employee website, submitting an email to create a user with.
-
-   ```bash
-   cd .. # go to root directory
-   ./scripts/create_employee_user.sh --email <ENTER YOUR EMAIL HERE>
-   ```
-
-   Output should look like this:
-   ```bash
-   User created successfully!
-   Username:           your_email
-   Email:              your_email
-   Temporary password: j8@wVFbN0j7T
-   Status:             FORCE_CHANGE_PASSWORD
-   ```
-
-1. Use the temporary password to login at the employee site url (part of terraform outputs).  It should be in this format:
-   ```
-   employee_site_url = "http://product-catalogue-test-employee-site-<aws_account_id>.s3-website-us-east-1.amazonaws.com"
-   ````
-
-1. Once logged in, choose a store and verify that you can:
-   1. List all products in stock by a given store (select store in drop down)
-   1. Edit quantity of what is in stock (Edit Qty button)
-   1. Remove an item from being in stock at a store (Remove button or set Qty to 0)
-   1. Add a product to this store (Select add product, Select product from drop down, enter store price, click add product)
-
-1. Verify that inventory changes made in the employee website are reflected in the customer website. 
-   1. Find customer_site_url from terraform output.  It will look like: 
-      ```
-      customer_site_url = "http://product-catalogue-test-customer-site-<aws-id>.s3-website-us-east-1.amazonaws.com"
-      ```
-   1. Hit the customer site, load the store you updated, and verify that the quantity matches.  Other functionality should be unchanged - search for products by category, etc.
-
-
-1. Verify API Gateway endpoints still work (previous assignment, optional)
-
-   ```bash
-   cd .. # go to root directory
-   ./scripts/test_api_gateway.sh
-   ```
 
 
 ## Pre-Deployment Setup
