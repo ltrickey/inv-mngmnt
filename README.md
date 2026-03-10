@@ -58,7 +58,6 @@ All stores and products are eligible on every run; with enough calls (e.g. `--ca
 # Custom rate and call count
 ./scripts/traffic_generator.sh --calls 50 --rate 5
 ```
-
 1. Run restock if needed
 Resets inventory quantities after the traffic generator depletes stock.
 
@@ -68,17 +67,6 @@ Resets inventory quantities after the traffic generator depletes stock.
 
 # Restock only depleted items (quantity <= 10)
 ./scripts/restock.sh --low-only --threshold 10
-```
-
-
-* create employee user to login to site 
-```bash
-./scripts/create_employee_user.sh --email your@email.com
-```
-
-Once you have the user, hit the employee_site_url, login with temporary password
-```
-employee_site_url = "http://product-catalogue-test-employee-site-<aws_account_id>.s3-website-us-east-1.amazonaws.com"
 ```
 
 ### Prerequisites
