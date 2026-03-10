@@ -42,6 +42,15 @@ resource "aws_security_group" "inventory_api" {
     cidr_blocks = [data.aws_vpc.default.cidr_block]
   }
 
+  # Allow public internet access for local testing scripts
+  ingress {
+    description = "FastAPI public access for testing"
+    from_port   = 9000
+    to_port     = 9000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   # Allow SSH access for management
   ingress {
     description = "SSH"

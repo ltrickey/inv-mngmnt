@@ -69,11 +69,49 @@ This will:
 
 | Script | Description |
 |--------|-------------|
-| `deploy_all.sh` | Deploys both Product Catalogue and Inventory API |
+| `deploy_all.sh` | Deploys Inventory API, Customer Site, and Employee Site in sequence |
 | `create_employee_user.sh` | Creates a Cognito user for the employee site (requires AWS CLI) |
 | `seed_dynamodb.sh` | Seeds DynamoDB tables with initial data |
 | `check_status.sh` | Checks the status of running services |
-| `generate_product_images.py` | Generates product images (if needed) |
+| `terraform_import.sh` | Imports pre-existing AWS resources into Terraform state (use after state reset) |
+| `restock.sh` | Resets inventory quantities so the traffic generator can run again |
+| `traffic_generator.sh` | Simulates POS sales against the Inventory API at a configurable rate |
+
+### Traffic Generator
+
+Simulates realistic point-of-sale traffic across all stores and products.
+
+```bash
+# Default: 20 calls at 2/sec
+./scripts/traffic_generator.sh
+
+# Custom rate and call count
+./scripts/traffic_generator.sh --calls 50 --rate 5
+
+# Against a specific API URL
+./scripts/traffic_generator.sh --url http://1.2.3.4:9000 --calls 10 --rate 1
+```
+
+Each call picks a random store, fetches its in-stock inventory, and submits a basket of 1–3 random items. All stores and products are eligible on every run; with enough calls (e.g. `--calls 50` across 5 stores) coverage is well-distributed.
+
+**Prerequisites:** `curl`, `jq`, `uuidgen`
+
+### Restock
+
+Resets inventory quantities after the traffic generator depletes stock.
+
+```bash
+# Restock all items to 500 units (default)
+./scripts/restock.sh
+
+# Restock only depleted items (quantity <= 10)
+./scripts/restock.sh --low-only --threshold 10
+
+# Custom quantity and specific API URL
+./scripts/restock.sh --quantity 1000 --url http://1.2.3.4:9000
+```
+
+**Prerequisites:** `curl`, `jq`
 
 ## Prerequisites
 

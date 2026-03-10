@@ -26,7 +26,11 @@ echo ""
 echo "Step 1: Building and pushing Customer API Docker image..."
 echo "  ECR: $ECR_REPOSITORY_URL"
 
-docker logout "${ECR_REPOSITORY_URL%%/*}" 2>/dev/null || true
+# Use a temp Docker config dir to avoid macOS keychain conflicts
+DOCKER_TEMP_CONFIG=$(mktemp -d)
+echo '{"auths":{}}' > "$DOCKER_TEMP_CONFIG/config.json"
+export DOCKER_CONFIG="$DOCKER_TEMP_CONFIG"
+
 aws ecr get-login-password --region "$AWS_REGION" \
   | docker login --username AWS --password-stdin "${ECR_REPOSITORY_URL%%/*}"
 

@@ -13,6 +13,74 @@ By Lynn Trickey with assistance from Cursor AI agent
 
 ## Testing for Inventory Management Tool
 
+1. Follow pre-deployment setup instructions to set SSH key and AWS credentials (if not already set)
+1. Make sure Docker Desktop is running
+1. Deploy app to AWS: 
+   ```bash
+   cd /infrastructure
+   terraform init
+   terraform apply
+   ```
+   (See [Deployment Process](#deployment-process) for more detailed instructions)
+
+1. Once deployment is complete, Create user in Cognito User pool for new Employee website, submitting an email to create a user with.
+
+   ```bash
+   cd .. # go to root directory
+   ./scripts/create_employee_user.sh --email <ENTER YOUR EMAIL HERE>
+   ```
+
+   Output should look like this:
+   ```bash
+   User created successfully!
+   Username:           your_email
+   Email:              your_email
+   Temporary password: j8@wVFbN0j7T
+   Status:             FORCE_CHANGE_PASSWORD
+   ```
+
+1. Use the temporary password to login at the employee site url (part of terraform outputs).  It should be in this format:
+   ```
+   employee_site_url = "http://product-catalogue-test-employee-site-<aws_account_id>.s3-website-us-east-1.amazonaws.com"
+   ````
+
+1. Once logged in, choose the 'reports' tab at the top of the page
+1. Click add new schedule
+1. Setup a report to run every minute (filtered by store or category)
+
+1. Run the traffic generator to create some sales.  Each call picks a random store, fetches its in-stock inventory, and submits a basket of 1–3 random items. 
+All stores and products are eligible on every run; with enough calls (e.g. `--calls 50` across 5 stores) coverage is well-distributed.
+
+```bash
+# Default: 20 calls at 2/sec
+./scripts/traffic_generator.sh
+
+# Custom rate and call count
+./scripts/traffic_generator.sh --calls 50 --rate 5
+```
+
+1. Run restock if needed
+Resets inventory quantities after the traffic generator depletes stock.
+
+```bash
+# Restock all items to 500 units (default)
+./scripts/restock.sh
+
+# Restock only depleted items (quantity <= 10)
+./scripts/restock.sh --low-only --threshold 10
+```
+
+
+* create employee user to login to site 
+```bash
+./scripts/create_employee_user.sh --email your@email.com
+```
+
+Once you have the user, hit the employee_site_url, login with temporary password
+```
+employee_site_url = "http://product-catalogue-test-employee-site-<aws_account_id>.s3-website-us-east-1.amazonaws.com"
+```
+
 ### Prerequisites
 
 Everything below must be installed and configured on your local machine for the deployment and scripts to work.
@@ -367,3 +435,17 @@ INFRASTRUCTURE_DIR=./infrastructure ./scripts/seed_dynamodb.sh
 ```
 
 **Note:** Seeding runs automatically whenever DynamoDB tables are created or recreated by Terraform.
+
+### Terraform remove state (if AWS Learner Lab closes w/o running terraform destroy)
+1. Back up the old state (just in case):
+
+
+cp infrastructure/terraform.tfstate infrastructure/terraform.tfstate.old-lab
+cp infrastructure/.terraform.lock.hcl infrastructure/.terraform.lock.hcl.bak 2>/dev/null || true
+
+2. Delete the stale state:
+
+
+rm -f infrastructure/terraform.tfstate
+rm -f infrastructure/terraform.tfstate.backup
+rm -rf infrastructure/.terraform
