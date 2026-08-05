@@ -1,11 +1,15 @@
+# Build context is the repo root (needed to COPY the shared catalog/ package):
+#   docker build -f customer_site/server/Dockerfile .
+
 FROM python:3.11-slim
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY customer_site/server/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app.py data.py stores.py stock.py sales.py ./
+COPY catalog ./catalog
+COPY customer_site/server/app.py customer_site/server/data.py customer_site/server/stores.py customer_site/server/stock.py customer_site/server/sales.py ./
 
 EXPOSE 8000
 

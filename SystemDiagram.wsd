@@ -1,82 +1,96 @@
-@startuml
-package "Client Browser" as client {
-}
-cloud {
-  folder "React UI" as react {
-    
-'     • package
-' • node
-' • folder
-' • frame
-' • cloud
-' • database
-    frame ProductsPage {
-      usecase "Get all products" as UC1
-      usecase "Get all Stores" as UCStores
-      usecase "Get Store Info" as UC2
-      usecase "Get Products for a store" as UC3
-      usecase "Get Sales for a store" as UC4
+@startuml SystemDiagram
+' Architecture diagram (accurate as of the interview-prep pass).
+' See SystemDesign.md for the narrative version of this same topology.
 
-    }
-  }
-  frame "Flask API" {
-    frame "get /PRODUCTS" as productDetails {
-   
-    } 
-    frame "get /STORE/<STORE_ID>" as storeDetails {
-    }
-    frame "get /STOCK/<STORE_ID>" as stockDetails {
-    }
-    frame "get /SALES/<STORE_ID>" as salesDetails {
-    }
-    
-  }
-  
-  database "DynamoDB" {
-    frame "Products" {
-      map productTable {
-        hash_key => barcode
-        secondary_indecies => categories
-      }
-    }
-    frame "Stores" {
-      map storeTable {
-        hash_key => store_id
-      }
-    }
-    frame "Stock" {
-      map stockTable {
-        hash_key => barcode
-        range_key => store_id
-      }
-    }
-    frame "Sales" {
-      map salesTable {
-        hash_key => barcode
-        range_key => store_id
-      }
-    }
-  }
+skinparam componentStyle rectangle
+skinparam linetype ortho
+skinparam defaultTextAlignment center
+
+actor "Customer" as customer
+actor "Employee" as employee
+actor "Vendor / POS device" as vendor
+
+package "S3 Static Sites" {
+  [Customer SPA\n(React)] as customerSpa
+  [Employee SPA\n(React, Cognito login)] as employeeSpa
 }
 
-[client] --> [react] 
-[UC1] --> [productDetails]
-[UC1] <-- [productDetails]
-[UC2] --> [storeDetails]
-[UC2] <-- [storeDetails]
-[UC3] --> [stockDetails]
-[UC3] <-- [stockDetails]
-[UC4] --> [salesDetails]
-[UC4] <-- [salesDetails]
+cloud "Cognito\nUser Pool (employee-only)" as cognito
 
-[storeDetails] --> [storeTable]
-[storeDetails] <-- [storeTable]
-[productDetails] --> [productTable]
-[productDetails] <-- [productTable]
+package "ECS Fargate + ALB" {
+  [Customer Flask\n(direct-to-DynamoDB)] as customerFlask
+  [Employee Flask BFF\n(Cognito-verified,\nowns report schedules)] as employeeFlask
+}
 
-[stockDetails] --> [stockTable]
-[stockDetails] <-- [stockTable]
-[salesDetails] --> [salesTable]
-[salesDetails] <-- [salesTable]
+package "ECS Fargate\n(no public ALB)" {
+  [FastAPI\nInventory / POS] as fastapi
+}
+
+package "API Gateway" {
+  [Vendor API\n(API key)] as apigw
+}
+[VPC Link -> internal NLB] as vpclink
+
+database "DynamoDB" {
+  frame "products" as tProducts
+  frame "stores" as tStores
+  frame "categories" as tCategories
+  frame "products_by_store\n(stock + pricing)" as tPBS
+  frame "sales_events\n(streams enabled)" as tSales
+  frame "report_schedules" as tSchedules
+  frame "report_results" as tResults
+}
+
+package "Scheduled Reporting" {
+  [EventBridge Scheduler\n(per-user schedule)] as eventbridge
+  [report_lambda] as lambda
+}
+
+database "S3\n(reports bucket)" as s3reports
+
+note bottom of employeeFlask
+  Proxies to Customer Flask (catalogue reads)
+  and to FastAPI (inventory CRUD).
+  Also creates/deletes EventBridge
+  Scheduler schedules per report.
+end note
+
+' Auth
+employeeSpa ..> cognito : login / JWT
+employeeFlask ..> cognito : verify JWT
+
+' Customer path (no auth, bypasses FastAPI)
+customer --> customerSpa
+customerSpa --> customerFlask : REST
+customerFlask --> tProducts
+customerFlask --> tStores
+customerFlask --> tCategories
+customerFlask --> tPBS
+
+' Employee path (through BFF)
+employee --> employeeSpa
+employeeSpa --> employeeFlask : REST + JWT
+employeeFlask --> customerFlask : proxy (catalogue)
+employeeFlask --> fastapi : proxy (inventory CRUD)
+employeeFlask --> tSchedules : CRUD
+employeeFlask --> tResults : read
+employeeFlask --> eventbridge : create/delete schedule
+employeeFlask --> s3reports : presigned URL
+
+' FastAPI internal + direct DynamoDB
+fastapi --> tPBS
+fastapi --> tSales
+
+' Vendor path (external, API-key protected)
+vendor --> apigw
+apigw --> vpclink
+vpclink --> fastapi : /api/pos/sale/{store_id}
+
+' Scheduled report path
+eventbridge --> lambda : invoke on cadence
+lambda --> tSchedules : read
+lambda --> tSales : aggregate
+lambda --> s3reports : write CSV
+lambda --> tResults : write
 
 @enduml

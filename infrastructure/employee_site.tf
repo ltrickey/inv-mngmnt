@@ -82,7 +82,7 @@ resource "aws_ecs_task_definition" "employee_bff" {
         { name = "COGNITO_APP_CLIENT_ID", value = aws_cognito_user_pool_client.employee_site.id },
         { name = "AWS_REGION", value = var.aws_region },
         { name = "PRODUCT_CATALOGUE_API_URL", value = "http://${aws_lb.customer.dns_name}" },
-        { name = "INVENTORY_API_URL", value = "http://${aws_instance.inventory_api.private_ip}:9000" },
+        { name = "INVENTORY_API_URL", value = "http://${aws_lb.inventory_api.dns_name}:9000" },
         { name = "REPORT_SCHEDULES_TABLE", value = aws_dynamodb_table.report_schedules.name },
         { name = "REPORT_RESULTS_TABLE", value = aws_dynamodb_table.report_results.name },
         { name = "REPORTS_BUCKET", value = aws_s3_bucket.reports.id },
@@ -238,19 +238,10 @@ resource "aws_ecs_service" "employee_bff" {
 }
 
 # ---------------------------------------------------------------------------
-# Allow ECS tasks to reach the inventory API and product catalogue
-# ---------------------------------------------------------------------------
-
-resource "aws_security_group_rule" "inventory_api_from_ecs" {
-  type                     = "ingress"
-  from_port                = 9000
-  to_port                  = 9000
-  protocol                 = "tcp"
-  security_group_id        = aws_security_group.inventory_api.id
-  source_security_group_id = aws_security_group.employee_ecs.id
-  description              = "Inventory API from employee BFF ECS tasks"
-}
-
+# Note: the employee BFF reaches the inventory API through the internal NLB
+# (aws_lb.inventory_api in api_gateway.tf), which is already allowed by the
+# VPC-cidr ingress rule on aws_security_group.inventory_api in security.tf —
+# no direct ECS-to-ECS security group rule is needed.
 # ---------------------------------------------------------------------------
 # S3 Static Website for Employee React Frontend
 # ---------------------------------------------------------------------------

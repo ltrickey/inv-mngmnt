@@ -1,6 +1,6 @@
 # Infrastructure Documentation
 
-This directory contains Terraform configuration for deploying the Product Catalogue application to AWS.
+This directory contains Terraform configuration for deploying the Product Catalogue / Inventory application to AWS. See [../SystemDesign.md](../SystemDesign.md) for the application-level architecture.
 
 ## Quick Start
 
@@ -11,13 +11,14 @@ terraform plan
 terraform apply
 ```
 
+`terraform apply` provisions the infrastructure **and** builds/pushes Docker images and deploys the three services (via `terraform_data` provisioners in `deploy.tf`), so a single `apply` gets you a working stack.
+
 ## Configuration
 
 ### Using AWS Academy / Learner Lab (Default)
 
 The configuration is pre-configured for AWS Academy with sensible defaults:
-- IAM Instance Profile: `LabInstanceProfile`
-- EC2 Key Pair: `vockey`
+- IAM Role: `LabRole` (used as the ECS execution/task role for all three services)
 - Region: `us-east-1`
 
 No additional configuration needed - just run `terraform apply`!
@@ -34,24 +35,14 @@ cp terraform.tfvars.example terraform.tfvars
 Example `terraform.tfvars`:
 
 ```hcl
-aws_region                = "us-west-2"
-environment               = "prod"
-project_name              = "my-product-catalogue"
-iam_instance_profile_name = "MyCustomProfile"
-ec2_key_pair              = "my-keypair"
-allowed_cidr_blocks       = ["1.2.3.4/32"]  # Your IP only
+aws_region          = "us-west-2"
+environment         = "prod"
+project_name        = "my-product-catalogue"
+iam_role_name       = "MyECSExecutionRole"
+allowed_cidr_blocks = ["1.2.3.4/32"]  # Your IP only
 ```
 
-### Creating a Custom Instance Profile
-
-If you want Terraform to create the instance profile instead of using an existing one:
-
-```hcl
-# In terraform.tfvars
-create_instance_profile = true
-```
-
-This will create a new instance profile named `{project_name}-{environment}-ec2-profile` using the existing `LabRole`.
+The IAM role must allow ECR image pulls, CloudWatch Logs writes, and DynamoDB access.
 
 ## Variables Reference
 
@@ -60,93 +51,75 @@ This will create a new instance profile named `{project_name}-{environment}-ec2-
 | `aws_region` | AWS region to deploy resources | `us-east-1` | No |
 | `environment` | Environment name (dev, test, prod) | `test` | No |
 | `project_name` | Project name for resource naming | `product-catalogue` | No |
-| `iam_role_name` | IAM role name (contains permissions) | `LabRole` | No |
-| `iam_instance_profile_name` | IAM instance profile name (wrapper for role) | `LabInstanceProfile` | No |
-| `create_instance_profile` | Create new instance profile vs use existing | `false` | No |
-| `ec2_key_pair` | EC2 key pair name for SSH | `vockey` | No |
-| `allowed_cidr_blocks` | CIDR blocks allowed to access EC2 | `["0.0.0.0/0"]` | No |
+| `iam_role_name` | IAM role used as the ECS execution/task role for all services | `LabRole` | No |
+| `allowed_cidr_blocks` | CIDR blocks allowed to reach the public ALBs | `["0.0.0.0/0"]` | No |
 
 ## Architecture
 
-The infrastructure creates:
+All three backend services run as **ECS Fargate** tasks (containerized, no bare EC2 instances). Both React SPAs are static S3 sites.
 
 ### Compute Resources
-- **Product Catalogue EC2 Instance** (`t4g.micro`)
-  - Runs Flask application serving React frontend
-  - Port 8000: Web application (public)
-  - Port 22: SSH access
-
-- **Inventory API EC2 Instance** (`t4g.micro`)
-  - Runs FastAPI inventory service
-  - Port 9000: API (private, accessible only from Product Catalogue)
-  - Port 22: SSH access
+- **Customer API** (`customer_site.tf`) — Flask, ECS Fargate behind a public ALB, port 8000. Talks directly to DynamoDB.
+- **Employee BFF** (`employee_site.tf`) — Flask, ECS Fargate behind a public ALB, port 5001. Cognito-JWT-gated; proxies to the Customer API and the Inventory API; owns report scheduling.
+- **Inventory API** (`fastapi_site.tf`) — FastAPI, ECS Fargate, port 9000. Not behind a public ALB — reachable only through the internal NLB defined in `api_gateway.tf`, which both internal callers (via VPC) and the external vendor-facing API Gateway route use.
 
 ### Security Groups
-- **product_catalogue-sg**: Allows inbound on ports 8000 (HTTP) and 22 (SSH)
-- **inventory_api-sg**: Allows inbound on port 9000 from product_catalogue-sg only, and 22 (SSH)
+- **customer-alb-sg / customer-ecs-sg**: public ALB → ECS tasks on 8000
+- **employee-alb-sg / employee-ecs-sg**: public ALB → ECS tasks on 5001
+- **inventory-api-sg**: allows 9000 from `customer-ecs-sg` and from anywhere inside the VPC (covers the internal NLB, used by both the employee BFF and API Gateway's VPC Link)
 
 ### DynamoDB Tables
 - `{name_prefix}-products`: Product catalog data
 - `{name_prefix}-stores`: Store locations
-- `{name_prefix}-products_by_store`: Per-store inventory
+- `{name_prefix}-products_by_store`: Per-store inventory + pricing
+- `{name_prefix}-sales_events`: POS transaction log (streams enabled)
+- `{name_prefix}-report_schedules` / `{name_prefix}-report_results`: scheduled reporting
 - `categories`: Product categories (fixed name)
 
-### S3 Storage (Always created for AWS deployments)
-- **S3 Bucket**: `{name_prefix}-product-images`
-  - Stores product images
-  - **Private bucket** - not publicly accessible
-  - Images accessed via time-limited signed URLs (1-hour expiration)
-  - Versioning enabled
-  - CORS configured for web access
-  - Automatically populated from `infrastructure/images/`
-- **Local Development**: Images served from `infrastructure/images/` directory (no S3)
+### S3 Storage
+- **Product images bucket** — private, signed-URL access, versioned, populated from `infrastructure/images/`
+- **Reports bucket** — CSV report output, written by the report Lambda, downloaded via presigned URL from the employee BFF
+- **Customer / Employee site buckets** — public static website hosting for the two React SPAs
 
-### IAM (Identity and Access Management)
+### Scheduled Reporting
+- `lambda.tf` provisions the `report_lambda` function and an EventBridge Scheduler group
+- The employee BFF creates a per-user EventBridge Scheduler schedule when a report is configured; the schedule invokes the Lambda on its cadence
 
-**Understanding IAM Role vs Instance Profile:**
+### Cognito
+- `cognito.tf` provisions one user pool + app client for the employee site only (admin-created users, no self-signup)
 
-```
-IAM Role                    Instance Profile              EC2 Instance
-┌─────────────────┐        ┌──────────────────┐          ┌──────────────┐
-│ LabRole         │   →    │ LabInstanceProfile│    →    │ EC2 Instance │
-│                 │        │                  │          │              │
-│ - DynamoDB      │        │ Contains:        │          │ Uses profile │
-│ - CloudWatch    │        │   LabRole        │          │ to access    │
-│ - S3 (optional) │        │                  │          │ AWS services │
-└─────────────────┘        └──────────────────┘          └──────────────┘
-  Permissions                  Wrapper                      Application
-```
+### IAM
 
-**Configuration Options:**
-- **Role**: Configurable via `iam_role_name` variable (default: `LabRole`)
-- **Instance Profile**: Configurable via `iam_instance_profile_name` (default: `LabInstanceProfile`)
-- **Create Profile**: Set `create_instance_profile = true` to have Terraform create a new profile
+All three ECS task definitions share a single execution/task role (`iam.tf`, `data.aws_iam_role.ec2_role`), configurable via `iam_role_name`. On AWS Academy this is the pre-created `LabRole`. No instance profiles are needed — Fargate tasks use the execution/task role directly.
 
 ## Network Architecture
 
 ```
 Internet
     |
-    +------------------+------------------+
+    +------------------+------------------+------------------+
+    |                  |                  |                  |
+    v                  v                  v                  v
+[Customers]      [Employees]      [Vendor / POS]      [S3: images, SPAs]
     |                  |                  |
     v                  v                  v
-[Users]      [S3 Product Images]  [Product Catalogue EC2] :8000
-              (public read)              |
-                                        | (private network)
-                                        v
-                             [Inventory API EC2] :9000 (private)
-                                        |
-                                        v
-                                  [DynamoDB Tables]
+[Customer ALB]   [Employee ALB]   [API Gateway :api-key]
+    |                  |                  |
+    v                  v                  v
+[Customer API    [Employee BFF    [VPC Link -> internal NLB]
+ ECS Fargate] <--- ECS Fargate]          |
+    |                  |                  v
+    |                  +---------> [Inventory API ECS Fargate]
+    v                                     |
+              [DynamoDB Tables] <---------+
 ```
 
 ### Security Notes
 
-1. **Product Catalogue** is publicly accessible on port 8000
-2. **Inventory API** is only accessible from Product Catalogue instance via private IP
-3. Both instances have SSH access (port 22) - restrict `allowed_cidr_blocks` in production
-4. All instances use VPC default subnet
-5. Outbound traffic allowed for both instances (for updates, DynamoDB access)
+1. **Customer API** and **Employee BFF** are publicly accessible via their ALBs (port 80)
+2. **Inventory API** has no public ALB — only reachable via the internal NLB, from inside the VPC or through API Gateway
+3. All ECS tasks run in the default VPC's default subnets with `assign_public_ip = true` (so Fargate can pull images without a NAT Gateway); inbound access is still restricted by security groups
+4. Restrict `allowed_cidr_blocks` in production
 
 ## Outputs
 
@@ -157,32 +130,38 @@ After `terraform apply`, you'll get:
 terraform output
 
 # Specific outputs
-terraform output customer_site_url        # Customer site URL (S3)
-terraform output inventory_api_url        # Internal inventory API URL
-terraform output inventory_api_public_dns # Inventory API EC2 DNS
-terraform output iam_instance_profile     # IAM profile being used
+terraform output customer_site_url        # Customer SPA URL (S3)
+terraform output employee_site_url        # Employee SPA URL (S3)
+terraform output inventory_api_url        # Internal inventory API URL (NLB, VPC-only)
+terraform output api_gateway_url          # Vendor-facing API Gateway URL
 terraform output s3_bucket_name           # S3 bucket for product images
 ```
 
 ## Deployment
 
-The infrastructure automatically deploys the applications when created:
+`terraform apply` automatically deploys all three services on first run (via `terraform_data` provisioners in `deploy.tf`):
 
-1. **Product Catalogue**: Packages React app + Flask, deploys to EC2
-2. **Inventory API**: Packages FastAPI app, deploys to EC2
-3. **DynamoDB**: Seeds tables with initial data
+1. **Inventory API**: builds/pushes the Docker image to ECR, deploys to ECS Fargate
+2. **DynamoDB**: seeds tables with initial data
+3. **Customer site**: builds/pushes the Docker image, builds the React SPA, uploads to S3, deploys to ECS Fargate
+4. **Employee site**: builds/pushes the Docker image, builds the React SPA, uploads to S3, deploys to ECS Fargate
 
-### Manual Deployment
+### Manual Redeploy
 
-To redeploy without recreating infrastructure:
+To redeploy a single service without recreating infrastructure:
 
 ```bash
-# Deploy everything
-../scripts/deploy_all.sh
+cd infrastructure
 
-# Or deploy individually
-../scripts/deploy_remote.sh              # Product catalogue
-../scripts/deploy_inventory_api_remote.sh  # Inventory API
+ECR_REPOSITORY_URL=$(terraform output -raw inventory_api_ecr_repository_url) \
+AWS_REGION=$(terraform output -raw aws_region) \
+ECS_CLUSTER=$(terraform output -raw name_prefix)-inventory-api \
+ECS_SERVICE=$(terraform output -raw name_prefix)-inventory-api \
+../scripts/deploy_inventory_api.sh
+
+# See scripts/deploy_customer_site.sh and scripts/deploy_employee_site.sh
+# for the equivalent commands for those two services (they also need the
+# ALB URL and, for the employee site, Cognito env vars — see deploy.tf).
 ```
 
 ## Troubleshooting
@@ -198,33 +177,6 @@ Solution: Ensure the role exists or update `iam_role_name` variable
 aws iam list-roles | grep RoleName
 ```
 
-**Error: Instance profile not found**
-```
-Error: error reading IAM Instance Profile (MyProfile): NoSuchEntity
-```
-
-**For AWS Academy:**
-- Ensure you're using the correct names (default: `LabRole` and `LabInstanceProfile`)
-- Check: `aws iam list-instance-profiles`
-
-**For Custom AWS:**
-- Verify the profile exists: `aws iam get-instance-profile --instance-profile-name MyProfile`
-- Or set `create_instance_profile = true` in your `terraform.tfvars` to create one
-
-**Understanding the relationship:**
-- The **role** must exist (has the permissions)
-- The **instance profile** wraps the role (allows EC2 to use it)
-- If `create_instance_profile = true`, Terraform creates a new profile using your existing role
-- If `create_instance_profile = false`, both role and profile must already exist
-
-### SSH Key Not Found
-
-Ensure your SSH key exists:
-- AWS Academy: `~/.ssh/vockey.pem`
-- Custom: `~/.ssh/{your-key-name}.pem`
-
-Set correct permissions: `chmod 400 ~/.ssh/vockey.pem`
-
 ### DynamoDB Tables Empty
 
 Run the seed script:
@@ -235,33 +187,35 @@ cd ..
 
 ### Service Not Starting
 
-SSH into the instance and check logs:
+Check ECS service status and CloudWatch logs — no SSH needed, everything runs as a container:
 ```bash
-ssh -i ~/.ssh/vockey.pem ec2-user@{instance-ip}
+./scripts/check_status.sh   # Inventory API ECS service status + recent events
 
-# Check Flask service
-sudo systemctl status product_catalogue_flask
-sudo journalctl -u product_catalogue_flask -f
-
-# Check Inventory API service
-sudo systemctl status inventory_api
-sudo journalctl -u inventory_api -f
+# Or directly:
+aws ecs describe-services --cluster {name_prefix}-inventory-api --services {name_prefix}-inventory-api
+aws logs tail /ecs/{name_prefix}-inventory-api --follow
 ```
 
 ## File Structure
 
 ```
 infrastructure/
-├── main.tf           # Provider, AMI, common locals
-├── ec2.tf            # EC2 instance definitions
-├── security.tf       # Security groups, VPC data sources
-├── iam.tf            # IAM roles and instance profiles
-├── dynamodb.tf       # DynamoDB table definitions
-├── deploy.tf         # Deployment automation
-├── outputs.tf        # Terraform outputs
-├── variables.tf      # Input variables
-├── terraform.tf      # Terraform/provider version constraints
-└── README.md         # This file
+├── main.tf              # Provider, common locals
+├── customer_site.tf      # Customer API: ECR, ECS Fargate, ALB, S3 static site
+├── employee_site.tf      # Employee BFF: ECR, ECS Fargate, ALB, S3 static site
+├── fastapi_site.tf        # Inventory API: ECR, ECS Fargate (registers into the NLB in api_gateway.tf)
+├── api_gateway.tf        # Vendor-facing API Gateway, internal NLB, VPC Link
+├── security.tf           # Security groups, VPC data sources
+├── iam.tf                # Shared ECS execution/task role lookup
+├── cognito.tf             # Employee user pool + app client
+├── lambda.tf              # Report Lambda + EventBridge Scheduler group
+├── dynamodb.tf            # DynamoDB table definitions
+├── s3.tf                  # Image + report buckets
+├── deploy.tf              # Deployment automation (build/push/deploy, seeding)
+├── outputs.tf              # Terraform outputs
+├── variables.tf            # Input variables
+├── terraform.tf             # Terraform/provider version constraints
+└── README.md                # This file
 ```
 
 ## Cleanup
@@ -272,7 +226,7 @@ To destroy all resources:
 terraform destroy
 ```
 
-**Warning**: This will delete all EC2 instances, security groups, and DynamoDB tables. Data in DynamoDB will be lost.
+**Warning**: This will delete all ECS services, ALBs/NLB, S3 buckets, Cognito user pool, the report Lambda, and DynamoDB tables. Data in DynamoDB will be lost.
 
 ## Image Hosting
 
@@ -303,7 +257,6 @@ See [S3_CONFIGURATION.md](S3_CONFIGURATION.md) for details.
 
 ## Additional Resources
 
-- [IAM Configuration Guide](IAM_CONFIGURATION.md)
 - [S3 Configuration Guide](S3_CONFIGURATION.md)
 - [AWS Academy Documentation](https://awsacademy.instructure.com/)
 - [Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)

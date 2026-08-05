@@ -12,29 +12,16 @@ environment = "test"
 project_name = "product-catalogue"
 
 # IAM Configuration
-# IAM Role: Contains the permissions (policies) for EC2 instances
+# IAM Role: used as the execution/task role for all ECS Fargate services
 # For AWS Academy/Learner Lab, use "LabRole" (default)
-# For custom AWS accounts, specify your role name
+# For custom AWS accounts, specify your role name (must allow ECR pull,
+# CloudWatch Logs, and DynamoDB access)
 iam_role_name = "LabRole"
-
-# IAM Instance Profile: Wrapper that allows EC2 to use the role
-# For AWS Academy/Learner Lab, use "LabInstanceProfile" (default)
-# For custom AWS accounts, specify your instance profile name
-iam_instance_profile_name = "LabInstanceProfile"
-
-# EC2 SSH Key Pair
-# For AWS Academy/Learner Lab, use "vockey" (default)
-# For custom AWS accounts, specify your key pair name
-ec2_key_pair = "vockey"
 
 # Network Access
 # Restrict this in production to specific IP ranges
 # Example: ["1.2.3.4/32", "5.6.7.8/32"]
 allowed_cidr_blocks = ["0.0.0.0/0"]
-
-# Optional: Create a custom instance profile instead of using existing one
-# Set to true if you want Terraform to create the instance profile
-# create_instance_profile = false
 
 # Note: S3 bucket for images is always created when deploying to AWS
 # For local development, the Flask app automatically serves images from infrastructure/images/

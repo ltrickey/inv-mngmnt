@@ -15,11 +15,9 @@ data "aws_subnet" "default" {
 
 resource "aws_security_group" "inventory_api" {
   name        = "${local.name_prefix}-inventory-api-sg"
-  description = "Security group for inventory API EC2 instance"
+  description = "Security group for inventory API ECS Fargate tasks"
   vpc_id      = data.aws_vpc.default.id
 
-  # Ensure EC2 instance is destroyed before security group
-  # This prevents deletion timeout issues
   lifecycle {
     create_before_destroy = true
   }
@@ -33,31 +31,14 @@ resource "aws_security_group" "inventory_api" {
     security_groups = [aws_security_group.customer_ecs.id]
   }
 
-  # Allow incoming traffic from VPC for API Gateway (via NLB)
+  # Allow incoming traffic from VPC for the internal NLB (API Gateway VPC Link,
+  # and the employee BFF, both of which reach this service through that NLB)
   ingress {
-    description = "FastAPI from API Gateway via VPC Link"
+    description = "FastAPI from internal NLB"
     from_port   = 9000
     to_port     = 9000
     protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.default.cidr_block]
-  }
-
-  # Allow public internet access for local testing scripts
-  ingress {
-    description = "FastAPI public access for testing"
-    from_port   = 9000
-    to_port     = 9000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # Allow SSH access for management
-  ingress {
-    description = "SSH"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = var.allowed_cidr_blocks
   }
 
   egress {

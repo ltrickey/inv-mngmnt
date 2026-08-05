@@ -5,32 +5,14 @@ variable "aws_region" {
 }
 
 variable "iam_role_name" {
-  description = "Name of the IAM role to use for EC2 instances. Defaults to 'LabRole' (AWS Academy). The role must have permissions for DynamoDB, CloudWatch, etc."
+  description = "Name of the IAM role used as the execution/task role for all ECS Fargate services. Defaults to 'LabRole' (AWS Academy). The role must have permissions for DynamoDB, CloudWatch, etc."
   type        = string
   default     = "LabRole"
 }
 
-variable "iam_instance_profile_name" {
-  description = "Name of the IAM instance profile to use for EC2 instances. Defaults to 'LabInstanceProfile' (AWS Academy default). Override via -var or terraform.tfvars"
-  type        = string
-  default     = "LabInstanceProfile"
-}
-
-variable "create_instance_profile" {
-  description = "Whether to create a new instance profile or use an existing one. Set to true for custom AWS accounts if you want Terraform to create the profile."
-  type        = bool
-  default     = false
-}
-
-variable "ec2_key_pair" {
-  description = "Name of the key pair to use for SSH access to EC2 instances"
-  type        = string
-  default     = "vockey"
-}
-
 #TODO: Find out what this should be for production
 variable "allowed_cidr_blocks" {
-  description = "CIDR blocks allowed to access the EC2 instance"
+  description = "CIDR blocks allowed to reach the public ALBs"
   type        = list(string)
   default     = ["0.0.0.0/0"] # Restrict this in production
 }

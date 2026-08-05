@@ -2,7 +2,7 @@
 
 from flask import Blueprint, jsonify
 
-from data import get_all_stores, get_store
+from catalog.catalog_dao import get_all_stores, get_store
 
 stores_bp = Blueprint('stores', __name__, url_prefix='/stores')
 

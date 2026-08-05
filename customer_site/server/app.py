@@ -1,10 +1,8 @@
+import sys
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
-import json
 import logging
 import os
-import threading
-import time
 
 # Load .env file if it exists (for local development)
 try:
@@ -16,13 +14,20 @@ except ImportError:
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-USE_DYNAMODB = os.environ.get('USE_DYNAMODB', '').lower() in ('1', 'true', 'yes')
-DYNAMODB_PRODUCTS_TABLE = os.environ.get('DYNAMODB_PRODUCTS_TABLE', '').strip()
-
-# Resolve repo root for local dev paths (seed_data, infrastructure/images).
-# In Docker these aren't used since USE_DYNAMODB=1 and images come from S3.
+# Resolve repo root for local dev paths (infrastructure/images) and so the
+# top-level `catalog` package (products/stores/categories data access,
+# shared conceptually across services) can be imported from here.
 _PARENT = os.path.dirname(os.path.dirname(__file__))
 _PROJECT_ROOT = _PARENT if os.path.isdir(os.path.join(_PARENT, 'seed_data')) else os.path.dirname(_PARENT)
+sys.path.insert(0, _PROJECT_ROOT)
+
+from catalog.catalog_dao import (
+    USE_DYNAMODB,
+    DYNAMODB_PRODUCTS_TABLE,
+    load_products as _load_catalog_products,
+    get_products_by_category_filters_dynamodb,
+    load_categories_from_dynamodb,
+)
 
 app = Flask(__name__)
 CORS(app)
@@ -32,7 +37,6 @@ CORS(app)
 from stores import stores_bp
 from stock import stock_bp
 from sales import sales_bp
-from data import load_categories_from_dynamodb
 app.register_blueprint(stores_bp)
 app.register_blueprint(stock_bp)
 app.register_blueprint(sales_bp)
@@ -49,34 +53,10 @@ def serve_image(filename):
         filename = PLACEHOLDER_IMAGE
     return send_from_directory(IMAGES_DIR, filename)
 
-# Path to the products JSON file (used when running locally, not using DynamoDB)
-PRODUCTS_FILE = os.path.join(_PROJECT_ROOT, 'seed_data', 'products.json')
-
 # S3 configuration (optional - if not set, uses local images)
 # S3_BUCKET_URL is the public base URL (e.g. https://bucket.s3.amazonaws.com)
 S3_BUCKET_URL = os.environ.get('S3_BUCKET_URL', '').rstrip('/')
 S3_BUCKET_NAME = os.environ.get('S3_BUCKET_NAME', None)
-
-# ---------------------------------------------------------------------------
-# Simple TTL cache – avoids repeated DynamoDB scans
-# ---------------------------------------------------------------------------
-CACHE_TTL_SECONDS = 120  # products rarely change; 2 minutes is safe
-
-_cache = {}
-_cache_lock = threading.Lock()
-
-
-def _cache_get(key):
-    with _cache_lock:
-        entry = _cache.get(key)
-        if entry and (time.time() - entry['ts']) < CACHE_TTL_SECONDS:
-            return entry['data']
-    return None
-
-
-def _cache_set(key, data):
-    with _cache_lock:
-        _cache[key] = {'data': data, 'ts': time.time()}
 
 
 def get_image_url(image_path):
@@ -97,162 +77,17 @@ def get_image_url(image_path):
         return f"/images/{filename}"
 
 
-def load_products_from_json():
-    """Load products from the local seed_data JSON file."""
-    try:
-        with open(PRODUCTS_FILE, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return []
-    except json.JSONDecodeError:
-        return []
-
-
-def _normalize_product_for_json(product):
-    """Convert DynamoDB types (e.g. Decimal) to JSON-serializable types."""
-    from decimal import Decimal
-    result = {}
-    for k, v in product.items():
-        if isinstance(v, Decimal):
-            result[k] = float(v)
-        elif isinstance(v, list):
-            result[k] = [float(x) if isinstance(x, Decimal) else x for x in v]
-        else:
-            result[k] = v
-    return result
-
-
-_dynamodb_products_client = None
-
-def _get_dynamodb_products_client():
-    global _dynamodb_products_client
-    if _dynamodb_products_client is None:
-        import boto3
-        region = os.environ.get('AWS_REGION') or os.environ.get('AWS_DEFAULT_REGION')
-        _dynamodb_products_client = boto3.client('dynamodb', region_name=region) if region else boto3.client('dynamodb')
-    return _dynamodb_products_client
-
-
-def get_products_by_category_filters_dynamodb(p_category=None, s_category=None, t_category=None):
-    """
-    Get products matching category filters using GSI_Category (primary_category, category_path).
-    category_path format: "secondary#tertiary#barcode" (e.g. "Milk#NONE#0123456789012").
-    """
-    if not DYNAMODB_PRODUCTS_TABLE:
-        return []
-    p_val = str(p_category).strip() if p_category else None
-    s_val = str(s_category).strip() if s_category else None
-    t_val = str(t_category).strip() if t_category else None
-    if not p_val and not s_val and not t_val:
-        return []
-    cache_key = f'cat_filter:{p_val}:{s_val}:{t_val}'
-    cached = _cache_get(cache_key)
-    if cached is not None:
-        return cached
-    try:
-        from boto3.dynamodb.types import TypeDeserializer
-        client = _get_dynamodb_products_client()
-        deserializer = TypeDeserializer()
-        items = []
-
-        if p_val:
-            # Query GSI_Category by primary_category; optionally filter by category_path prefix
-            key_condition = 'primary_category = :p'
-            expr_vals = {':p': {'S': p_val}}
-            filter_expr = None
-            if t_val and s_val:
-                filter_expr = 'begins_with(category_path, :prefix)'
-                expr_vals[':prefix'] = {'S': s_val + '#' + t_val + '#'}
-            elif s_val:
-                filter_expr = 'begins_with(category_path, :prefix)'
-                expr_vals[':prefix'] = {'S': s_val + '#'}
-            elif t_val:
-                # Tertiary only: category_path contains "#t_val#"
-                filter_expr = 'contains(category_path, :ter)'
-                expr_vals[':ter'] = {'S': '#' + t_val + '#'}
-
-            paginator = client.get_paginator('query')
-            paginate_kw = {
-                'TableName': DYNAMODB_PRODUCTS_TABLE,
-                'IndexName': 'GSI_Category',
-                'KeyConditionExpression': key_condition,
-                'ExpressionAttributeValues': expr_vals,
-            }
-            if filter_expr:
-                paginate_kw['FilterExpression'] = filter_expr
-            for page in paginator.paginate(**paginate_kw):
-                for item in page.get('Items', []):
-                    raw = {k: deserializer.deserialize(v) for k, v in item.items()}
-                    items.append(_normalize_product_for_json(raw))
-        else:
-            # Secondary or tertiary only (no primary): scan with filter
-            filter_parts = []
-            expr_vals = {}
-            if s_val:
-                filter_parts.append('begins_with(category_path, :sec)')
-                expr_vals[':sec'] = {'S': s_val + '#'}
-            if t_val:
-                filter_parts.append('contains(category_path, :ter)')
-                expr_vals[':ter'] = {'S': '#' + t_val + '#'}
-            if not expr_vals:
-                return []
-            paginator = client.get_paginator('scan')
-            for page in paginator.paginate(
-                TableName=DYNAMODB_PRODUCTS_TABLE,
-                FilterExpression=' AND '.join(filter_parts),
-                ExpressionAttributeValues=expr_vals,
-            ):
-                for item in page.get('Items', []):
-                    raw = {k: deserializer.deserialize(v) for k, v in item.items()}
-                    items.append(_normalize_product_for_json(raw))
-
-        _cache_set(cache_key, items)
-        return items
-    except Exception as e:
-        logger.exception("DynamoDB get_products_by_category_filters failed: %s", e)
-        return []
-
-
-def load_products_from_dynamodb():
-    """Load products from the DynamoDB products table (used when running on EC2)."""
-    if not DYNAMODB_PRODUCTS_TABLE:
-        return []
-    cached = _cache_get('all_products_dynamo')
-    if cached is not None:
-        return cached
-    try:
-        from boto3.dynamodb.types import TypeDeserializer
-        deserializer = TypeDeserializer()
-        client = _get_dynamodb_products_client()
-        paginator = client.get_paginator('scan')
-        products = []
-        for page in paginator.paginate(TableName=DYNAMODB_PRODUCTS_TABLE):
-            for item in page.get('Items', []):
-                raw = {k: deserializer.deserialize(v) for k, v in item.items()}
-                products.append(_normalize_product_for_json(raw))
-        _cache_set('all_products_dynamo', products)
-        return products
-    except Exception as e:
-        logger.exception("DynamoDB load_products failed: %s", e)
-        return []
-
-
 def load_products():
     """
-    Load products from DynamoDB (on EC2) or from the JSON file (locally), then resolve image URLs.
-    Results are cached to avoid repeated DynamoDB scans and presigned URL generation.
+    Load catalog products (DynamoDB or JSON, cached by catalog_dao) and resolve
+    image URLs for this site's presentation (S3 vs local /images route).
     """
-    cached = _cache_get('products_with_urls')
-    if cached is not None:
-        return cached
-    if USE_DYNAMODB and DYNAMODB_PRODUCTS_TABLE:
-        products = load_products_from_dynamodb()
-    else:
-        products = load_products_from_json()
-    for product in products:
+    products = []
+    for product in _load_catalog_products():
+        product = dict(product)
         if product.get('image_url'):
             product['image_url'] = get_image_url(product['image_url'])
-    _cache_set('products_with_urls', products)
+        products.append(product)
     return products
 
 
@@ -399,7 +234,6 @@ def health():
 # so every worker starts ready to serve instantly.
 if USE_DYNAMODB and DYNAMODB_PRODUCTS_TABLE:
     try:
-        _get_dynamodb_products_client()
         load_products()
         logger.info("Warm-up complete: DynamoDB client initialized, products cached")
     except Exception as e:

@@ -1,42 +1,6 @@
-output "inventory_api_public_ip" {
-  description = "Public IP address of the inventory API EC2 instance"
-  value       = aws_instance.inventory_api.public_ip
-}
-
-output "inventory_api_public_dns" {
-  description = "Public DNS name of the inventory API EC2 instance"
-  value       = aws_instance.inventory_api.public_dns
-}
-
-output "inventory_api_private_ip" {
-  description = "Private IP address of the inventory API EC2 instance (for internal VPC communication)"
-  value       = aws_instance.inventory_api.private_ip
-}
-
-/* output "s3_bucket_name" {
-  description = "Name of the S3 bucket for build artifacts"
-  value       = aws_s3_bucket.build_artifacts.id
-} */
-
-
-output "inventory_api_url" {
-  description = "Internal URL for the inventory API (accessible from product catalogue instance)"
-  value       = "http://${aws_instance.inventory_api.private_ip}:9000"
-}
-
-output "inventory_api_health_url" {
-  description = "Health check endpoint for inventory API"
-  value       = "http://${aws_instance.inventory_api.private_ip}:9000/health"
-}
-
 output "aws_region" {
   description = "AWS region"
   value       = var.aws_region
-}
-
-output "ec2_key_pair" {
-  description = "EC2 key pair name for SSH access"
-  value       = var.ec2_key_pair
 }
 
 output "name_prefix" {
@@ -45,13 +9,8 @@ output "name_prefix" {
 }
 
 output "iam_role_name" {
-  description = "IAM role used by EC2 instances"
+  description = "IAM role used as the execution/task role for all ECS Fargate services"
   value       = local.iam_role_name
-}
-
-output "iam_instance_profile" {
-  description = "IAM instance profile used by EC2 instances"
-  value       = local.instance_profile_name
 }
 
 output "s3_bucket_name" {

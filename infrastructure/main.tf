@@ -12,17 +12,7 @@
 # 3. AWS CLI: aws configure
 
 provider "aws" {
-    region = var.aws_region
-}
-
-data "aws_ami" "amazon_linux" {
-    most_recent = true
-    owners      = ["amazon"]
-
-    filter {
-        name   = "image-id"
-        values = ["ami-059afa9e3a9c7af0c"]
-    }
+  region = var.aws_region
 }
 
 data "aws_caller_identity" "current" {}

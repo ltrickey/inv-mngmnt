@@ -1,0 +1,49 @@
+version: "3.9"
+
+# Local dev stack — mirrors the ECS Fargate topology without touching AWS.
+# Defaults to each service's local-JSON / no-auth fallback mode (USE_DYNAMODB unset,
+# SKIP_AUTH=1) so `docker compose up` works with zero AWS credentials.
+# Set USE_DYNAMODB=1 + AWS creds/DYNAMODB_*_TABLE env vars to point at real tables instead.
+
+services:
+  inventory-api:
+    build:
+      context: .
+      dockerfile: inventory_api/Dockerfile
+    ports:
+      - "9000:9000"
+    environment:
+      USE_DYNAMODB: ${USE_DYNAMODB:-}
+      DYNAMODB_PRODUCTS_TABLE: ${DYNAMODB_PRODUCTS_TABLE:-}
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+    volumes:
+      - ./seed_data:/app/seed_data:ro
+
+  customer-api:
+    build:
+      context: .
+      dockerfile: customer_site/server/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      USE_DYNAMODB: ${USE_DYNAMODB:-}
+      DYNAMODB_PRODUCTS_TABLE: ${DYNAMODB_PRODUCTS_TABLE:-}
+      INVENTORY_API_BASE_URL: "http://inventory-api:9000"
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+    volumes:
+      - ./seed_data:/app/seed_data:ro
+    depends_on:
+      - inventory-api
+
+  employee-bff:
+    build: ./employee_site/server
+    ports:
+      - "5001:5001"
+    environment:
+      SKIP_AUTH: ${SKIP_AUTH:-1}
+      PRODUCT_CATALOGUE_API_URL: "http://customer-api:8000"
+      INVENTORY_API_URL: "http://inventory-api:9000"
+      AWS_REGION: ${AWS_REGION:-us-east-1}
+    depends_on:
+      - customer-api
+      - inventory-api

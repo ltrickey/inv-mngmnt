@@ -34,8 +34,8 @@ export DOCKER_CONFIG="$DOCKER_TEMP_CONFIG"
 aws ecr get-login-password --region "$AWS_REGION" \
   | docker login --username AWS --password-stdin "${ECR_REPOSITORY_URL%%/*}"
 
-cd "$PROJECT_ROOT/customer_site/server"
-docker build --platform linux/amd64 -t customer-api .
+cd "$PROJECT_ROOT"
+docker build --platform linux/amd64 -f customer_site/server/Dockerfile -t customer-api .
 docker tag customer-api:latest "$ECR_REPOSITORY_URL:latest"
 docker push "$ECR_REPOSITORY_URL:latest"
 

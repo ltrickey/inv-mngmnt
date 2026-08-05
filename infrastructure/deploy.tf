@@ -27,35 +27,33 @@ resource "terraform_data" "upload_images_to_s3" {
   }
 }
 
-# Automatically deploy Inventory API after EC2 instance is created
+# Automatically build/push/deploy the Inventory API container after its ECS
+# infrastructure is ready
 resource "terraform_data" "deploy_inventory_api" {
-  depends_on = [aws_instance.inventory_api]
+  depends_on = [
+    aws_ecr_repository.inventory_api,
+    aws_ecs_cluster.inventory_api,
+    aws_ecs_service.inventory_api,
+  ]
 
   triggers_replace = [
-    aws_instance.inventory_api.id,
-    aws_instance.inventory_api.public_ip
+    aws_ecr_repository.inventory_api.repository_url,
+    aws_ecs_service.inventory_api.id,
   ]
 
   provisioner "local-exec" {
     command = <<-EOT
       set -e
       PROJECT_ROOT="${abspath("${path.module}/..")}"
-      INFRA_DIR="${abspath(path.module)}"
       cd "$PROJECT_ROOT"
-      echo "=========================================="
-      echo "TERRAFORM TRIGGERED DEPLOYMENT - INVENTORY API"
-      echo "=========================================="
-      echo "Making scripts executable..."
-      chmod +x scripts/package_inventory_api.sh scripts/deploy_inventory_api_remote.sh scripts/deploy_inventory_api.sh
+      echo "Making deploy script executable..."
+      chmod +x scripts/deploy_inventory_api.sh
       echo ""
-      echo "Ensuring deploy directory exists..."
-      mkdir -p deploy/inventory_api
-      echo ""
-      echo "Packaging Inventory API..."
-      ./scripts/package_inventory_api.sh
-      echo ""
-      echo "Deploying Inventory API to EC2 instance..."
-      INFRASTRUCTURE_DIR="$INFRA_DIR" ./scripts/deploy_inventory_api_remote.sh
+      ECR_REPOSITORY_URL="${aws_ecr_repository.inventory_api.repository_url}" \
+      AWS_REGION="${var.aws_region}" \
+      ECS_CLUSTER="${aws_ecs_cluster.inventory_api.name}" \
+      ECS_SERVICE="${aws_ecs_service.inventory_api.name}" \
+      ./scripts/deploy_inventory_api.sh
     EOT
   }
 }

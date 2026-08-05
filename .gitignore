@@ -50,5 +50,7 @@ logs/
 # Python bytecode
 __pycache__/
 *.pyc
-.claude
 infrastructure/.terraform.lock.hcl.bak
+
+.dockerignore
+.claude

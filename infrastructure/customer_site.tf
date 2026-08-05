@@ -73,7 +73,7 @@ resource "aws_ecs_task_definition" "customer_api" {
         { name = "USE_DYNAMODB", value = "1" },
         { name = "DYNAMODB_PRODUCTS_TABLE", value = aws_dynamodb_table.products.name },
         { name = "AWS_REGION", value = var.aws_region },
-        { name = "INVENTORY_API_BASE_URL", value = "http://${aws_instance.inventory_api.private_ip}:9000" },
+        { name = "INVENTORY_API_BASE_URL", value = "http://${aws_lb.inventory_api.dns_name}:9000" },
         { name = "S3_BUCKET_URL", value = local.s3_bucket_url },
         { name = "S3_BUCKET_NAME", value = local.s3_bucket_name },
       ]

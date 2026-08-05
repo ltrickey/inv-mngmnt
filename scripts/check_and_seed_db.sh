@@ -15,8 +15,6 @@ echo "=========================================="
 # Get configuration from Terraform
 NAME_PREFIX=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw name_prefix 2>/dev/null || echo "")
 AWS_REGION=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw aws_region 2>/dev/null || echo "us-east-1")
-EC2_PUBLIC_DNS=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw inventory_api_public_dns 2>/dev/null || echo "")
-KEY_PAIR=$(terraform -chdir="$INFRASTRUCTURE_DIR" output -raw ec2_key_pair 2>/dev/null || echo "vockey")
 
 if [ -z "$NAME_PREFIX" ]; then
     echo "Error: Could not get NAME_PREFIX from Terraform"
@@ -98,38 +96,24 @@ else
     echo "✓ All tables have data"
 fi
 
-# Optionally restart Inventory API on EC2 to pick up any changes
-if [ -n "$EC2_PUBLIC_DNS" ]; then
+# Optionally force a fresh ECS deployment to pick up any changes
+if [ -n "$NAME_PREFIX" ]; then
     echo ""
-    read -p "Restart Inventory API service on EC2? (y/n) " -n 1 -r
+    read -p "Force a new Inventory API ECS deployment? (y/n) " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        # Find SSH key
-        SSH_KEY=""
-        if [ -f "$HOME/.ssh/${KEY_PAIR}.pem" ]; then
-            SSH_KEY="$HOME/.ssh/${KEY_PAIR}.pem"
-        elif [ -f "$HOME/.ssh/${KEY_PAIR}" ]; then
-            SSH_KEY="$HOME/.ssh/${KEY_PAIR}"
-        elif [ -f "$INFRASTRUCTURE_DIR/${KEY_PAIR}.pem" ]; then
-            SSH_KEY="$INFRASTRUCTURE_DIR/${KEY_PAIR}.pem"
-        else
-            echo "Error: Could not find SSH key for ${KEY_PAIR}"
-            exit 1
-        fi
-        
-        echo "Restarting Inventory API service..."
-        ssh -i "$SSH_KEY" \
-            -o StrictHostKeyChecking=no \
-            -o UserKnownHostsFile=/dev/null \
-            ec2-user@"$EC2_PUBLIC_DNS" \
-            "sudo systemctl restart inventory_api"
-        
+        echo "Triggering new ECS deployment..."
+        aws ecs update-service \
+            --cluster "${NAME_PREFIX}-inventory-api" \
+            --service "${NAME_PREFIX}-inventory-api" \
+            --force-new-deployment \
+            --region "$AWS_REGION" \
+            --no-cli-pager > /dev/null
+
         if [ $? -eq 0 ]; then
-            echo "✓ Inventory API service restarted"
-            echo ""
-            echo "Inventory API URL: http://$EC2_PUBLIC_DNS:9000"
+            echo "✓ Inventory API ECS deployment triggered"
         else
-            echo "✗ Failed to restart Inventory API service"
+            echo "✗ Failed to trigger ECS deployment"
         fi
     fi
 fi

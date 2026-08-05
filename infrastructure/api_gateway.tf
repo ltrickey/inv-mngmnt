@@ -77,12 +77,15 @@ resource "aws_lb" "inventory_api" {
   })
 }
 
-# Target group for the inventory API EC2 instance
+# Target group for the inventory API ECS Fargate service.
+# target_type "ip" is required for awsvpc-mode Fargate tasks; the ECS service's
+# load_balancer block (in fastapi_site.tf) registers/deregisters task IPs automatically.
 resource "aws_lb_target_group" "inventory_api" {
-  name     = "${local.short_name_prefix}-inv-tg"
-  port     = 9000
-  protocol = "TCP"
-  vpc_id   = data.aws_vpc.default.id
+  name        = "${local.short_name_prefix}-inv-tg"
+  port        = 9000
+  protocol    = "TCP"
+  vpc_id      = data.aws_vpc.default.id
+  target_type = "ip"
 
   health_check {
     enabled             = true
@@ -97,13 +100,6 @@ resource "aws_lb_target_group" "inventory_api" {
   tags = merge(local.common_tags, {
     Name = "${local.name_prefix}-inventory-api-tg"
   })
-}
-
-# Attach EC2 instance to target group
-resource "aws_lb_target_group_attachment" "inventory_api" {
-  target_group_arn = aws_lb_target_group.inventory_api.arn
-  target_id        = aws_instance.inventory_api.id
-  port             = 9000
 }
 
 # Listener for the NLB
@@ -135,15 +131,15 @@ resource "aws_api_gateway_vpc_link" "inventory_api" {
 # ============================================================================
 
 resource "aws_api_gateway_method" "check_stock" {
-  rest_api_id   = aws_api_gateway_rest_api.inventory_api.id
-  resource_id   = aws_api_gateway_resource.item.id
-  http_method   = "GET"
-  authorization = "NONE"
+  rest_api_id      = aws_api_gateway_rest_api.inventory_api.id
+  resource_id      = aws_api_gateway_resource.item.id
+  http_method      = "GET"
+  authorization    = "NONE"
   api_key_required = true
 
   request_parameters = {
-    "method.request.path.store_id" = true
-    "method.request.path.barcode"  = true
+    "method.request.path.store_id"        = true
+    "method.request.path.barcode"         = true
     "method.request.querystring.quantity" = true
   }
 }
@@ -160,9 +156,9 @@ resource "aws_api_gateway_integration" "check_stock" {
   connection_id           = aws_api_gateway_vpc_link.inventory_api.id
 
   request_parameters = {
-    "integration.request.path.store_id"           = "method.request.path.store_id"
-    "integration.request.path.barcode"            = "method.request.path.barcode"
-    "integration.request.querystring.quantity"    = "method.request.querystring.quantity"
+    "integration.request.path.store_id"        = "method.request.path.store_id"
+    "integration.request.path.barcode"         = "method.request.path.barcode"
+    "integration.request.querystring.quantity" = "method.request.querystring.quantity"
   }
 }
 
@@ -171,10 +167,10 @@ resource "aws_api_gateway_integration" "check_stock" {
 # ============================================================================
 
 resource "aws_api_gateway_method" "get_price" {
-  rest_api_id   = aws_api_gateway_rest_api.inventory_api.id
-  resource_id   = aws_api_gateway_resource.price.id
-  http_method   = "GET"
-  authorization = "NONE"
+  rest_api_id      = aws_api_gateway_rest_api.inventory_api.id
+  resource_id      = aws_api_gateway_resource.price.id
+  http_method      = "GET"
+  authorization    = "NONE"
   api_key_required = true
 
   request_parameters = {
@@ -205,10 +201,10 @@ resource "aws_api_gateway_integration" "get_price" {
 # ============================================================================
 
 resource "aws_api_gateway_method" "deduct_single" {
-  rest_api_id   = aws_api_gateway_rest_api.inventory_api.id
-  resource_id   = aws_api_gateway_resource.item.id
-  http_method   = "PATCH"
-  authorization = "NONE"
+  rest_api_id      = aws_api_gateway_rest_api.inventory_api.id
+  resource_id      = aws_api_gateway_resource.item.id
+  http_method      = "PATCH"
+  authorization    = "NONE"
   api_key_required = true
 
   request_parameters = {
@@ -239,10 +235,10 @@ resource "aws_api_gateway_integration" "deduct_single" {
 # ============================================================================
 
 resource "aws_api_gateway_method" "deduct_batch" {
-  rest_api_id   = aws_api_gateway_rest_api.inventory_api.id
-  resource_id   = aws_api_gateway_resource.store.id
-  http_method   = "PATCH"
-  authorization = "NONE"
+  rest_api_id      = aws_api_gateway_rest_api.inventory_api.id
+  resource_id      = aws_api_gateway_resource.store.id
+  http_method      = "PATCH"
+  authorization    = "NONE"
   api_key_required = true
 
   request_parameters = {
@@ -273,28 +269,28 @@ resource "aws_api_gateway_integration" "deduct_batch" {
 # Enable CORS for all endpoints
 module "cors_item" {
   source = "./modules/api_gateway_cors"
-  
+
   api_id          = aws_api_gateway_rest_api.inventory_api.id
   api_resource_id = aws_api_gateway_resource.item.id
-  
+
   depends_on = [aws_api_gateway_resource.item]
 }
 
 module "cors_price" {
   source = "./modules/api_gateway_cors"
-  
+
   api_id          = aws_api_gateway_rest_api.inventory_api.id
   api_resource_id = aws_api_gateway_resource.price.id
-  
+
   depends_on = [aws_api_gateway_resource.price]
 }
 
 module "cors_store" {
   source = "./modules/api_gateway_cors"
-  
+
   api_id          = aws_api_gateway_rest_api.inventory_api.id
   api_resource_id = aws_api_gateway_resource.store.id
-  
+
   depends_on = [aws_api_gateway_resource.store]
 }
 
